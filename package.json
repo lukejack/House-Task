@@ -1,0 +1,37 @@
+{
+  "name": "house-task",
+  "version": "1.0.0",
+  "description": "An application to facilitate house chore distribution",
+  "main": "index.js",
+  "scripts": {
+    "webpack-watch": "webpack -w",
+    "express-server": "node ./server",
+    "dev": "concurrent --kill-others \"npm run webpack-watch\" \"npm run express-server\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Luke Jackson",
+  "license": "ISC",
+  "dependencies": {
+    "babel-loader": "^6.2.10",
+    "babel-register": "^6.18.0",
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "^1.16.0",
+    "connect-flash": "^0.1.1",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.14.0",
+    "express-session": "^1.14.2",
+    "method-override": "^2.3.7",
+    "mongodb": "^2.2.21",
+    "mongoose": "^4.7.7",
+    "morgan": "^1.7.0",
+    "passport": "^0.3.2",
+    "passport-local": "^1.0.0",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2",
+    "react-router": "^3.0.2",
+    "webpack": "^1.14.0"
+  },
+  "devDependencies": {
+    "concurrently": "^3.1.0"
+  }
+}
