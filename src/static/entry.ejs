@@ -1,0 +1,68 @@
+<!DOCTYPE HTML>
+<head>
+</head>
+<body>
+
+<button onclick="showLogin()" id="loginbtn">Log In</button>
+<button onclick="showSignup()" id="signupbtn">Sign Up</button>
+
+<% if (message) { %>
+<p><%= message %></p>
+<% } %>
+
+<form action="/post/login" method="post" id="login" onsubmit="submitForm(this)">
+    <div>
+        <label>Email</label>
+        <input type="text" name="email"/>
+    </div>
+    <div>
+        <label>Password</label>
+        <input type="password" name="password"/>
+    </div>
+    <button type="submit">Submit</button>
+</form>
+<form action="/post/signup" method="post" id="signup" onsubmit="submitForm(this)">
+        <div>
+            <label>First Name</label>
+            <input type="text" name="fname"/>
+        </div>
+        <div>
+            <label>Surname</label>
+            <input type="text" name="lname"/>
+        </div>
+        <div>
+            <label>Email</label>
+            <input type="text" name="email"/>
+        </div>
+        <div>
+            <label>Password</label>
+            <input type="password" name="password"/>
+        </div>
+        <button type="submit">Submit</button>
+        
+    </form>
+    <script>
+        function showLogin(){
+            document.getElementById('login').style.visibility = "visible";
+            document.getElementById('signup').style.visibility = "hidden";
+        }
+        function showSignup(){
+            document.getElementById('signup').style.visibility = "visible";
+            document.getElementById('login').style.visibility = "hidden";
+        }
+        showLogin();
+
+        function submitForm(oFormElement){
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    alert(this.responseText);
+                // Action to be performed when the document is read;
+                }
+            };
+            xhr.open (oFormElement.method, oFormElement.action, true);
+            xhr.send (new FormData (oFormElement));
+            return false;
+        };
+    </script>
+</body>

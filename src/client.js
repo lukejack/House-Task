@@ -3,10 +3,9 @@ import ReactDOM from 'react-dom';
 let tools = require('./clientTools');
 import AppShell from './components/AppShell';
 import HouseCreate from './components/HouseCreate';
-import HouseView from './components/HouseView';
+import HouseView from './components/HouseCreate';
 
 import { Router, Route, hashHistory, Link } from 'react-router';
-
 
 ReactDOM.render((
   <Router history={hashHistory}>

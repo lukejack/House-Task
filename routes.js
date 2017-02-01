@@ -1,5 +1,10 @@
+let House = require('./models/house');
+let User = require('./models/user');
+let Task = require('./models/task');
+let TaskDone = require('./models/taskDone');
 
 module.exports = function(app, passport){
+
 
 //Is the user logged in
 function isLogged(req, res, next){
@@ -16,6 +21,7 @@ function isMember(req, res, next){
 };
 
 //Page routes
+
 app.get('/', function(req, res, next) {
         if (req.isAuthenticated())
                 res.sendFile(__dirname + '/public/index.html');
@@ -30,13 +36,31 @@ app.get('/bundle.js', function(req, res, next) {
                 res.redirect('/login');
 });
 
-app.get('/login', function(req, res, next) {
-        res.sendFile(__dirname + '/src/components/Login.html');
+
+
+/*
+app.get('/socket.io.js', function(req, res, next) {
+        if (req.isAuthenticated()) 
+                res.sendFile(__dirname + '/node_modules/socket.io/node_modules/socket.io-client/dist/socket.io.js');
+        else
+                res.redirect('/login');
 });
 
-app.get('/signup', function(req, res, next) {  
-  res.sendFile(__dirname + '/src/components/SignUp.html');
+app.get('/socket.io.js.map', function(req, res, next) {
+        if (req.isAuthenticated()) 
+                res.sendFile(__dirname + '/node_modules/socket.io/node_modules/socket.io-client/dist/socket.io.js.map');
+        else
+                res.redirect('/login');
+});*/
+
+app.get('/entry.js', function(req, res){
+        res.sendFile(__dirname + '/src/static/entry.js');
 });
+
+app.get('/login', function(req, res, next) {
+        res.render('entry', { message: req.flash('loginMessage') });
+});
+
 
 //JSON request routes
 app.get('/json/user', isLogged, function (req, res){
@@ -44,6 +68,21 @@ app.get('/json/user', isLogged, function (req, res){
                 {email: req.user.email,
                  fname: req.user.fname,
                  lname: req.user.lname});
+});
+
+app.get('/json/getuser/:email', isLogged, function(req, res){
+        User.findOne({'email' : req.params.email}, (err, user)=>{
+                if (err)
+                        res.send({error: 'Error'});
+                if (!user)
+                
+                        res.send({exists: false});
+                else
+                        res.send({exists: true,
+                                fname: user.fname,
+                                lname: user.lname});
+                        
+        });
 });
 
 app.get('/json/houses', isLogged, function (req, res){
@@ -139,11 +178,15 @@ app.post('/post/newtask', function(req, res){ //UNTESTED
         } else res.reditect('/login');
 });
 
-app.post('/post/signup', passport.authenticate('local-signup', {
+app.post('/post/signup',passport.authenticate('local-signup', {
         successRedirect : '/', // redirect to the secure profile section
-        failureRedirect : '/signup', // redirect back to the signup page if there is an error
+        failureRedirect : '/login', // redirect back to the signup page if there is an error
         failureFlash : true // allow flash messages
 }));
+
+/*
+app.post('/post/test', (req, res, next)=>{
+});*/
 
 app.post('/post/login',passport.authenticate('local-login', {
         successRedirect : '/', // redirect to the home section

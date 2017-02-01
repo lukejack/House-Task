@@ -5,9 +5,11 @@ class AppShell extends React.Component{
     constructor(props){
         super(props);
         this.state = {
-          fname: 'waiting',
-          lname: 'waiting',
-          email: 'waiting',
+          fname: '...',
+          lname: '...',
+          email: '...',
+          houses: [],
+          hasHouses: true,
           error: false
         }
 
@@ -16,10 +18,6 @@ class AppShell extends React.Component{
     }
 
     componentDidMount(){
-      /*
-      this.setState((prevState, props) => {return {
-        fname: 'Yadad'
-           }}); */
 
       tools.get('/json/user', this, function (data, stateRef){
           stateRef.setState((prevState, props) => {return {
@@ -29,30 +27,62 @@ class AppShell extends React.Component{
             error: data.error
           }});
         });
+
+        tools.get('/json/houses', this, function (data, stateRef){
+          if (!data.houses)
+          {
+            stateRef.setState({hasHouses: false});
+          }
+          stateRef.setState((prevState, props) => {return {
+            houses: data.houses
+          }});
+
+        });
+
     }
 
     componentWillUnmount(){
     }  
 
     render(){
-      let topBarStyle = {
-        width: '100%',
-        backgroundColor: "#ffde00",
-        color: "#333",
-        fontFamily: "monospace",
-        fontSize: "32",
-        textAlign: "center"
-      };
-
+        let housesList = this.state.houses.map((house)=><option>{house}</option>);
         return (
           this.state.error ? 
             <a href='/login'>Log in to view this page</a> :
-          <div>
-            <div style={topBarStyle}>
-              {'Logged in as ' + this.state.fname + ' ' + this.state.lname}
+            <div className='container'>
+              <div className='row'>
+                <button className='four columns'>
+                  Task+
+                </button>
+                <button className='four columns'>
+                  My Stats
+                </button>
+                <button className='four columns'>
+                  House Stats
+                </button>
+              </div>
+              
+              {/*FIX THIS AS IT WORKS AND I DONT KNOW WHY*/}
+              <div>{this.state.hasHouses ? this.props.children : <link to={'/create'}>You arent a member of any houses, click here to create one</link>}</div>
+              <div className='row'>
+                <h5 className='two columns'>
+                  House:
+                </h5>
+                <select name='houses' className='four columns'>
+                  {housesList}
+                </select>
+                <div className='three columns'>
+                  <h5>
+                    {this.state.fname} {this.state.lname}
+                  </h5>
+                </div>
+                <div className='three columns'>
+                  <button>
+                    Logout
+                  </button>
+                </div>
+              </div>
             </div>
-            <a>{this.props.children}</a>
-          </div>
         );
     }
 }
