@@ -1,7 +1,7 @@
 import React from 'react';
 let tools = require('../clientTools');
 
-class HC_members extends React.Component{
+class HC_tasks extends React.Component{
     constructor(props){
         super(props);
 
@@ -30,7 +30,7 @@ class HC_members extends React.Component{
     }
 
     submit(){
-        
+        this.setState({userExists: true});
         tools.get('/json/getuser/' + this.state.currentInput, this, function(data, stateRef){
             if (data.exists == false)
             {
@@ -38,7 +38,6 @@ class HC_members extends React.Component{
             }
             else
                 {
-                    stateRef.setState({userExists: true});
                     stateRef.setState((prevState, props)=>{
                         let currentMembers = prevState.membersToAdd;
                         currentMembers.push({email: prevState.currentInput, fname: data.fname, lname: data.lname});
@@ -68,7 +67,7 @@ class HC_members extends React.Component{
         let memberNames = this.state.membersToAdd.map((member)=><h4>{member.fname + ' ' + member.lname}</h4>);
         return(
             <div>
-                
+                <div>{this.state.userExists ? '' : 'User ' + this.state.lastFailed + ' does not exist'}</div>
                 <h2>House creation - {this.state.houseName}</h2>
                 <h3>
                     Add people to this house
@@ -78,11 +77,10 @@ class HC_members extends React.Component{
                     User's email: 
                     <input type="text" onChange={this.handleChange} value={this.state.currentInput} onKeyPress={this.handleKeyPress} ref={(input)=>{this.field = input;}}/>
                 <button type="submit" onClick={this.submit}>Submit</button>
-                <div>{this.state.userExists ? '' : 'User ' + this.state.lastFailed + ' does not exist'}</div>
                 </label>
                 <button type="submit" onClick={this.next}>Next</button>
             </div>);
     }
 }
 
-export default HC_members;
+export default HC_tasks;

@@ -1,6 +1,7 @@
 import React from 'react';
 import HC_name from './HC_name';
 import HC_members from './HC_members';
+import HC_tasls from './HC_tasks';
 
 
 class HouseCreate extends React.Component {
@@ -48,6 +49,9 @@ class HouseCreate extends React.Component {
                     break;
                 case 1:
                     currentStep = <HC_members houseName={this.state.houseName} incrementStep={this.incrementStep} setMembers={this.setMembers}/>
+                    break;
+                case 2:
+                    currentStep = <HC_members houseName={this.state.houseName} incrementStep={this.incrementStep}/>
                     break;
                 default:
                     currentStep = <p>Illegal step</p>

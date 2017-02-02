@@ -1,6 +1,6 @@
 function get(URL, stateRef,callback){
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", URL,true);
+    xhr.open("GET", URL, true);
     // register the event handler
     xhr.addEventListener('load',function(){
       if(xhr.status === 200){

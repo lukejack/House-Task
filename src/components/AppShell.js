@@ -1,4 +1,6 @@
 import React from 'react';
+import {Link} from 'react-router';
+import HouseCreate from './HouseCreate';
 let tools = require('../clientTools');
 
 class AppShell extends React.Component{
@@ -9,7 +11,6 @@ class AppShell extends React.Component{
           lname: '...',
           email: '...',
           houses: [],
-          hasHouses: true,
           error: false
         }
 
@@ -23,20 +24,14 @@ class AppShell extends React.Component{
           stateRef.setState((prevState, props) => {return {
             fname: data.fname,
             lname: data.lname,
-            email: data.email,
-            error: data.error
+            email: data.email
           }});
         });
 
         tools.get('/json/houses', this, function (data, stateRef){
-          if (!data.houses)
-          {
-            stateRef.setState({hasHouses: false});
-          }
-          stateRef.setState((prevState, props) => {return {
-            houses: data.houses
-          }});
-
+            stateRef.setState((prevState, props) => {return {
+              houses: data.houses
+            }});
         });
 
     }
@@ -46,6 +41,8 @@ class AppShell extends React.Component{
 
     render(){
         let housesList = this.state.houses.map((house)=><option>{house}</option>);
+        let hasHouses = (this.state.houses.length != 0);
+
         return (
           this.state.error ? 
             <a href='/login'>Log in to view this page</a> :
@@ -61,9 +58,9 @@ class AppShell extends React.Component{
                   House Stats
                 </button>
               </div>
-              
-              {/*FIX THIS AS IT WORKS AND I DONT KNOW WHY*/}
-              <div>{this.state.hasHouses ? this.props.children : <link to={'/create'}>You arent a member of any houses, click here to create one</link>}</div>
+              <div className='innerComponent'>
+              {hasHouses ? this.props.children : <HouseCreate/>}
+              </div>
               <div className='row'>
                 <h5 className='two columns'>
                   House:
