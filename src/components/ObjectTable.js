@@ -32,6 +32,7 @@ class ObjectTable extends React.Component{
                 <thead>
                     <tr>
                         {headings}
+                        <th>remove</th>
                     </tr>
                 </thead>
                 <tbody>

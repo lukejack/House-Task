@@ -64,7 +64,6 @@ app.get('/login', function(req, res, next) {
 
 //JSON request routes
 app.get('/json/user', isLogged, function (req, res){
-        console.log(req.user);
         res.send(
                 {email: req.user.email,
                  fname: req.user.fname,

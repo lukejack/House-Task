@@ -1,5 +1,12 @@
 import React from 'react';
 let tools = require('../clientTools');
+import ObjectTable from './ObjectTable';
+
+let id = 0;
+
+function genId(){
+    return id++;
+}
 
 class HC_members extends React.Component{
     constructor(props){
@@ -19,6 +26,7 @@ class HC_members extends React.Component{
         this.submit = this.submit.bind(this);
         this.next = this.next.bind(this);
         this.undo = this.undo.bind(this);
+        this.deleteMember = this.deleteMember.bind(this);
     }
 
     handleChange(event){
@@ -45,7 +53,7 @@ class HC_members extends React.Component{
                 {
                     stateRef.setState((prevState, props)=>{
                         let currentMembers = prevState.membersToAdd;
-                        currentMembers.push({email: prevState.currentInput, fname: data.fname, lname: data.lname});
+                        currentMembers.push({email: prevState.currentInput, fname: data.fname, lname: data.lname, id: genId()});
                         
                         return {
                             membersToAdd: currentMembers,
@@ -75,9 +83,24 @@ class HC_members extends React.Component{
         }});
     }
 
+    deleteMember(id){
+        this.setState((prevState, props)=>{
+            let i = prevState.membersToAdd.length;
+            let newMembers = prevState.membersToAdd;
+            while (i--){
+                if (prevState.membersToAdd[i].id === id){
+                    newMembers.splice(i, 1);
+                }
+            }
+            return {
+                membersToAdd: newMembers
+            };
+        });
+    }
+
     render(){
         
-        let memberNames = this.state.membersToAdd.map((member)=><h4 key={member.fname}>{member.fname + ' ' + member.lname}</h4>);
+
         let errorMessage;
 
         if (this.state.error) {
@@ -85,7 +108,6 @@ class HC_members extends React.Component{
         } else
             errorMessage = '';
         
-        let undoButton = this.state.membersToAdd != [] ? <button type="submit" onClick={this.undo}>Undo</button> : <div></div>;
         return(
             <div>
                 
@@ -96,12 +118,12 @@ class HC_members extends React.Component{
                 <h5>
                     (You can add more later)
                 </h5>
-                {memberNames}
+                <ObjectTable items={this.state.membersToAdd} headings={['fname', 'email']} delete={(id)=>this.deleteMember(id)}/>
                 <label>
                     User's email: 
                     <input type="text" onChange={this.handleChange} value={this.state.currentInput} onKeyPress={this.handleKeyPress} ref={(input)=>{this.field = input;}}/>
                 <button type="submit" onClick={this.submit}>Submit</button>
-                {undoButton}
+                
                 <div>{errorMessage}</div>
                 </label>
                 <button type="submit" onClick={this.next}>Next</button>

@@ -66,7 +66,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var tools = __webpack_require__(323);
+	var tools = __webpack_require__(325);
 
 
 	_reactDom2.default.render(_react2.default.createElement(
@@ -21556,7 +21556,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var tools = __webpack_require__(323);
+	var tools = __webpack_require__(325);
 
 	var AppShell = function (_React$Component) {
 	  (0, _inherits3.default)(AppShell, _React$Component);
@@ -28293,7 +28293,7 @@
 
 	var _HC_members2 = _interopRequireDefault(_HC_members);
 
-	var _HC_tasks = __webpack_require__(324);
+	var _HC_tasks = __webpack_require__(326);
 
 	var _HC_tasks2 = _interopRequireDefault(_HC_tasks);
 
@@ -28524,9 +28524,20 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _ObjectTable = __webpack_require__(323);
+
+	var _ObjectTable2 = _interopRequireDefault(_ObjectTable);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var tools = __webpack_require__(323);
+	var tools = __webpack_require__(325);
+
+
+	var id = 0;
+
+	function genId() {
+	    return id++;
+	}
 
 	var HC_members = function (_React$Component) {
 	    (0, _inherits3.default)(HC_members, _React$Component);
@@ -28550,6 +28561,7 @@
 	        _this.submit = _this.submit.bind(_this);
 	        _this.next = _this.next.bind(_this);
 	        _this.undo = _this.undo.bind(_this);
+	        _this.deleteMember = _this.deleteMember.bind(_this);
 	        return _this;
 	    }
 
@@ -28580,7 +28592,7 @@
 	                });else {
 	                    stateRef.setState(function (prevState, props) {
 	                        var currentMembers = prevState.membersToAdd;
-	                        currentMembers.push({ email: prevState.currentInput, fname: data.fname, lname: data.lname });
+	                        currentMembers.push({ email: prevState.currentInput, fname: data.fname, lname: data.lname, id: genId() });
 
 	                        return {
 	                            membersToAdd: currentMembers,
@@ -28614,28 +28626,32 @@
 	            });
 	        }
 	    }, {
+	        key: 'deleteMember',
+	        value: function deleteMember(id) {
+	            this.setState(function (prevState, props) {
+	                var i = prevState.membersToAdd.length;
+	                var newMembers = prevState.membersToAdd;
+	                while (i--) {
+	                    if (prevState.membersToAdd[i].id === id) {
+	                        newMembers.splice(i, 1);
+	                    }
+	                }
+	                return {
+	                    membersToAdd: newMembers
+	                };
+	            });
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
 	            var _this2 = this;
 
-	            var memberNames = this.state.membersToAdd.map(function (member) {
-	                return _react2.default.createElement(
-	                    'h4',
-	                    { key: member.fname },
-	                    member.fname + ' ' + member.lname
-	                );
-	            });
 	            var errorMessage = void 0;
 
 	            if (this.state.error) {
 	                errorMessage = this.state.error;
 	            } else errorMessage = '';
 
-	            var undoButton = this.state.membersToAdd != [] ? _react2.default.createElement(
-	                'button',
-	                { type: 'submit', onClick: this.undo },
-	                'Undo'
-	            ) : _react2.default.createElement('div', null);
 	            return _react2.default.createElement(
 	                'div',
 	                null,
@@ -28655,7 +28671,9 @@
 	                    null,
 	                    '(You can add more later)'
 	                ),
-	                memberNames,
+	                _react2.default.createElement(_ObjectTable2.default, { items: this.state.membersToAdd, headings: ['fname', 'email'], 'delete': function _delete(id) {
+	                        return _this2.deleteMember(id);
+	                    } }),
 	                _react2.default.createElement(
 	                    'label',
 	                    null,
@@ -28668,7 +28686,6 @@
 	                        { type: 'submit', onClick: this.submit },
 	                        'Submit'
 	                    ),
-	                    undoButton,
 	                    _react2.default.createElement(
 	                        'div',
 	                        null,
@@ -28690,23 +28707,113 @@
 
 /***/ },
 /* 323 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
-	function get(URL, stateRef, callback) {
-	  var xhr = new XMLHttpRequest();
-	  xhr.open("GET", URL, true);
-	  // register the event handler
-	  xhr.addEventListener('load', function () {
-	    if (xhr.status === 200) {
-	      callback(JSON.parse(xhr.response), stateRef);
-	    }
-	  }, false);
-	  xhr.send();
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _getPrototypeOf = __webpack_require__(179);
+
+	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+
+	var _classCallCheck2 = __webpack_require__(205);
+
+	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+	var _createClass2 = __webpack_require__(206);
+
+	var _createClass3 = _interopRequireDefault(_createClass2);
+
+	var _possibleConstructorReturn2 = __webpack_require__(210);
+
+	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+	var _inherits2 = __webpack_require__(257);
+
+	var _inherits3 = _interopRequireDefault(_inherits2);
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _ObjectRow = __webpack_require__(324);
+
+	var _ObjectRow2 = _interopRequireDefault(_ObjectRow);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var id = 0;
+
+	function genId() {
+	    return id++;
 	}
 
-	module.exports = { get: get };
+	var ObjectTable = function (_React$Component) {
+	    (0, _inherits3.default)(ObjectTable, _React$Component);
+
+	    function ObjectTable(props) {
+	        (0, _classCallCheck3.default)(this, ObjectTable);
+
+	        var _this = (0, _possibleConstructorReturn3.default)(this, (ObjectTable.__proto__ || (0, _getPrototypeOf2.default)(ObjectTable)).call(this, props));
+
+	        _this.state = {};
+
+	        _this.componentDidMount = _this.componentDidMount.bind(_this);
+	        return _this;
+	    }
+
+	    (0, _createClass3.default)(ObjectTable, [{
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {}
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var _this2 = this;
+
+	            var itemList = this.props.items ? this.props.items.map(function (item) {
+	                return _react2.default.createElement(_ObjectRow2.default, { key: genId(), item: item, headings: _this2.props.headings, removeThis: function removeThis(id) {
+	                        return _this2.props.delete(id);
+	                    } });
+	            }) : _react2.default.createElement('tr', null);
+	            var headings = this.props.headings.map(function (heading) {
+	                return _react2.default.createElement(
+	                    'th',
+	                    { key: genId() },
+	                    heading
+	                );
+	            });
+	            return _react2.default.createElement(
+	                'table',
+	                { className: 'u-full-width' },
+	                _react2.default.createElement(
+	                    'thead',
+	                    null,
+	                    _react2.default.createElement(
+	                        'tr',
+	                        null,
+	                        headings,
+	                        _react2.default.createElement(
+	                            'th',
+	                            null,
+	                            'remove'
+	                        )
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    'tbody',
+	                    null,
+	                    itemList
+	                )
+	            );
+	        }
+	    }]);
+	    return ObjectTable;
+	}(_react2.default.Component);
+
+	exports.default = ObjectTable;
 
 /***/ },
 /* 324 */
@@ -28742,11 +28849,137 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactBootstrapSlider = __webpack_require__(325);
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var id = 0;
+
+	function genId() {
+	    return id++;
+	}
+
+	var ObjectRow = function (_React$Component) {
+	    (0, _inherits3.default)(ObjectRow, _React$Component);
+
+	    function ObjectRow(props) {
+	        (0, _classCallCheck3.default)(this, ObjectRow);
+
+	        var _this = (0, _possibleConstructorReturn3.default)(this, (ObjectRow.__proto__ || (0, _getPrototypeOf2.default)(ObjectRow)).call(this, props));
+
+	        _this.state = {
+	            item: props.item,
+	            headings: props.headings
+	        };
+
+	        _this.componentDidMount = _this.componentDidMount.bind(_this);
+	        _this.remove = _this.remove.bind(_this);
+	        return _this;
+	    }
+
+	    (0, _createClass3.default)(ObjectRow, [{
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {}
+	    }, {
+	        key: 'remove',
+	        value: function remove() {
+	            console.log('rows remove called');
+	            this.props.removeThis(this.state.item.id);
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var _this2 = this;
+
+	            var rowItems = [];
+	            for (var i = 0; i < this.state.headings.length; i++) {
+	                rowItems.push(_react2.default.createElement(
+	                    'td',
+	                    { key: genId() },
+	                    this.state.item[this.state.headings[i]]
+	                ));
+	            }
+
+	            return _react2.default.createElement(
+	                'tr',
+	                null,
+	                rowItems,
+	                _react2.default.createElement(
+	                    'td',
+	                    null,
+	                    _react2.default.createElement(
+	                        'button',
+	                        { type: 'submit', onClick: function onClick() {
+	                                return _this2.remove();
+	                            } },
+	                        'X'
+	                    )
+	                )
+	            );
+	        }
+	    }]);
+	    return ObjectRow;
+	}(_react2.default.Component);
+
+	exports.default = ObjectRow;
+
+/***/ },
+/* 325 */
+/***/ function(module, exports) {
+
+	"use strict";
+
+	function get(URL, stateRef, callback) {
+	  var xhr = new XMLHttpRequest();
+	  xhr.open("GET", URL, true);
+	  // register the event handler
+	  xhr.addEventListener('load', function () {
+	    if (xhr.status === 200) {
+	      callback(JSON.parse(xhr.response), stateRef);
+	    }
+	  }, false);
+	  xhr.send();
+	}
+
+	module.exports = { get: get };
+
+/***/ },
+/* 326 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _getPrototypeOf = __webpack_require__(179);
+
+	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+
+	var _classCallCheck2 = __webpack_require__(205);
+
+	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+	var _createClass2 = __webpack_require__(206);
+
+	var _createClass3 = _interopRequireDefault(_createClass2);
+
+	var _possibleConstructorReturn2 = __webpack_require__(210);
+
+	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+	var _inherits2 = __webpack_require__(257);
+
+	var _inherits3 = _interopRequireDefault(_inherits2);
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactBootstrapSlider = __webpack_require__(327);
 
 	var _reactBootstrapSlider2 = _interopRequireDefault(_reactBootstrapSlider);
 
-	var _ObjectTable = __webpack_require__(330);
+	var _ObjectTable = __webpack_require__(323);
 
 	var _ObjectTable2 = _interopRequireDefault(_ObjectTable);
 
@@ -28937,12 +29170,12 @@
 	exports.default = HC_tasks;
 
 /***/ },
-/* 325 */
+/* 327 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
 	    if (true) {
-	        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1), __webpack_require__(326), __webpack_require__(328)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1), __webpack_require__(328), __webpack_require__(330)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 	    } else if (typeof exports !== "undefined") {
 	        factory(exports, require("react"), require("bootstrap-slider"), require("es6bindall"));
 	    } else {
@@ -29153,7 +29386,7 @@
 
 
 /***/ },
-/* 326 */
+/* 328 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*! =======================================================
@@ -29211,7 +29444,7 @@
 
 	(function (factory) {
 		if (true) {
-			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(327)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(329)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 		} else if ((typeof module === "undefined" ? "undefined" : _typeof(module)) === "object" && module.exports) {
 			var jQuery;
 			try {
@@ -31049,7 +31282,7 @@
 
 
 /***/ },
-/* 327 */
+/* 329 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -41275,7 +41508,7 @@
 
 
 /***/ },
-/* 328 */
+/* 330 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
@@ -41324,217 +41557,6 @@
 	  module.exports = exports["default"];
 	});
 
-
-/***/ },
-/* 329 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _getPrototypeOf = __webpack_require__(179);
-
-	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
-
-	var _classCallCheck2 = __webpack_require__(205);
-
-	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-	var _createClass2 = __webpack_require__(206);
-
-	var _createClass3 = _interopRequireDefault(_createClass2);
-
-	var _possibleConstructorReturn2 = __webpack_require__(210);
-
-	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
-
-	var _inherits2 = __webpack_require__(257);
-
-	var _inherits3 = _interopRequireDefault(_inherits2);
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var id = 0;
-
-	function genId() {
-	    return id++;
-	}
-
-	var ObjectRow = function (_React$Component) {
-	    (0, _inherits3.default)(ObjectRow, _React$Component);
-
-	    function ObjectRow(props) {
-	        (0, _classCallCheck3.default)(this, ObjectRow);
-
-	        var _this = (0, _possibleConstructorReturn3.default)(this, (ObjectRow.__proto__ || (0, _getPrototypeOf2.default)(ObjectRow)).call(this, props));
-
-	        _this.state = {
-	            item: props.item,
-	            headings: props.headings
-	        };
-
-	        _this.componentDidMount = _this.componentDidMount.bind(_this);
-	        _this.remove = _this.remove.bind(_this);
-	        return _this;
-	    }
-
-	    (0, _createClass3.default)(ObjectRow, [{
-	        key: 'componentDidMount',
-	        value: function componentDidMount() {}
-	    }, {
-	        key: 'remove',
-	        value: function remove() {
-	            console.log('rows remove called');
-	            this.props.removeThis(this.state.item.id);
-	        }
-	    }, {
-	        key: 'render',
-	        value: function render() {
-	            var _this2 = this;
-
-	            var rowItems = [];
-	            for (var i = 0; i < this.state.headings.length; i++) {
-	                rowItems.push(_react2.default.createElement(
-	                    'td',
-	                    { key: genId() },
-	                    this.state.item[this.state.headings[i]]
-	                ));
-	            }
-
-	            return _react2.default.createElement(
-	                'tr',
-	                null,
-	                rowItems,
-	                _react2.default.createElement(
-	                    'td',
-	                    null,
-	                    _react2.default.createElement(
-	                        'button',
-	                        { type: 'submit', onClick: function onClick() {
-	                                return _this2.remove();
-	                            } },
-	                        'X'
-	                    )
-	                )
-	            );
-	        }
-	    }]);
-	    return ObjectRow;
-	}(_react2.default.Component);
-
-	exports.default = ObjectRow;
-
-/***/ },
-/* 330 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _getPrototypeOf = __webpack_require__(179);
-
-	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
-
-	var _classCallCheck2 = __webpack_require__(205);
-
-	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-	var _createClass2 = __webpack_require__(206);
-
-	var _createClass3 = _interopRequireDefault(_createClass2);
-
-	var _possibleConstructorReturn2 = __webpack_require__(210);
-
-	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
-
-	var _inherits2 = __webpack_require__(257);
-
-	var _inherits3 = _interopRequireDefault(_inherits2);
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _ObjectRow = __webpack_require__(329);
-
-	var _ObjectRow2 = _interopRequireDefault(_ObjectRow);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var id = 0;
-
-	function genId() {
-	    return id++;
-	}
-
-	var ObjectTable = function (_React$Component) {
-	    (0, _inherits3.default)(ObjectTable, _React$Component);
-
-	    function ObjectTable(props) {
-	        (0, _classCallCheck3.default)(this, ObjectTable);
-
-	        var _this = (0, _possibleConstructorReturn3.default)(this, (ObjectTable.__proto__ || (0, _getPrototypeOf2.default)(ObjectTable)).call(this, props));
-
-	        _this.state = {};
-
-	        _this.componentDidMount = _this.componentDidMount.bind(_this);
-	        return _this;
-	    }
-
-	    (0, _createClass3.default)(ObjectTable, [{
-	        key: 'componentDidMount',
-	        value: function componentDidMount() {}
-	    }, {
-	        key: 'render',
-	        value: function render() {
-	            var _this2 = this;
-
-	            var itemList = this.props.items ? this.props.items.map(function (item) {
-	                return _react2.default.createElement(_ObjectRow2.default, { key: genId(), item: item, headings: _this2.props.headings, removeThis: function removeThis(id) {
-	                        return _this2.props.delete(id);
-	                    } });
-	            }) : _react2.default.createElement('tr', null);
-	            var headings = this.props.headings.map(function (heading) {
-	                return _react2.default.createElement(
-	                    'th',
-	                    { key: genId() },
-	                    heading
-	                );
-	            });
-	            return _react2.default.createElement(
-	                'table',
-	                { className: 'u-full-width' },
-	                _react2.default.createElement(
-	                    'thead',
-	                    null,
-	                    _react2.default.createElement(
-	                        'tr',
-	                        null,
-	                        headings
-	                    )
-	                ),
-	                _react2.default.createElement(
-	                    'tbody',
-	                    null,
-	                    itemList
-	                )
-	            );
-	        }
-	    }]);
-	    return ObjectTable;
-	}(_react2.default.Component);
-
-	exports.default = ObjectTable;
 
 /***/ }
 /******/ ]);
