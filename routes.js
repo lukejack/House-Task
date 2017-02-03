@@ -76,10 +76,11 @@ app.get('/json/getuser/:email', isLogged, function(req, res){
                 if (err)
                         res.send({error: 'Error'});
                 if (!user)
-                
-                        res.send({exists: false});
+                        res.send({error: 'User ' + req.params.email + ' does not exist.'});
+                else if (req.params.email == req.user.email)
+                        res.send({error: 'Current user is that user'})
                 else
-                        res.send({exists: true,
+                        res.send({error: false,
                                 fname: user.fname,
                                 lname: user.lname});
                         

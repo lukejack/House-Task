@@ -1,7 +1,7 @@
 import React from 'react';
 import HC_name from './HC_name';
 import HC_members from './HC_members';
-import HC_tasls from './HC_tasks';
+import HC_tasks from './HC_tasks';
 
 
 class HouseCreate extends React.Component {
@@ -13,6 +13,7 @@ class HouseCreate extends React.Component {
             houseName: '',
             members: []
         };
+
         this.incrementStep = this.incrementStep.bind(this);
         this.setHouseName = this.setHouseName.bind(this);
         this.setMembers = this.setMembers.bind(this);
@@ -24,7 +25,6 @@ class HouseCreate extends React.Component {
                 step: prevState.step + 1
             }
         });
-        console.log(this.state.step);
     }
 
     setHouseName(name){
@@ -33,12 +33,10 @@ class HouseCreate extends React.Component {
                 houseName: name
             }
         });
-        console.log(name);
     }
 
     setMembers(members){
         this.setState((prevState, props)=>{return {members: members}});
-        console.log(members);
     }
 
    render() {
@@ -51,7 +49,7 @@ class HouseCreate extends React.Component {
                     currentStep = <HC_members houseName={this.state.houseName} incrementStep={this.incrementStep} setMembers={this.setMembers}/>
                     break;
                 case 2:
-                    currentStep = <HC_members houseName={this.state.houseName} incrementStep={this.incrementStep}/>
+                    currentStep = <HC_tasks houseName={this.state.houseName} incrementStep={this.incrementStep}/>
                     break;
                 default:
                     currentStep = <p>Illegal step</p>

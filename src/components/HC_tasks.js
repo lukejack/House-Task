@@ -1,22 +1,37 @@
 import React from 'react';
-let tools = require('../clientTools');
+import ReactBootstrapSlider from 'react-bootstrap-slider';
+import ObjectTable from './ObjectTable';
+
+//let tools = require('../clientTools');
+
+
+
+let id = 0;
+function genId(){
+    return id++;
+}
 
 class HC_tasks extends React.Component{
     constructor(props){
         super(props);
 
-        this.state = {
-            houseName: this.props.houseName,
-            currentInput: '',
-            membersToAdd: [],
-            userExists: true,
-            field: ''
-        };
+        
 
         this.handleChange = this.handleChange.bind(this);
         this.handleKeyPress = this.handleKeyPress.bind(this);
         this.submit = this.submit.bind(this);
         this.next = this.next.bind(this);
+        this.sliderChanged = this.sliderChanged.bind(this);
+        this.deleteTask = this.deleteTask.bind(this);
+
+        this.state = {
+            currentInput: '',
+            error: false,
+            tasksToAdd: [],
+            currentDifficulty: 5,
+            field: '',
+            deleteTask: this.deleteTask
+        };
     }
 
     handleChange(event){
@@ -30,24 +45,44 @@ class HC_tasks extends React.Component{
     }
 
     submit(){
-        this.setState({userExists: true});
-        tools.get('/json/getuser/' + this.state.currentInput, this, function(data, stateRef){
-            if (data.exists == false)
-            {
-                stateRef.setState((prevState, props)=>{return {userExists: false, lastFailed: prevState.currentInput}});
-            }
-            else
-                {
-                    stateRef.setState((prevState, props)=>{
-                        let currentMembers = prevState.membersToAdd;
-                        currentMembers.push({email: prevState.currentInput, fname: data.fname, lname: data.lname});
-                        
-                        return {
-                            membersToAdd: currentMembers
-                        }
-                    });
-                    stateRef.setState({currentInput : ''})
+        if (this.state.currentInput == '')
+        {
+            this.setState({
+                error: 'There is no text in the box'
+            });
+        } else {
+            //Add to structure here
+            this.setState((prevState, props)=>{
+                let thisTask = {
+                    name: prevState.currentInput,
+                    difficulty: prevState.currentDifficulty,
+                    id: genId()
+                };
+                let lastTasks = prevState.tasksToAdd;
+                lastTasks.push(thisTask)
+
+                return {
+                    tasksToAdd: lastTasks
                 }
+            }
+            );
+            this.setState({currentInput : '', currentDifficulty: 5});
+        }
+    }
+
+    
+    deleteTask(taskId){
+        this.setState((prevState, props)=>{
+            let i = prevState.tasksToAdd.length;
+            let newTasks = prevState.tasksToAdd;
+            while (i--){
+                if (prevState.tasksToAdd[i].id === taskId){
+                    newTasks.splice(i, 1);
+                }
+            }
+            return {
+                tasksToAdd: newTasks
+            };
         });
     }
 
@@ -57,28 +92,59 @@ class HC_tasks extends React.Component{
         }
     }
 
+    sliderChanged(input){
+        this.setState({currentDifficulty: input.target.value});
+    }
+
     next(){
         this.props.incrementStep();
-        this.props.setMembers(this.state.membersToAdd);
+        //Need setTasks method of parent
     }
 
     render(){
+        let errorMessage;
+        if (this.state.error) {
+            errorMessage = this.state.error;
+        } else
+            errorMessage = '';
+
         
-        let memberNames = this.state.membersToAdd.map((member)=><h4>{member.fname + ' ' + member.lname}</h4>);
+
         return(
             <div>
-                <div>{this.state.userExists ? '' : 'User ' + this.state.lastFailed + ' does not exist'}</div>
-                <h2>House creation - {this.state.houseName}</h2>
+                <h2>House creation - {this.props.houseName}</h2>
                 <h3>
-                    Add people to this house
+                    Create some tasks for your house
                 </h3>
-                {memberNames}
+                <h5>
+                    You can add more later
+                </h5>
+
+                <ObjectTable items={this.state.tasksToAdd} headings={['name', 'difficulty']} delete={(id)=>this.deleteTask(id)}/>
+                
                 <label>
-                    User's email: 
+                    Task name: 
                     <input type="text" onChange={this.handleChange} value={this.state.currentInput} onKeyPress={this.handleKeyPress} ref={(input)=>{this.field = input;}}/>
-                <button type="submit" onClick={this.submit}>Submit</button>
                 </label>
+                <label>
+                    Difficulty: {this.state.currentDifficulty}
+                <ReactBootstrapSlider
+                    value={this.state.currentDifficulty}
+                    change={this.sliderChanged}
+                    step={1}
+                    max={10}
+                    min={0}
+                    orientation="horizontal"
+                />
+                    
+                </label>
+                <div>{errorMessage}</div>
+                <button type="submit" onClick={this.submit}>Submit</button>
                 <button type="submit" onClick={this.next}>Next</button>
+
+                
+
+
             </div>);
     }
 }

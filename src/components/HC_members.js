@@ -10,6 +10,7 @@ class HC_members extends React.Component{
             currentInput: '',
             membersToAdd: [],
             userExists: true,
+            error: false,
             field: ''
         };
 
@@ -17,6 +18,7 @@ class HC_members extends React.Component{
         this.handleKeyPress = this.handleKeyPress.bind(this);
         this.submit = this.submit.bind(this);
         this.next = this.next.bind(this);
+        this.undo = this.undo.bind(this);
     }
 
     handleChange(event){
@@ -30,21 +32,24 @@ class HC_members extends React.Component{
     }
 
     submit(){
-        
+        if (this.state.currentInput == '')
+        {
+            this.setState({
+                error: 'There is no text in the box'
+            });
+        } else
         tools.get('/json/getuser/' + this.state.currentInput, this, function(data, stateRef){
-            if (data.exists == false)
-            {
-                stateRef.setState((prevState, props)=>{return {userExists: false, lastFailed: prevState.currentInput}});
-            }
+            if (data.error)
+                stateRef.setState((prevState, props)=>{return {error: data.error}});
             else
                 {
-                    stateRef.setState({userExists: true});
                     stateRef.setState((prevState, props)=>{
                         let currentMembers = prevState.membersToAdd;
                         currentMembers.push({email: prevState.currentInput, fname: data.fname, lname: data.lname});
                         
                         return {
-                            membersToAdd: currentMembers
+                            membersToAdd: currentMembers,
+                            error: false
                         }
                     });
                     stateRef.setState({currentInput : ''})
@@ -63,9 +68,24 @@ class HC_members extends React.Component{
         this.props.setMembers(this.state.membersToAdd);
     }
 
+    undo(){
+        this.setState((prevState, props)=>{
+            return{
+                membersToAdd: prevState.membersToAdd.length > 1 ? prevState.membersToAdd.splice(0, 1) : []
+        }});
+    }
+
     render(){
         
-        let memberNames = this.state.membersToAdd.map((member)=><h4>{member.fname + ' ' + member.lname}</h4>);
+        let memberNames = this.state.membersToAdd.map((member)=><h4 key={member.fname}>{member.fname + ' ' + member.lname}</h4>);
+        let errorMessage;
+
+        if (this.state.error) {
+            errorMessage = this.state.error;
+        } else
+            errorMessage = '';
+        
+        let undoButton = this.state.membersToAdd != [] ? <button type="submit" onClick={this.undo}>Undo</button> : <div></div>;
         return(
             <div>
                 
@@ -73,12 +93,16 @@ class HC_members extends React.Component{
                 <h3>
                     Add people to this house
                 </h3>
+                <h5>
+                    (You can add more later)
+                </h5>
                 {memberNames}
                 <label>
                     User's email: 
                     <input type="text" onChange={this.handleChange} value={this.state.currentInput} onKeyPress={this.handleKeyPress} ref={(input)=>{this.field = input;}}/>
                 <button type="submit" onClick={this.submit}>Submit</button>
-                <div>{this.state.userExists ? '' : 'User ' + this.state.lastFailed + ' does not exist'}</div>
+                {undoButton}
+                <div>{errorMessage}</div>
                 </label>
                 <button type="submit" onClick={this.next}>Next</button>
             </div>);

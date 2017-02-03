@@ -40,7 +40,7 @@ class AppShell extends React.Component{
     }  
 
     render(){
-        let housesList = this.state.houses.map((house)=><option>{house}</option>);
+        let housesList = this.state.houses.map((house)=><option key={house}>{house}</option>);
         let hasHouses = (this.state.houses.length != 0);
 
         return (
