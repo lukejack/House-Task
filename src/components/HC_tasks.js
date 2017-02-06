@@ -2,9 +2,7 @@ import React from 'react';
 import ReactBootstrapSlider from 'react-bootstrap-slider';
 import ObjectTable from './ObjectTable';
 
-//let tools = require('../clientTools');
-
-
+let tools = require('../clientTools');
 
 let id = 0;
 function genId(){
@@ -22,15 +20,13 @@ class HC_tasks extends React.Component{
         this.submit = this.submit.bind(this);
         this.next = this.next.bind(this);
         this.sliderChanged = this.sliderChanged.bind(this);
-        this.deleteTask = this.deleteTask.bind(this);
 
         this.state = {
             currentInput: '',
             error: false,
             tasksToAdd: [],
             currentDifficulty: 5,
-            field: '',
-            deleteTask: this.deleteTask
+            field: ''
         };
     }
 
@@ -45,12 +41,18 @@ class HC_tasks extends React.Component{
     }
 
     submit(){
-        if (this.state.currentInput == '')
+        const input = this.state.currentInput;
+        if (input === '')
         {
             this.setState({
                 error: 'There is no text in the box'
             });
-        } else {
+        } else if (tools.find(this.state.tasksToAdd, 'name', input)){
+            this.setState({error: 'A task by that name already exists'});
+        } 
+        else
+        {
+            console.log(tools.find(this.state.tasksToAdd, 'name', input));
             //Add to structure here
             this.setState((prevState, props)=>{
                 let thisTask = {
@@ -70,22 +72,6 @@ class HC_tasks extends React.Component{
         }
     }
 
-    
-    deleteTask(taskId){
-        this.setState((prevState, props)=>{
-            let i = prevState.tasksToAdd.length;
-            let newTasks = prevState.tasksToAdd;
-            while (i--){
-                if (prevState.tasksToAdd[i].id === taskId){
-                    newTasks.splice(i, 1);
-                }
-            }
-            return {
-                tasksToAdd: newTasks
-            };
-        });
-    }
-
     handleKeyPress(target) {
         if(target.charCode==13){
             this.submit();
@@ -98,7 +84,7 @@ class HC_tasks extends React.Component{
 
     next(){
         this.props.incrementStep();
-        //Need setTasks method of parent
+        this.props.setTasks(this.state.tasksToAdd);
     }
 
     render(){
@@ -120,7 +106,7 @@ class HC_tasks extends React.Component{
                     You can add more later
                 </h5>
 
-                <ObjectTable items={this.state.tasksToAdd} headings={['name', 'difficulty']} delete={(id)=>this.deleteTask(id)}/>
+                <ObjectTable items={this.state.tasksToAdd} headings={['name', 'difficulty']} delete={(id)=>tools.delete(this, 'tasksToAdd', id)}/>
                 
                 <label>
                     Task name: 
@@ -140,11 +126,7 @@ class HC_tasks extends React.Component{
                 </label>
                 <div>{errorMessage}</div>
                 <button type="submit" onClick={this.submit}>Submit</button>
-                <button type="submit" onClick={this.next}>Next</button>
-
-                
-
-
+                <button type="submit" onClick={this.next}>Finish</button>
             </div>);
     }
 }

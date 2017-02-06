@@ -1,6 +1,6 @@
 import React from 'react';
-let tools = require('../clientTools');
 import ObjectTable from './ObjectTable';
+let tools = require('../clientTools');
 
 let id = 0;
 
@@ -25,8 +25,6 @@ class HC_members extends React.Component{
         this.handleKeyPress = this.handleKeyPress.bind(this);
         this.submit = this.submit.bind(this);
         this.next = this.next.bind(this);
-        this.undo = this.undo.bind(this);
-        this.deleteMember = this.deleteMember.bind(this);
     }
 
     handleChange(event){
@@ -76,31 +74,8 @@ class HC_members extends React.Component{
         this.props.setMembers(this.state.membersToAdd);
     }
 
-    undo(){
-        this.setState((prevState, props)=>{
-            return{
-                membersToAdd: prevState.membersToAdd.length > 1 ? prevState.membersToAdd.splice(0, 1) : []
-        }});
-    }
-
-    deleteMember(id){
-        this.setState((prevState, props)=>{
-            let i = prevState.membersToAdd.length;
-            let newMembers = prevState.membersToAdd;
-            while (i--){
-                if (prevState.membersToAdd[i].id === id){
-                    newMembers.splice(i, 1);
-                }
-            }
-            return {
-                membersToAdd: newMembers
-            };
-        });
-    }
-
     render(){
         
-
         let errorMessage;
 
         if (this.state.error) {
@@ -118,7 +93,7 @@ class HC_members extends React.Component{
                 <h5>
                     (You can add more later)
                 </h5>
-                <ObjectTable items={this.state.membersToAdd} headings={['fname', 'email']} delete={(id)=>this.deleteMember(id)}/>
+                <ObjectTable items={this.state.membersToAdd} headings={['fname', 'email']} delete={(id)=>tools.delete(this, 'membersToAdd', id)}/>
                 <label>
                     User's email: 
                     <input type="text" onChange={this.handleChange} value={this.state.currentInput} onKeyPress={this.handleKeyPress} ref={(input)=>{this.field = input;}}/>

@@ -66,7 +66,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var tools = __webpack_require__(325);
+	var tools = __webpack_require__(322);
 
 
 	_reactDom2.default.render(_react2.default.createElement(
@@ -21556,7 +21556,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var tools = __webpack_require__(325);
+	var tools = __webpack_require__(322);
 
 	var AppShell = function (_React$Component) {
 	  (0, _inherits3.default)(AppShell, _React$Component);
@@ -28289,7 +28289,7 @@
 
 	var _HC_name2 = _interopRequireDefault(_HC_name);
 
-	var _HC_members = __webpack_require__(322);
+	var _HC_members = __webpack_require__(323);
 
 	var _HC_members2 = _interopRequireDefault(_HC_members);
 
@@ -28310,12 +28310,14 @@
 	        _this.state = {
 	            step: 0,
 	            houseName: '',
-	            members: []
+	            members: [],
+	            tasks: []
 	        };
 
 	        _this.incrementStep = _this.incrementStep.bind(_this);
 	        _this.setHouseName = _this.setHouseName.bind(_this);
 	        _this.setMembers = _this.setMembers.bind(_this);
+	        _this.setTasks = _this.setTasks.bind(_this);
 	        return _this;
 	    }
 
@@ -28345,18 +28347,27 @@
 	            });
 	        }
 	    }, {
+	        key: 'setTasks',
+	        value: function setTasks(tasks) {
+	            this.setState(function (prevState, props) {
+	                return {
+	                    tasks: tasks
+	                };
+	            });
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
 	            var currentStep = void 0;
 	            switch (this.state.step) {
 	                case 0:
-	                    currentStep = _react2.default.createElement(_HC_name2.default, { setHouseName: this.setHouseName, incrementStep: this.incrementStep });
+	                    currentStep = _react2.default.createElement(_HC_name2.default, { incrementStep: this.incrementStep, setHouseName: this.setHouseName });
 	                    break;
 	                case 1:
 	                    currentStep = _react2.default.createElement(_HC_members2.default, { houseName: this.state.houseName, incrementStep: this.incrementStep, setMembers: this.setMembers });
 	                    break;
 	                case 2:
-	                    currentStep = _react2.default.createElement(_HC_tasks2.default, { houseName: this.state.houseName, incrementStep: this.incrementStep });
+	                    currentStep = _react2.default.createElement(_HC_tasks2.default, { houseName: this.state.houseName, incrementStep: this.incrementStep, setTasks: this.setTasks });
 	                    break;
 	                default:
 	                    currentStep = _react2.default.createElement(
@@ -28415,6 +28426,8 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	var tools = __webpack_require__(322);
+
 	var HC_name = function (_React$Component) {
 	    (0, _inherits3.default)(HC_name, _React$Component);
 
@@ -28453,13 +28466,40 @@
 	    }, {
 	        key: 'submit',
 	        value: function submit() {
-	            this.props.setHouseName(this.state.inputText);
-	            this.props.incrementStep();
+	            var _this2 = this;
+
+	            /* Check whether the house name is taken 
+	            Load input into a temporary variable so the user cannot change it mid-request*/
+	            var input = this.state.inputText;
+	            if (input === '') this.setState({ error: 'Enter a name into the box' });else {
+	                tools.get('/json/gethouse/' + input, this, function (data, stateRef) {
+	                    if (data.error) stateRef.setState(function (prevState, props) {
+	                        return {
+	                            error: data.error
+	                        };
+	                    });else if (data.exists === true) stateRef.setState(function (prevState, props) {
+	                        return {
+	                            error: 'That house name has already been taken'
+	                        };
+	                    });else if (data.exists === false) {
+	                        _this2.props.setHouseName(input);
+	                        _this2.props.incrementStep();
+	                    } else {
+	                        stateRef.setState(function (prevState, props) {
+	                            return {
+	                                error: 'There has been a problem downloading data from the server'
+	                            };
+	                        });
+	                    }
+	                });
+	            }
 	        }
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var _this2 = this;
+	            var _this3 = this;
+
+	            var errorMessage = this.state.error ? this.state.error : '';
 
 	            return _react2.default.createElement(
 	                'div',
@@ -28474,8 +28514,13 @@
 	                    null,
 	                    'Give a name to your house: ',
 	                    _react2.default.createElement('input', { type: 'text', onChange: this.handleChange, onKeyPress: this.handleKeyPress, ref: function ref(input) {
-	                            _this2.field = input;
+	                            _this3.field = input;
 	                        } })
+	                ),
+	                _react2.default.createElement(
+	                    'div',
+	                    null,
+	                    errorMessage
 	                ),
 	                _react2.default.createElement(
 	                    'button',
@@ -28492,6 +28537,54 @@
 
 /***/ },
 /* 322 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var _defineProperty2 = __webpack_require__(331);
+
+	var _defineProperty3 = _interopRequireDefault(_defineProperty2);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	//HTTP GET request
+	function get(URL, stateRef, callback) {
+	  var xhr = new XMLHttpRequest();
+	  xhr.open("GET", URL, true);
+	  xhr.addEventListener('load', function () {
+	    if (xhr.status === 200) {
+	      callback(JSON.parse(xhr.response), stateRef);
+	    }
+	  }, false);
+	  xhr.send();
+	}
+
+	//Delete an item from a collection in state via an id
+	function deleteFromCollection(stateRef, collectionName, id) {
+	  stateRef.setState(function (prevState, props) {
+	    var i = prevState[collectionName].length;
+	    var newTasks = prevState[collectionName];
+	    while (i--) {
+	      if (prevState[collectionName][i].id === id) {
+	        newTasks.splice(i, 1);
+	      }
+	    }
+	    return (0, _defineProperty3.default)({}, collectionName, newTasks);
+	  });
+	}
+
+	//Search for an object in a collection by its attribute value
+	function find(collection, attribute, value) {
+	  for (var i = 0; i < collection.length; i++) {
+	    if (collection[i][attribute] === value) return i === 0 ? true : i;
+	  }
+	  return false;
+	}
+
+	module.exports = { get: get, delete: deleteFromCollection, find: find };
+
+/***/ },
+/* 323 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28524,14 +28617,13 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _ObjectTable = __webpack_require__(323);
+	var _ObjectTable = __webpack_require__(324);
 
 	var _ObjectTable2 = _interopRequireDefault(_ObjectTable);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var tools = __webpack_require__(325);
-
+	var tools = __webpack_require__(322);
 
 	var id = 0;
 
@@ -28560,8 +28652,6 @@
 	        _this.handleKeyPress = _this.handleKeyPress.bind(_this);
 	        _this.submit = _this.submit.bind(_this);
 	        _this.next = _this.next.bind(_this);
-	        _this.undo = _this.undo.bind(_this);
-	        _this.deleteMember = _this.deleteMember.bind(_this);
 	        return _this;
 	    }
 
@@ -28617,31 +28707,6 @@
 	            this.props.setMembers(this.state.membersToAdd);
 	        }
 	    }, {
-	        key: 'undo',
-	        value: function undo() {
-	            this.setState(function (prevState, props) {
-	                return {
-	                    membersToAdd: prevState.membersToAdd.length > 1 ? prevState.membersToAdd.splice(0, 1) : []
-	                };
-	            });
-	        }
-	    }, {
-	        key: 'deleteMember',
-	        value: function deleteMember(id) {
-	            this.setState(function (prevState, props) {
-	                var i = prevState.membersToAdd.length;
-	                var newMembers = prevState.membersToAdd;
-	                while (i--) {
-	                    if (prevState.membersToAdd[i].id === id) {
-	                        newMembers.splice(i, 1);
-	                    }
-	                }
-	                return {
-	                    membersToAdd: newMembers
-	                };
-	            });
-	        }
-	    }, {
 	        key: 'render',
 	        value: function render() {
 	            var _this2 = this;
@@ -28672,7 +28737,7 @@
 	                    '(You can add more later)'
 	                ),
 	                _react2.default.createElement(_ObjectTable2.default, { items: this.state.membersToAdd, headings: ['fname', 'email'], 'delete': function _delete(id) {
-	                        return _this2.deleteMember(id);
+	                        return tools.delete(_this2, 'membersToAdd', id);
 	                    } }),
 	                _react2.default.createElement(
 	                    'label',
@@ -28706,7 +28771,7 @@
 	exports.default = HC_members;
 
 /***/ },
-/* 323 */
+/* 324 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28739,7 +28804,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _ObjectRow = __webpack_require__(324);
+	var _ObjectRow = __webpack_require__(325);
 
 	var _ObjectRow2 = _interopRequireDefault(_ObjectRow);
 
@@ -28816,7 +28881,7 @@
 	exports.default = ObjectTable;
 
 /***/ },
-/* 324 */
+/* 325 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28922,26 +28987,6 @@
 	exports.default = ObjectRow;
 
 /***/ },
-/* 325 */
-/***/ function(module, exports) {
-
-	"use strict";
-
-	function get(URL, stateRef, callback) {
-	  var xhr = new XMLHttpRequest();
-	  xhr.open("GET", URL, true);
-	  // register the event handler
-	  xhr.addEventListener('load', function () {
-	    if (xhr.status === 200) {
-	      callback(JSON.parse(xhr.response), stateRef);
-	    }
-	  }, false);
-	  xhr.send();
-	}
-
-	module.exports = { get: get };
-
-/***/ },
 /* 326 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -28979,14 +29024,13 @@
 
 	var _reactBootstrapSlider2 = _interopRequireDefault(_reactBootstrapSlider);
 
-	var _ObjectTable = __webpack_require__(323);
+	var _ObjectTable = __webpack_require__(324);
 
 	var _ObjectTable2 = _interopRequireDefault(_ObjectTable);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	//let tools = require('../clientTools');
-
+	var tools = __webpack_require__(322);
 
 	var id = 0;
 	function genId() {
@@ -29006,15 +29050,13 @@
 	        _this.submit = _this.submit.bind(_this);
 	        _this.next = _this.next.bind(_this);
 	        _this.sliderChanged = _this.sliderChanged.bind(_this);
-	        _this.deleteTask = _this.deleteTask.bind(_this);
 
 	        _this.state = {
 	            currentInput: '',
 	            error: false,
 	            tasksToAdd: [],
 	            currentDifficulty: 5,
-	            field: '',
-	            deleteTask: _this.deleteTask
+	            field: ''
 	        };
 	        return _this;
 	    }
@@ -29036,11 +29078,15 @@
 	    }, {
 	        key: 'submit',
 	        value: function submit() {
-	            if (this.state.currentInput == '') {
+	            var input = this.state.currentInput;
+	            if (input === '') {
 	                this.setState({
 	                    error: 'There is no text in the box'
 	                });
+	            } else if (tools.find(this.state.tasksToAdd, 'name', input)) {
+	                this.setState({ error: 'A task by that name already exists' });
 	            } else {
+	                console.log(tools.find(this.state.tasksToAdd, 'name', input));
 	                //Add to structure here
 	                this.setState(function (prevState, props) {
 	                    var thisTask = {
@@ -29059,22 +29105,6 @@
 	            }
 	        }
 	    }, {
-	        key: 'deleteTask',
-	        value: function deleteTask(taskId) {
-	            this.setState(function (prevState, props) {
-	                var i = prevState.tasksToAdd.length;
-	                var newTasks = prevState.tasksToAdd;
-	                while (i--) {
-	                    if (prevState.tasksToAdd[i].id === taskId) {
-	                        newTasks.splice(i, 1);
-	                    }
-	                }
-	                return {
-	                    tasksToAdd: newTasks
-	                };
-	            });
-	        }
-	    }, {
 	        key: 'handleKeyPress',
 	        value: function handleKeyPress(target) {
 	            if (target.charCode == 13) {
@@ -29090,7 +29120,7 @@
 	        key: 'next',
 	        value: function next() {
 	            this.props.incrementStep();
-	            //Need setTasks method of parent
+	            this.props.setTasks(this.state.tasksToAdd);
 	        }
 	    }, {
 	        key: 'render',
@@ -29122,7 +29152,7 @@
 	                    'You can add more later'
 	                ),
 	                _react2.default.createElement(_ObjectTable2.default, { items: this.state.tasksToAdd, headings: ['name', 'difficulty'], 'delete': function _delete(id) {
-	                        return _this2.deleteTask(id);
+	                        return tools.delete(_this2, 'tasksToAdd', id);
 	                    } }),
 	                _react2.default.createElement(
 	                    'label',
@@ -29159,7 +29189,7 @@
 	                _react2.default.createElement(
 	                    'button',
 	                    { type: 'submit', onClick: this.next },
-	                    'Next'
+	                    'Finish'
 	                )
 	            );
 	        }
@@ -41557,6 +41587,35 @@
 	  module.exports = exports["default"];
 	});
 
+
+/***/ },
+/* 331 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	exports.__esModule = true;
+
+	var _defineProperty = __webpack_require__(207);
+
+	var _defineProperty2 = _interopRequireDefault(_defineProperty);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = function (obj, key, value) {
+	  if (key in obj) {
+	    (0, _defineProperty2.default)(obj, key, {
+	      value: value,
+	      enumerable: true,
+	      configurable: true,
+	      writable: true
+	    });
+	  } else {
+	    obj[key] = value;
+	  }
+
+	  return obj;
+	};
 
 /***/ }
 /******/ ]);

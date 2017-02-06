@@ -70,10 +70,11 @@ app.get('/json/user', isLogged, function (req, res){
                  lname: req.user.lname});
 });
 
+// Email => Error, First Name, Last Name
 app.get('/json/getuser/:email', isLogged, function(req, res){
         User.findOne({'email' : req.params.email}, (err, user)=>{
                 if (err)
-                        res.send({error: 'Error'});
+                        res.send({error: 'Database Error'});
                 if (!user)
                         res.send({error: 'User ' + req.params.email + ' does not exist.'});
                 else if (req.params.email == req.user.email)
@@ -83,6 +84,18 @@ app.get('/json/getuser/:email', isLogged, function(req, res){
                                 fname: user.fname,
                                 lname: user.lname});
                         
+        });
+});
+
+// House Name => House Exists?
+app.get('/json/gethouse/:name', isLogged, function(req, res){
+        House.findOne({'name': decodeURI(req.params.name)}, (err, house)=>{
+                if (err)
+                        res.send({error: 'Database Error'});
+                if (house)
+                        res.send({exists: true});
+                else
+                        res.send({exists: false});
         });
 });
 
@@ -139,9 +152,12 @@ app.post('/post/memberadd', (req, res)=>{ //UNTESTED req.body = house, newEmail
 app.post('/post/housecreate', function (req, res){
         if (req.isAuthenticated())
                 House.findOne({ 'name' :  req.body.name }, function(err, house) {
-                        if (err) console.log(err);
+                        if (err) {
+                                console.log(err);
+                                res.send({error: 'Database error'});
+                        }
                         if (house) {
-                                console.log('House already exists');
+                                res.send({error: 'House already exists'});
                         } else {
                                 var newHouse    = new House();
                                 newHouse.name   = req.body.name;
