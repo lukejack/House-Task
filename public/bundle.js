@@ -66,7 +66,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var tools = __webpack_require__(322);
+	var tools = __webpack_require__(324);
 
 
 	_reactDom2.default.render(_react2.default.createElement(
@@ -21556,7 +21556,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var tools = __webpack_require__(322);
+	var tools = __webpack_require__(324);
 
 	var AppShell = function (_React$Component) {
 	  (0, _inherits3.default)(AppShell, _React$Component);
@@ -21569,7 +21569,6 @@
 	    _this.state = {
 	      fname: '...',
 	      lname: '...',
-	      email: '...',
 	      houses: [],
 	      error: false
 	    };
@@ -21587,8 +21586,7 @@
 	        stateRef.setState(function (prevState, props) {
 	          return {
 	            fname: data.fname,
-	            lname: data.lname,
-	            email: data.email
+	            lname: data.lname
 	          };
 	        });
 	      });
@@ -28261,6 +28259,10 @@
 	    value: true
 	});
 
+	var _stringify = __webpack_require__(321);
+
+	var _stringify2 = _interopRequireDefault(_stringify);
+
 	var _getPrototypeOf = __webpack_require__(179);
 
 	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -28285,19 +28287,21 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _HC_name = __webpack_require__(321);
+	var _HC_name = __webpack_require__(323);
 
 	var _HC_name2 = _interopRequireDefault(_HC_name);
 
-	var _HC_members = __webpack_require__(323);
+	var _HC_members = __webpack_require__(326);
 
 	var _HC_members2 = _interopRequireDefault(_HC_members);
 
-	var _HC_tasks = __webpack_require__(326);
+	var _HC_tasks = __webpack_require__(329);
 
 	var _HC_tasks2 = _interopRequireDefault(_HC_tasks);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var tools = __webpack_require__(324);
 
 	var HouseCreate = function (_React$Component) {
 	    (0, _inherits3.default)(HouseCreate, _React$Component);
@@ -28318,6 +28322,7 @@
 	        _this.setHouseName = _this.setHouseName.bind(_this);
 	        _this.setMembers = _this.setMembers.bind(_this);
 	        _this.setTasks = _this.setTasks.bind(_this);
+	        _this.finish = _this.finish.bind(_this);
 	        return _this;
 	    }
 
@@ -28349,11 +28354,35 @@
 	    }, {
 	        key: 'setTasks',
 	        value: function setTasks(tasks) {
+	            var tasksToSend = [];
+	            //Remove ID field from tasks for POST
+	            for (var i = 0; i < tasks.length; i++) {
+	                tasksToSend[i] = { name: tasks[i].name, difficulty: tasks[i].difficulty };
+	            }console.log(tasksToSend);
 	            this.setState(function (prevState, props) {
 	                return {
-	                    tasks: tasks
+	                    tasks: tasksToSend
 	                };
 	            });
+
+	            this.finish();
+	        }
+	    }, {
+	        key: 'finish',
+	        value: function finish() {
+	            //Post the house name, then add members and tasks
+	            console.log();
+	            tools.post('/post/housecreate', this, function (data, stateRef) {
+	                console.log(data);
+	                if (data.success) {
+	                    tools.post('/post/memberadd', stateRef, function (data, stateRef) {
+	                        //SUCCESS
+	                    }, 'house=' + stateRef.state.houseName + "&members=" + (0, _stringify2.default)(stateRef.state.members));
+	                    tools.post('/post/taskadd', stateRef, function (data, stateRef) {
+	                        //SUCCESS
+	                    }, 'tasks=' + (0, _stringify2.default)(stateRef.state.tasks) + '&house=' + stateRef.state.houseName);
+	                }
+	            }, 'house=' + this.state.houseName);
 	        }
 	    }, {
 	        key: 'render',
@@ -28394,6 +28423,22 @@
 /* 321 */
 /***/ function(module, exports, __webpack_require__) {
 
+	module.exports = { "default": __webpack_require__(322), __esModule: true };
+
+/***/ },
+/* 322 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var core  = __webpack_require__(192)
+	  , $JSON = core.JSON || (core.JSON = {stringify: JSON.stringify});
+	module.exports = function stringify(it){ // eslint-disable-line no-unused-vars
+	  return $JSON.stringify.apply($JSON, arguments);
+	};
+
+/***/ },
+/* 323 */
+/***/ function(module, exports, __webpack_require__) {
+
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
@@ -28426,7 +28471,7 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var tools = __webpack_require__(322);
+	var tools = __webpack_require__(324);
 
 	var HC_name = function (_React$Component) {
 	    (0, _inherits3.default)(HC_name, _React$Component);
@@ -28536,12 +28581,12 @@
 	exports.default = HC_name;
 
 /***/ },
-/* 322 */
+/* 324 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
-	var _defineProperty2 = __webpack_require__(331);
+	var _defineProperty2 = __webpack_require__(325);
 
 	var _defineProperty3 = _interopRequireDefault(_defineProperty2);
 
@@ -28557,6 +28602,26 @@
 	    }
 	  }, false);
 	  xhr.send();
+	}
+
+	function objectToParams(data) {}
+
+	//HTTP POST
+	function post(URL, stateRef, callback, data) {
+	  var http = new XMLHttpRequest();
+	  http.open("POST", URL, true);
+
+	  //Send the proper header information along with the request
+	  http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+	  http.onreadystatechange = function () {
+	    //Call a function when the state changes.
+	    if (http.readyState == 4 && http.status == 200) {
+	      callback(JSON.parse(http.responseText), stateRef);
+	    }
+	  };
+	  console.log('Sending data');
+	  http.send(data);
 	}
 
 	//Delete an item from a collection in state via an id
@@ -28581,10 +28646,39 @@
 	  return false;
 	}
 
-	module.exports = { get: get, delete: deleteFromCollection, find: find };
+	module.exports = { get: get, delete: deleteFromCollection, find: find, post: post };
 
 /***/ },
-/* 323 */
+/* 325 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	exports.__esModule = true;
+
+	var _defineProperty = __webpack_require__(207);
+
+	var _defineProperty2 = _interopRequireDefault(_defineProperty);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	exports.default = function (obj, key, value) {
+	  if (key in obj) {
+	    (0, _defineProperty2.default)(obj, key, {
+	      value: value,
+	      enumerable: true,
+	      configurable: true,
+	      writable: true
+	    });
+	  } else {
+	    obj[key] = value;
+	  }
+
+	  return obj;
+	};
+
+/***/ },
+/* 326 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28617,13 +28711,13 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _ObjectTable = __webpack_require__(324);
+	var _ObjectTable = __webpack_require__(327);
 
 	var _ObjectTable2 = _interopRequireDefault(_ObjectTable);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var tools = __webpack_require__(322);
+	var tools = __webpack_require__(324);
 
 	var id = 0;
 
@@ -28704,7 +28798,12 @@
 	        key: 'next',
 	        value: function next() {
 	            this.props.incrementStep();
-	            this.props.setMembers(this.state.membersToAdd);
+	            var memberEmails = [];
+	            for (var i = 0; i < this.state.membersToAdd.length; i++) {
+	                memberEmails[i] = this.state.membersToAdd[i].email;
+	            }
+	            console.log(memberEmails);
+	            this.props.setMembers(memberEmails);
 	        }
 	    }, {
 	        key: 'render',
@@ -28771,7 +28870,7 @@
 	exports.default = HC_members;
 
 /***/ },
-/* 324 */
+/* 327 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28804,7 +28903,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _ObjectRow = __webpack_require__(325);
+	var _ObjectRow = __webpack_require__(328);
 
 	var _ObjectRow2 = _interopRequireDefault(_ObjectRow);
 
@@ -28881,7 +28980,7 @@
 	exports.default = ObjectTable;
 
 /***/ },
-/* 325 */
+/* 328 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28987,7 +29086,7 @@
 	exports.default = ObjectRow;
 
 /***/ },
-/* 326 */
+/* 329 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29020,17 +29119,17 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactBootstrapSlider = __webpack_require__(327);
+	var _reactBootstrapSlider = __webpack_require__(330);
 
 	var _reactBootstrapSlider2 = _interopRequireDefault(_reactBootstrapSlider);
 
-	var _ObjectTable = __webpack_require__(324);
+	var _ObjectTable = __webpack_require__(327);
 
 	var _ObjectTable2 = _interopRequireDefault(_ObjectTable);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var tools = __webpack_require__(322);
+	var tools = __webpack_require__(324);
 
 	var id = 0;
 	function genId() {
@@ -29086,7 +29185,6 @@
 	            } else if (tools.find(this.state.tasksToAdd, 'name', input)) {
 	                this.setState({ error: 'A task by that name already exists' });
 	            } else {
-	                console.log(tools.find(this.state.tasksToAdd, 'name', input));
 	                //Add to structure here
 	                this.setState(function (prevState, props) {
 	                    var thisTask = {
@@ -29200,12 +29298,12 @@
 	exports.default = HC_tasks;
 
 /***/ },
-/* 327 */
+/* 330 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
 	    if (true) {
-	        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1), __webpack_require__(328), __webpack_require__(330)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	        !(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1), __webpack_require__(331), __webpack_require__(333)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 	    } else if (typeof exports !== "undefined") {
 	        factory(exports, require("react"), require("bootstrap-slider"), require("es6bindall"));
 	    } else {
@@ -29416,7 +29514,7 @@
 
 
 /***/ },
-/* 328 */
+/* 331 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*! =======================================================
@@ -29474,7 +29572,7 @@
 
 	(function (factory) {
 		if (true) {
-			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(329)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(332)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory), __WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? (__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 		} else if ((typeof module === "undefined" ? "undefined" : _typeof(module)) === "object" && module.exports) {
 			var jQuery;
 			try {
@@ -31312,7 +31410,7 @@
 
 
 /***/ },
-/* 329 */
+/* 332 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -41538,7 +41636,7 @@
 
 
 /***/ },
-/* 330 */
+/* 333 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (global, factory) {
@@ -41587,35 +41685,6 @@
 	  module.exports = exports["default"];
 	});
 
-
-/***/ },
-/* 331 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	exports.__esModule = true;
-
-	var _defineProperty = __webpack_require__(207);
-
-	var _defineProperty2 = _interopRequireDefault(_defineProperty);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	exports.default = function (obj, key, value) {
-	  if (key in obj) {
-	    (0, _defineProperty2.default)(obj, key, {
-	      value: value,
-	      enumerable: true,
-	      configurable: true,
-	      writable: true
-	    });
-	  } else {
-	    obj[key] = value;
-	  }
-
-	  return obj;
-	};
 
 /***/ }
 /******/ ]);

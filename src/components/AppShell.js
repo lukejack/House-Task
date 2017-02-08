@@ -9,7 +9,6 @@ class AppShell extends React.Component{
         this.state = {
           fname: '...',
           lname: '...',
-          email: '...',
           houses: [],
           error: false
         }
@@ -23,8 +22,7 @@ class AppShell extends React.Component{
       tools.get('/json/user', this, function (data, stateRef){
           stateRef.setState((prevState, props) => {return {
             fname: data.fname,
-            lname: data.lname,
-            email: data.email
+            lname: data.lname
           }});
         });
 

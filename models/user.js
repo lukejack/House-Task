@@ -1,34 +1,34 @@
 var mongoose = require('mongoose');
-var bcrypt   = require('bcrypt-nodejs');
+var bcrypt = require('bcrypt-nodejs');
 
 var userSchema = mongoose.Schema({
-    email       : String,
-    password    : String,
-    fname       : String,
-    lname       : String,
-    houses      : [String]
+    email: String,
+    password: String,
+    fname: String,
+    lname: String,
+    houses: [String]
 });
 
-userSchema.methods.generateHash = function(password) {
+userSchema.methods.generateHash = function (password) {
     return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
 };
 
-userSchema.methods.validPassword = function(password) {
+userSchema.methods.validPassword = function (password) {
     return bcrypt.compareSync(password, this.password);
 };
 
-userSchema.methods.addHouse = function(name){
+userSchema.methods.addHouse = function (name) {
     this.houses.push(name);
     this.save();
 }
 
-userSchema.methods.isMember = function(houseName){
-    foreach (house in this.houses)
-    {
-        if (house == houseName)
-            return true;
-    }
-    return false;
+userSchema.methods.isMember = function (houseName) {
+    let found = false;
+    this.houses.forEach(function (house) {
+        if (house === houseName)
+            found = true;
+    });
+    return found;
 }
 
 module.exports = mongoose.model('User', userSchema);

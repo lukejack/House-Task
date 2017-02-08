@@ -52,7 +52,6 @@ class HC_tasks extends React.Component{
         } 
         else
         {
-            console.log(tools.find(this.state.tasksToAdd, 'name', input));
             //Add to structure here
             this.setState((prevState, props)=>{
                 let thisTask = {

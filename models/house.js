@@ -6,4 +6,8 @@ var houseSchema = mongoose.Schema({
     icon    : String
 });
 
+houseSchema.methods.isAdmin = function(id){
+    return this.admin === id;
+}
+
 module.exports = mongoose.model('House', houseSchema);

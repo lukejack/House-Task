@@ -71,7 +71,12 @@ class HC_members extends React.Component{
 
     next(){
         this.props.incrementStep();
-        this.props.setMembers(this.state.membersToAdd);
+        let memberEmails = [];
+        for (let i = 0; i < this.state.membersToAdd.length; i++){
+            memberEmails[i] = this.state.membersToAdd[i].email;
+        }
+        console.log(memberEmails);
+        this.props.setMembers(memberEmails);
     }
 
     render(){
