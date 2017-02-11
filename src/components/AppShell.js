@@ -72,9 +72,9 @@ class AppShell extends React.Component{
                   </h5>
                 </div>
                 <div className='three columns'>
-                  <button>
-                    Logout
-                  </button>
+                  <Link to='/create'>
+                    Create
+                  </Link>
                 </div>
               </div>
             </div>

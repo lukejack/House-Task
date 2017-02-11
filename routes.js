@@ -87,7 +87,12 @@ module.exports = function (app, passport) {
         });
 
         app.get('/json/houses', isLogged, function (req, res) {
-                res.send({ houses: req.user.houses });
+                User.findOne({'email': req.user.email}, function(err, user){
+                        req.user.getHouseNames((names)=>{
+                                res.send({ houses: names});
+                        });
+                        
+                })
         });
 
         app.get('/json/tasks', isLogged, isMember, function (req, res) { //UNTESTED
@@ -116,6 +121,7 @@ module.exports = function (app, passport) {
         //Data submission routes
         app.post('/post/memberadd', isLogged, (req, res) => {
                 ops.addMembers(req.body.house, req.user, JSON.parse(req.body.members), (response) => {
+                        console.log('post memberadd response: ', response);
                         res.send(JSON.stringify(response));
                 });
         });
@@ -131,6 +137,10 @@ module.exports = function (app, passport) {
                 ops.addTasks(req.body.house, req.user, JSON.parse(req.body.tasks), (response)=>{
                         res.send(JSON.stringify(response));
                 });
+        });
+
+        app.post('/post/taskcomplete', isLogged, function (req, res){
+                //[][][]
         });
 
         app.post('/post/signup', passport.authenticate('local-signup', {

@@ -21673,9 +21673,9 @@
 	            'div',
 	            { className: 'three columns' },
 	            _react2.default.createElement(
-	              'button',
-	              null,
-	              'Logout'
+	              _reactRouter.Link,
+	              { to: '/create' },
+	              'Create'
 	            )
 	          )
 	        )
