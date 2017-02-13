@@ -62,7 +62,7 @@ function addTasks(houseName, user, tasks, cb) {
                     tasks.forEach((task) => {
                         var newTask = new Task();
                         newTask.name = task.name;
-                        newTask.house = house._id.toString();
+                        newTask.houseId = house._id.toString();
                         newTask.description = task.description;
                         newTask.difficulty = task.difficulty;
                         newTask.save(function (err) {

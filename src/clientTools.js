@@ -1,18 +1,20 @@
 
 //HTTP GET request
-function get(URL, stateRef, callback) {
+function get(URL, stateRef, callback, data) {
   var xhr = new XMLHttpRequest();
   xhr.open("GET", URL, true);
+
+  xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
   xhr.addEventListener('load', function () {
     if (xhr.status === 200) {
       callback(JSON.parse(xhr.response), stateRef);
     }
   }, false);
-  xhr.send();
+  xhr.send(data);
 }
 
-function objectToParams(data){
-}
+
 
 //HTTP POST
 function post(URL, stateRef, callback, data) {
@@ -27,7 +29,6 @@ function post(URL, stateRef, callback, data) {
       callback(JSON.parse(http.responseText), stateRef);
     }
   }
-  console.log('Sending data');
   http.send(data);
 }
 

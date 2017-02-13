@@ -15,9 +15,10 @@ module.exports = function (app, passport) {
 
         //Is the user a member of the house
         function isMember(req, res, next) {
-                if (req.user.isMember(req.body.house)) {
-                        next();
-                } else res.send({ error: req.user.fname + ' is not a member of ' + req.body.house });
+                req.user.isMember(req.params.house, (is) => {
+                        if (is) next();
+                        else res.send({ error: req.user.fname + ' is not a member of ' + req.params.house });
+                });
         };
 
         //Page routes
@@ -87,18 +88,24 @@ module.exports = function (app, passport) {
         });
 
         app.get('/json/houses', isLogged, function (req, res) {
-                User.findOne({'email': req.user.email}, function(err, user){
-                        req.user.getHouseNames((names)=>{
-                                res.send({ houses: names});
+                User.findOne({ 'email': req.user.email }, function (err, user) {
+                        req.user.getHouseNames((names) => {
+                                res.send({ houses: names });
                         });
-                        
+
                 })
         });
 
-        app.get('/json/tasks', isLogged, isMember, function (req, res) { //UNTESTED
-                Task.find({ 'house': req.body.house }, (err, docs) => {
-                        if (err) console.log(err);
-                        else res.send(docs);
+        app.get('/json/tasks/:house', isLogged, isMember, function (req, res) {
+                console.log('Request: ', req.params.house);
+                House.findOne({ 'name': req.params.house }, (err, house) => {
+                        console.log('House found: ', house);
+                        if (err) { console.log(err); res.send({ error: 'Database Error' }) }
+                        Task.find({ 'houseId': house._id.toString() }, (err, tasks) => {
+                                console.log('Tasks found: ', tasks);
+                                if (err) { console.log(err); res.send({ error: 'Database Error' }) }
+                                else res.send(JSON.stringify(tasks));
+                        });
                 });
         });
 
@@ -134,12 +141,12 @@ module.exports = function (app, passport) {
 
         //req.body = tasks[{name, description, difficulty}], house
         app.post('/post/taskadd', isLogged, function (req, res) {
-                ops.addTasks(req.body.house, req.user, JSON.parse(req.body.tasks), (response)=>{
+                ops.addTasks(req.body.house, req.user, JSON.parse(req.body.tasks), (response) => {
                         res.send(JSON.stringify(response));
                 });
         });
 
-        app.post('/post/taskcomplete', isLogged, function (req, res){
+        app.post('/post/taskcomplete', isLogged, function (req, res) {
                 //[][][]
         });
 

@@ -62,6 +62,10 @@
 
 	var _HouseCreate2 = _interopRequireDefault(_HouseCreate);
 
+	var _TaskCompletion = __webpack_require__(334);
+
+	var _TaskCompletion2 = _interopRequireDefault(_TaskCompletion);
+
 	var _reactRouter = __webpack_require__(265);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -76,7 +80,8 @@
 	    _reactRouter.Route,
 	    { path: '/', component: _AppShell2.default },
 	    _react2.default.createElement(_reactRouter.Route, { path: 'create', component: _HouseCreate2.default }),
-	    _react2.default.createElement(_reactRouter.Route, { path: 'houses', component: _HouseCreate2.default })
+	    _react2.default.createElement(_reactRouter.Route, { path: 'houses', component: _HouseCreate2.default }),
+	    _react2.default.createElement(_reactRouter.Route, { path: 'add/:tasks', component: _TaskCompletion2.default })
 	  )
 	), document.getElementById('root'));
 
@@ -21575,6 +21580,7 @@
 
 	    _this.componentDidMount = _this.componentDidMount.bind(_this);
 	    _this.componentWillUnmount = _this.componentWillUnmount.bind(_this);
+	    _this.houseChange = _this.houseChange.bind(_this);
 	    return _this;
 	  }
 
@@ -21582,6 +21588,7 @@
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
 
+	      //Get user information
 	      tools.get('/json/user', this, function (data, stateRef) {
 	        stateRef.setState(function (prevState, props) {
 	          return {
@@ -21591,17 +21598,29 @@
 	        });
 	      });
 
+	      //Get all of the houses the user is a member of
 	      tools.get('/json/houses', this, function (data, stateRef) {
 	        stateRef.setState(function (prevState, props) {
 	          return {
-	            houses: data.houses
+	            houses: data.houses,
+	            currentHouse: data.houses.length > 0 ? data.houses[0] : null
 	          };
+	        });
+
+	        //Get all the tasks for the selected house
+	        tools.get('/json/tasks/' + stateRef.state.currentHouse, stateRef, function (data, stateRef) {
+	          stateRef.setState({ tasks: data });
 	        });
 	      });
 	    }
 	  }, {
 	    key: 'componentWillUnmount',
 	    value: function componentWillUnmount() {}
+	  }, {
+	    key: 'houseChange',
+	    value: function houseChange(event) {
+	      this.setState({ currentHouse: event.target.value });
+	    }
 	  }, {
 	    key: 'render',
 	    value: function render() {
@@ -21655,7 +21674,7 @@
 	          ),
 	          _react2.default.createElement(
 	            'select',
-	            { name: 'houses', className: 'four columns' },
+	            { name: 'houses', className: 'four columns', onChange: this.houseChange },
 	            housesList
 	          ),
 	          _react2.default.createElement(
@@ -28593,18 +28612,19 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	//HTTP GET request
-	function get(URL, stateRef, callback) {
+	function get(URL, stateRef, callback, data) {
 	  var xhr = new XMLHttpRequest();
 	  xhr.open("GET", URL, true);
+
+	  xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
 	  xhr.addEventListener('load', function () {
 	    if (xhr.status === 200) {
 	      callback(JSON.parse(xhr.response), stateRef);
 	    }
 	  }, false);
-	  xhr.send();
+	  xhr.send(data);
 	}
-
-	function objectToParams(data) {}
 
 	//HTTP POST
 	function post(URL, stateRef, callback, data) {
@@ -28620,7 +28640,6 @@
 	      callback(JSON.parse(http.responseText), stateRef);
 	    }
 	  };
-	  console.log('Sending data');
 	  http.send(data);
 	}
 
@@ -41685,6 +41704,126 @@
 	  module.exports = exports["default"];
 	});
 
+
+/***/ },
+/* 334 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _getPrototypeOf = __webpack_require__(179);
+
+	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+
+	var _classCallCheck2 = __webpack_require__(205);
+
+	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+	var _createClass2 = __webpack_require__(206);
+
+	var _createClass3 = _interopRequireDefault(_createClass2);
+
+	var _possibleConstructorReturn2 = __webpack_require__(210);
+
+	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+	var _inherits2 = __webpack_require__(257);
+
+	var _inherits3 = _interopRequireDefault(_inherits2);
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var tools = __webpack_require__(324);
+
+	var TaskCompletion = function (_React$Component) {
+	    (0, _inherits3.default)(TaskCompletion, _React$Component);
+
+	    function TaskCompletion(props) {
+	        (0, _classCallCheck3.default)(this, TaskCompletion);
+
+	        var _this = (0, _possibleConstructorReturn3.default)(this, (TaskCompletion.__proto__ || (0, _getPrototypeOf2.default)(TaskCompletion)).call(this, props));
+
+	        _this.state = {
+	            inputText: ''
+	        };
+
+	        _this.handleChange = _this.handleChange.bind(_this);
+	        _this.submit = _this.submit.bind(_this);
+	        _this.handleKeyPress = _this.handleKeyPress.bind(_this);
+	        return _this;
+	    }
+
+	    (0, _createClass3.default)(TaskCompletion, [{
+	        key: 'handleChange',
+	        value: function handleChange(event) {
+	            this.setState({ inputText: event.target.value });
+	        }
+	    }, {
+	        key: 'handleKeyPress',
+	        value: function handleKeyPress(target) {
+	            if (target.charCode == 13) {
+	                this.submit();
+	            }
+	        }
+	    }, {
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            this.field.focus();
+	        }
+	    }, {
+	        key: 'submit',
+	        value: function submit() {
+	            var input = this.state.inputText;
+	            if (input === '') this.setState({ error: 'Enter a name into the box' });else {}
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var _this2 = this;
+
+	            var errorMessage = this.state.error ? this.state.error : '';
+
+	            return _react2.default.createElement(
+	                'div',
+	                null,
+	                _react2.default.createElement(
+	                    'h2',
+	                    null,
+	                    'Task Completion'
+	                ),
+	                _react2.default.createElement(
+	                    'h4',
+	                    null,
+	                    'Description',
+	                    _react2.default.createElement('input', { type: 'text', onChange: this.handleChange, onKeyPress: this.handleKeyPress, ref: function ref(input) {
+	                            _this2.field = input;
+	                        } })
+	                ),
+	                _react2.default.createElement(
+	                    'div',
+	                    null,
+	                    errorMessage
+	                ),
+	                _react2.default.createElement(
+	                    'button',
+	                    { type: 'submit', onClick: this.submit },
+	                    'Next'
+	                )
+	            );
+	        }
+	    }]);
+	    return TaskCompletion;
+	}(_react2.default.Component);
+
+	exports.default = TaskCompletion;
 
 /***/ }
 /******/ ]);

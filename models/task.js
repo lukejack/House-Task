@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 
 var taskSchema = mongoose.Schema({
     name        : String,
-    house       : String,
+    houseId       : String,
     description : String,
     difficulty  : Number
 });

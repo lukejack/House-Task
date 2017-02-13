@@ -4,6 +4,7 @@ var taskDoneSchema = mongoose.Schema({
     userId: String,
     houseId: String,
     taskId: String,
+    description: String,
     date: Number
 });
 
