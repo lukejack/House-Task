@@ -3,6 +3,7 @@ let User = require('./models/user');
 let Task = require('./models/task');
 let TaskDone = require('./models/taskDone');
 let ops = require('./dataOps');
+let mongoose = require('mongoose');
 
 module.exports = function (app, passport) {
 
@@ -89,20 +90,37 @@ module.exports = function (app, passport) {
 
         app.get('/json/houses', isLogged, function (req, res) {
                 User.findOne({ 'email': req.user.email }, function (err, user) {
-                        req.user.getHouseNames((names) => {
-                                res.send({ houses: names });
-                        });
+                        /*
+                        user.getHouseNames((names) => {
+                                res.send({ houses: names, ids: user.houses });
+                        });*/
+                        
+                        let houseIds = [];
+                        for (let i = 0; i < user.houseIds.length; i++) {
+                                houseIds[i] = mongoose.Types.ObjectId(user.houseIds[i]);
+                        }
 
+                        House.find({
+                                '_id': {
+                                        $in: houseIds
+                                }
+                        }, (err, houses) => {
+                                if (err){
+                                        console.log(err);
+                                        res.send({error: 'Database error'});
+                                }
+                                if (!houses) {console.log('No houses'); res.send({error: 'No houses found'})}
+                                else {
+                                        res.send({houses: houses});
+                                }
+                        });
                 })
         });
 
         app.get('/json/tasks/:house', isLogged, isMember, function (req, res) {
-                console.log('Request: ', req.params.house);
                 House.findOne({ 'name': req.params.house }, (err, house) => {
-                        console.log('House found: ', house);
                         if (err) { console.log(err); res.send({ error: 'Database Error' }) }
                         Task.find({ 'houseId': house._id.toString() }, (err, tasks) => {
-                                console.log('Tasks found: ', tasks);
                                 if (err) { console.log(err); res.send({ error: 'Database Error' }) }
                                 else res.send(JSON.stringify(tasks));
                         });
@@ -147,7 +165,9 @@ module.exports = function (app, passport) {
         });
 
         app.post('/post/taskcomplete', isLogged, function (req, res) {
-                //[][][]
+                ops.addCompletion(req.body.houseId, req.body.taskId, req.user, req.body.description, (response)=>{
+                        res.send(JSON.stringify(response));
+                });
         });
 
         app.post('/post/signup', passport.authenticate('local-signup', {

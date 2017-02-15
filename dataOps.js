@@ -41,7 +41,7 @@ function addMembers(house, user, members, cb) {
                     }, function (err, usersGot) {
                         if (err) { console.log(err); cb({ error: 'Database error' }) }
                         usersGot.forEach((one) => {
-                            one.isMember(foundHouse.name, (is)=>{
+                            one.isMember(foundHouse.name, (is) => {
                                 if (!is) one.addHouseId(foundHouse._id.toString());
                             })
                         });
@@ -77,37 +77,38 @@ function addTasks(houseName, user, tasks, cb) {
 
 }
 
-/*
-function addCompletion(houseId, taskId, userId, time, cb) {
 
-    let house = houseExists(houseId);
-    let task = taskExists(taskId);
+function addCompletion(houseId, taskId, user, description, cb) {
 
-    if (house && task && user.isMember(house)) {
-        var completion = new TaskDone();
-        completion.userId = user._id;
-        completion.house = houseId;
-        completion.task = task._id;
-        completion.date = Date.getTime();
-        completion.save(function (err) {
-            if (err) {
-                throw err;
-                cb({ error: 'Database error' });
-            } else cb({ success: true });
-        })
+    //console.log('house id: ', houseId, ' taskId: ', taskId, ' userId: ', user, ' description: ', description);
 
-    } else cb({ error: 'You are not a member of this house' });
-}*/
+    /*
+        let house = houseExists(houseId);
+        let task = taskExists(taskId);*/
 
-function houseExists(houseId) {
-    House.findOne({ '_id': ObjectId.fromString(houseId) }, (err, house) => {
-        return house ? house : false;
+    House.findOne({ '_id': mongoose.Types.ObjectId(houseId) }, (err, house) => {
+        user.isMember(house.name, (is) => {
+            Task.findOne({ '_id': mongoose.Types.ObjectId(taskId) }, (err, task) => {
+                let date = new Date();
+                if ((house && task) && is) {
+                    let completion = new TaskDone();
+                    completion.userId = user._id.toString();
+                    completion.houseId = house._id.toString();
+                    completion.taskId = task._id.toString();
+                    completion.date = date.getTime();
+                    completion.description = description;
+                    completion.save(function (err) {
+                        if (err) {
+                            throw err;
+                            cb({ error: 'Database error' });
+                        } else cb({ success: true });
+                    });
+
+                } else cb({ error: 'Invalid house or task' });
+            });
+        });
     });
+
 }
 
-function taskExists(taskId) {
-    Task.findOne({ '_id': ObjectId.fromString(taskId) }, (err, task) => {
-        return task ? task : false;
-    });
-}
-module.exports = { createHouse: createHouse, addMembers: addMembers, addTasks: addTasks };
+module.exports = { createHouse: createHouse, addMembers: addMembers, addTasks: addTasks, addCompletion: addCompletion };

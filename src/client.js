@@ -10,10 +10,10 @@ import { Router, Route, hashHistory, Link } from 'react-router';
 
 ReactDOM.render((
   <Router history={hashHistory}>
-    <Route path="/" component={AppShell} >
+    <Route path="/" component={AppShell}>
       <Route path="create" component={HouseCreate}/>
       <Route path="houses" component={HouseView}/>
-      <Route path="add/:tasks" component={TaskCompletion}/>
+      <Route path="add" component={TaskCompletion}/>
     </Route>
   </Router>),
   document.getElementById('root')
