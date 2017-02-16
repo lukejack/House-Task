@@ -94,7 +94,7 @@ module.exports = function (app, passport) {
                         user.getHouseNames((names) => {
                                 res.send({ houses: names, ids: user.houses });
                         });*/
-                        
+
                         let houseIds = [];
                         for (let i = 0; i < user.houseIds.length; i++) {
                                 houseIds[i] = mongoose.Types.ObjectId(user.houseIds[i]);
@@ -105,13 +105,13 @@ module.exports = function (app, passport) {
                                         $in: houseIds
                                 }
                         }, (err, houses) => {
-                                if (err){
+                                if (err) {
                                         console.log(err);
-                                        res.send({error: 'Database error'});
+                                        res.send({ error: 'Database error' });
                                 }
-                                if (!houses) {console.log('No houses'); res.send({error: 'No houses found'})}
+                                if (!houses) { console.log('No houses'); res.send({ error: 'No houses found' }) }
                                 else {
-                                        res.send({houses: houses});
+                                        res.send({ houses: houses });
                                 }
                         });
                 })
@@ -129,7 +129,7 @@ module.exports = function (app, passport) {
 
 
 
-        app.get('/json/members', isLogged, isMember, (req, res) => { //UNTESTED
+        app.get('/json/members', isLogged, isMember, (req, res) => { //Verify
                 User.find({ 'houses': req.body.house }, (err, docs) => {
                         if (err) console.log(err);
                         else if (docs) {
@@ -138,6 +138,12 @@ module.exports = function (app, passport) {
                                 response.push({ fname: doc.fname, lname: doc.lname })
                                 res.send(response);
                         } else res.send({ error: 'No members found' });
+                });
+        });
+
+        app.get('/json/completions', isLogged, isMember, (req, res) => {
+                ops.getCompletions(req.body.houseId, req.user, (response)=>{
+                        
                 });
         });
 
@@ -165,7 +171,7 @@ module.exports = function (app, passport) {
         });
 
         app.post('/post/taskcomplete', isLogged, function (req, res) {
-                ops.addCompletion(req.body.houseId, req.body.taskId, req.user, req.body.description, (response)=>{
+                ops.addCompletion(req.body.houseId, req.body.taskId, req.user, req.body.description, (response) => {
                         res.send(JSON.stringify(response));
                 });
         });

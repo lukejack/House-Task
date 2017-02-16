@@ -84,6 +84,9 @@ class AppShell extends React.Component {
       case 'complete':
         content = <TaskCompletion house={this.state.currentHouse} houseId={this.state.currentHouseId} tasks={this.state.tasks} />;
         break;
+      case 'housestats':
+        content = <Completions tasks={this.state.taskCompletions}/>;
+        break;
       default:
         content = (<p>No selection</p>);
         break;
@@ -102,7 +105,7 @@ class AppShell extends React.Component {
             <button className='four columns'>
               My Stats
                 </button>
-            <button className='four columns'>
+            <button className='four columns' onClick={this.pageChange} value={'housestats'}>
               House Stats
                 </button>
           </div>

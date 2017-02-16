@@ -79,13 +79,6 @@ function addTasks(houseName, user, tasks, cb) {
 
 
 function addCompletion(houseId, taskId, user, description, cb) {
-
-    //console.log('house id: ', houseId, ' taskId: ', taskId, ' userId: ', user, ' description: ', description);
-
-    /*
-        let house = houseExists(houseId);
-        let task = taskExists(taskId);*/
-
     House.findOne({ '_id': mongoose.Types.ObjectId(houseId) }, (err, house) => {
         user.isMember(house.name, (is) => {
             Task.findOne({ '_id': mongoose.Types.ObjectId(taskId) }, (err, task) => {
@@ -111,4 +104,68 @@ function addCompletion(houseId, taskId, user, description, cb) {
 
 }
 
-module.exports = { createHouse: createHouse, addMembers: addMembers, addTasks: addTasks, addCompletion: addCompletion };
+function getCompletions(houseId, user, cb) {
+    House.findOne({ '_id': mongoose.Types.ObjectId(houseId) }, (err, house) => {
+        user.isMember(house.name, (is) => {
+            if (house && is) {
+                TaskDone.find({ 'houseId': houseId }, (err, completions) => {
+
+                    if (err) cb({ error: 'Database error' });
+                    if (!completions) cb({ error: 'No data' });
+                    let taskIds = [];
+                    let userIds = [];
+                    for (let i = 0; i < completions.length; i++) {
+                        let thisTaskId = mongoose.Types.ObjectId(completions[i].taskId);
+                        let thisUserId = mongoose.Types.ObjectId(completions[i].userId);
+                        if (!taskIds.includes(thisTaskId))
+                            taskIds.push(thisTaskId);
+                        if (!userIds.includes(thisUserId))
+                            userIds.push(thisUserId);
+                    }
+                    User.find({
+                        '_id': {
+                            $in: userIds
+                        }
+                    }, function (err, users) {
+                        if (err) { console.log(err); cb({ error: 'Database error' }) }
+                        Task.find({
+                            '_id': {
+                                $in: taskIds
+                            }
+                        }, function (err, tasks) {
+                            if (err) { console.log(err); cb({ error: 'Database error' }) }
+
+                            let niceCompletions = [];
+                            for (let i = 0; i < completions.length; i++) {
+                                let thisNiceCompletion = {};
+                                users.forEach((user) => {
+                                    if (completions[i].userId === user._id.toString()) {
+                                        thisNiceCompletion.fname = user.fname;
+                                        thisNiceCompletion.lname = user.lname;
+                                        thisNiceCompletion.userId = user._id.toString();
+                                    }
+                                });
+
+                                tasks.forEach((task) => {
+                                    if (completions[i].taskId === task._id.toString()) {
+                                        thisNiceCompletion.name = task.name;
+                                        thisNiceCompletion.difficulty = task.difficulty;
+                                    }
+                                });
+
+                                thisNiceCompletion.date = completions[i].date;
+                                thisNiceCompletion.description = completions[i].description;
+
+                                niceCompletions.push(thisNiceCompletion);
+                            }
+                            cb(niceCompletions);
+                        });
+                    });
+
+                });
+            } else cb({ error: 'The user is not a member of that house' })
+        });
+    });
+}
+
+module.exports = { createHouse: createHouse, addMembers: addMembers, addTasks: addTasks, addCompletion: addCompletion, getCompletions: getCompletions };
