@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router';
 import HouseCreate from './HouseCreate';
 import TaskCompletion from './TaskCompletion';
+import Completions from './Completions';
 let tools = require('../clientTools');
 
 class AppShell extends React.Component {
@@ -14,6 +15,7 @@ class AppShell extends React.Component {
       houses: [],
       tasks: null,
       page: null,
+      completions: null,
       error: false
     }
 
@@ -21,6 +23,7 @@ class AppShell extends React.Component {
     this.componentWillUnmount = this.componentWillUnmount.bind(this);
     this.houseChange = this.houseChange.bind(this);
     this.pageChange = this.pageChange.bind(this);
+    this.pullData = this.pullData.bind(this);
   }
 
   componentDidMount() {
@@ -44,16 +47,22 @@ class AppShell extends React.Component {
           currentHouseId: (data.houses.length > 0) ? data.houses[0]._id : null
         }
       });
-
-
-      //Get all the tasks for the selected house
-
-      tools.get('/json/tasks/' + stateRef.state.currentHouse, stateRef, (data, stateRef) => {
-        stateRef.setState({ tasks: data });
-      });
-
+      stateRef.pullData();
     });
 
+  }
+
+  pullData() {
+    //Get all the tasks for the selected house
+
+    tools.get('/json/tasks/' + this.state.currentHouse, this, (data, stateRef) => {
+      stateRef.setState({ tasks: data });
+    });
+
+    tools.get('/json/completions/' + this.state.currentHouse, this, (data, stateRef) => {
+      stateRef.setState({ completions: data });
+      console.log('Completions: ', data);
+    });
   }
 
   componentWillUnmount() {
@@ -62,8 +71,14 @@ class AppShell extends React.Component {
   houseChange(event) {
     let eventData = JSON.parse(event.target.value);
     this.setState({ currentHouse: eventData[0], currentHouseId: eventData[1] });
+
     tools.get('/json/tasks/' + eventData[0], this, (data, stateRef) => {
       stateRef.setState({ tasks: data });
+    });
+
+    tools.get('/json/completions/' + eventData[0], this, (data, stateRef) => {
+      stateRef.setState({ completions: data });
+      console.log('Completions: ', data);
     });
   }
 
@@ -85,7 +100,7 @@ class AppShell extends React.Component {
         content = <TaskCompletion house={this.state.currentHouse} houseId={this.state.currentHouseId} tasks={this.state.tasks} />;
         break;
       case 'housestats':
-        content = <Completions tasks={this.state.taskCompletions}/>;
+        content = <Completions tasks={this.state.completions} house={this.state.currentHouse}/>;
         break;
       default:
         content = (<p>No selection</p>);

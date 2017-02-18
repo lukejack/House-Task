@@ -58,14 +58,6 @@
 
 	var _AppShell2 = _interopRequireDefault(_AppShell);
 
-	var _HouseCreate = __webpack_require__(322);
-
-	var _HouseCreate2 = _interopRequireDefault(_HouseCreate);
-
-	var _TaskCompletion = __webpack_require__(334);
-
-	var _TaskCompletion2 = _interopRequireDefault(_TaskCompletion);
-
 	var _reactRouter = __webpack_require__(267);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -76,13 +68,7 @@
 	_reactDom2.default.render(_react2.default.createElement(
 	  _reactRouter.Router,
 	  { history: _reactRouter.hashHistory },
-	  _react2.default.createElement(
-	    _reactRouter.Route,
-	    { path: '/', component: _AppShell2.default },
-	    _react2.default.createElement(_reactRouter.Route, { path: 'create', component: _HouseCreate2.default }),
-	    _react2.default.createElement(_reactRouter.Route, { path: 'houses', component: _HouseCreate2.default }),
-	    _react2.default.createElement(_reactRouter.Route, { path: 'add', component: _TaskCompletion2.default })
-	  )
+	  _react2.default.createElement(_reactRouter.Route, { path: '/', component: _AppShell2.default })
 	), document.getElementById('root'));
 
 /***/ },
@@ -21567,6 +21553,10 @@
 
 	var _TaskCompletion2 = _interopRequireDefault(_TaskCompletion);
 
+	var _Completions = __webpack_require__(335);
+
+	var _Completions2 = _interopRequireDefault(_Completions);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var tools = __webpack_require__(324);
@@ -21585,6 +21575,7 @@
 	      houses: [],
 	      tasks: null,
 	      page: null,
+	      completions: null,
 	      error: false
 	    };
 
@@ -21592,6 +21583,7 @@
 	    _this.componentWillUnmount = _this.componentWillUnmount.bind(_this);
 	    _this.houseChange = _this.houseChange.bind(_this);
 	    _this.pageChange = _this.pageChange.bind(_this);
+	    _this.pullData = _this.pullData.bind(_this);
 	    return _this;
 	  }
 
@@ -21618,12 +21610,21 @@
 	            currentHouseId: data.houses.length > 0 ? data.houses[0]._id : null
 	          };
 	        });
+	        stateRef.pullData();
+	      });
+	    }
+	  }, {
+	    key: 'pullData',
+	    value: function pullData() {
+	      //Get all the tasks for the selected house
 
-	        //Get all the tasks for the selected house
+	      tools.get('/json/tasks/' + this.state.currentHouse, this, function (data, stateRef) {
+	        stateRef.setState({ tasks: data });
+	      });
 
-	        tools.get('/json/tasks/' + stateRef.state.currentHouse, stateRef, function (data, stateRef) {
-	          stateRef.setState({ tasks: data });
-	        });
+	      tools.get('/json/completions/' + this.state.currentHouse, this, function (data, stateRef) {
+	        stateRef.setState({ completions: data });
+	        console.log('Completions: ', data);
 	      });
 	    }
 	  }, {
@@ -21634,8 +21635,14 @@
 	    value: function houseChange(event) {
 	      var eventData = JSON.parse(event.target.value);
 	      this.setState({ currentHouse: eventData[0], currentHouseId: eventData[1] });
+
 	      tools.get('/json/tasks/' + eventData[0], this, function (data, stateRef) {
 	        stateRef.setState({ tasks: data });
+	      });
+
+	      tools.get('/json/completions/' + eventData[0], this, function (data, stateRef) {
+	        stateRef.setState({ completions: data });
+	        console.log('Completions: ', data);
 	      });
 	    }
 	  }, {
@@ -21663,6 +21670,9 @@
 	          break;
 	        case 'complete':
 	          content = _react2.default.createElement(_TaskCompletion2.default, { house: this.state.currentHouse, houseId: this.state.currentHouseId, tasks: this.state.tasks });
+	          break;
+	        case 'housestats':
+	          content = _react2.default.createElement(_Completions2.default, { tasks: this.state.completions, house: this.state.currentHouse });
 	          break;
 	        default:
 	          content = _react2.default.createElement(
@@ -21695,7 +21705,7 @@
 	          ),
 	          _react2.default.createElement(
 	            'button',
-	            { className: 'four columns' },
+	            { className: 'four columns', onClick: this.pageChange, value: 'housestats' },
 	            'House Stats'
 	          )
 	        ),
@@ -41897,6 +41907,112 @@
 	}(_react2.default.Component);
 
 	exports.default = TaskCompletion;
+
+/***/ },
+/* 335 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _getPrototypeOf = __webpack_require__(182);
+
+	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+
+	var _classCallCheck2 = __webpack_require__(207);
+
+	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+	var _createClass2 = __webpack_require__(208);
+
+	var _createClass3 = _interopRequireDefault(_createClass2);
+
+	var _possibleConstructorReturn2 = __webpack_require__(212);
+
+	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+	var _inherits2 = __webpack_require__(259);
+
+	var _inherits3 = _interopRequireDefault(_inherits2);
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _ObjectTable = __webpack_require__(327);
+
+	var _ObjectTable2 = _interopRequireDefault(_ObjectTable);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var tools = __webpack_require__(324);
+
+	var id = 0;
+
+	function genId() {
+	    return id++;
+	}
+
+	var HC_members = function (_React$Component) {
+	    (0, _inherits3.default)(HC_members, _React$Component);
+
+	    function HC_members(props) {
+	        (0, _classCallCheck3.default)(this, HC_members);
+
+	        var _this = (0, _possibleConstructorReturn3.default)(this, (HC_members.__proto__ || (0, _getPrototypeOf2.default)(HC_members)).call(this, props));
+
+	        _this.state = {};
+
+	        return _this;
+	    }
+
+	    (0, _createClass3.default)(HC_members, [{
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {}
+	    }, {
+	        key: 'render',
+	        value: function render() {
+
+	            var errorMessage = void 0;
+
+	            if (this.state.error) {
+	                errorMessage = this.state.error;
+	            } else errorMessage = '';
+
+	            return _react2.default.createElement(
+	                'div',
+	                null,
+	                _react2.default.createElement(
+	                    'h2',
+	                    null,
+	                    'Task completions - ',
+	                    this.props.houseName
+	                ),
+	                _react2.default.createElement(
+	                    'h3',
+	                    null,
+	                    'Completions by all house members'
+	                ),
+	                _react2.default.createElement(_ObjectTable2.default, { items: this.props.tasks, headings: ['fname', 'lname', 'name', 'difficulty', 'description', 'date'], 'delete': function _delete(id) {} }),
+	                _react2.default.createElement(
+	                    'label',
+	                    null,
+	                    _react2.default.createElement(
+	                        'div',
+	                        null,
+	                        errorMessage
+	                    )
+	                )
+	            );
+	        }
+	    }]);
+	    return HC_members;
+	}(_react2.default.Component);
+
+	exports.default = HC_members;
 
 /***/ }
 /******/ ]);

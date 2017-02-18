@@ -141,9 +141,12 @@ module.exports = function (app, passport) {
                 });
         });
 
-        app.get('/json/completions', isLogged, isMember, (req, res) => {
-                ops.getCompletions(req.body.houseId, req.user, (response)=>{
-                        
+        app.get('/json/completions/:house', isLogged, isMember, (req, res) => {
+                House.findOne({ 'name': req.params.house }, (err, house) => {
+                        if (err) res.send({ error: 'Database error' })
+                        ops.getCompletions(house._id.toString(), req.user, (response) => {
+                                res.send(response);
+                        });
                 });
         });
 
