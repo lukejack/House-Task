@@ -38,9 +38,10 @@ module.exports = function (app, passport) {
                         res.redirect('/login');
         });
 
-        app.get('/entry.js', function (req, res) {
-                res.sendFile(__dirname + '/src/static/entry.js');
-        });
+        /*
+        app.get('/entry.ejs', function (req, res) {
+                res.sendFile(__dirname + '/src/static/entry.ejs');
+        });*/
 
         app.get('/login', function (req, res, next) {
                 res.render('entry', { message: req.flash('loginMessage') });
@@ -177,6 +178,11 @@ module.exports = function (app, passport) {
                 ops.addCompletion(req.body.houseId, req.body.taskId, req.user, req.body.description, (response) => {
                         res.send(JSON.stringify(response));
                 });
+        });
+
+        app.get('/logout', function (req, res) {
+                req.logout();
+                res.redirect('/');
         });
 
         app.post('/post/signup', passport.authenticate('local-signup', {

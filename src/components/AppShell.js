@@ -43,6 +43,7 @@ class AppShell extends React.Component {
       stateRef.setState((prevState, props) => {
         return {
           houses: data.houses,
+          page: (data.houses.length > 0) ? 'housestats' : 'create',
           currentHouse: (data.houses.length > 0) ? data.houses[0].name : null,
           currentHouseId: (data.houses.length > 0) ? data.houses[0]._id : null
         }
@@ -97,13 +98,13 @@ class AppShell extends React.Component {
         content = <HouseCreate />;
         break;
       case 'complete':
-        content = <TaskCompletion house={this.state.currentHouse} houseId={this.state.currentHouseId} tasks={this.state.tasks} />;
+        content = <TaskCompletion refresh={this.componentDidMount} house={this.state.currentHouse} houseId={this.state.currentHouseId} tasks={this.state.tasks} />;
         break;
       case 'housestats':
-        content = <Completions tasks={this.state.completions} house={this.state.currentHouse}/>;
+        content = <Completions tasks={this.state.completions} house={this.state.currentHouse} />;
         break;
       default:
-        content = (<p>No selection</p>);
+        content = (<p>Waiting for content...</p>);
         break;
     }
 
@@ -114,14 +115,17 @@ class AppShell extends React.Component {
         <a href='/login'>Log in to view this page</a> :
         <div className='container'>
           <div className='row'>
-            <button className='four columns' onClick={this.pageChange} value={'complete'}>
+            <button className='three columns' onClick={this.pageChange} value={'complete'}>
               Task+
             </button>
-            <button className='four columns'>
+            <button className='three columns'>
               My Stats
                 </button>
-            <button className='four columns' onClick={this.pageChange} value={'housestats'}>
+            <button className='three columns' onClick={this.pageChange} value={'housestats'}>
               House Stats
+                </button>
+            <button className='three columns' onClick={this.pageChange} value={'create'}>
+              Create
                 </button>
           </div>
           <div className='innerComponent'>
@@ -140,8 +144,10 @@ class AppShell extends React.Component {
               </h5>
             </div>
             <div className='three columns'>
-              <button onClick={this.pageChange} value={'create'}>
-                Create
+              <button onClick={
+                ()=>{document.location.href="/logout"}
+              }>
+                Logout
               </button>
             </div>
           </div>

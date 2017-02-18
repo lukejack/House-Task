@@ -21606,6 +21606,7 @@
 	        stateRef.setState(function (prevState, props) {
 	          return {
 	            houses: data.houses,
+	            page: data.houses.length > 0 ? 'housestats' : 'create',
 	            currentHouse: data.houses.length > 0 ? data.houses[0].name : null,
 	            currentHouseId: data.houses.length > 0 ? data.houses[0]._id : null
 	          };
@@ -21669,7 +21670,7 @@
 	          content = _react2.default.createElement(_HouseCreate2.default, null);
 	          break;
 	        case 'complete':
-	          content = _react2.default.createElement(_TaskCompletion2.default, { house: this.state.currentHouse, houseId: this.state.currentHouseId, tasks: this.state.tasks });
+	          content = _react2.default.createElement(_TaskCompletion2.default, { refresh: this.componentDidMount, house: this.state.currentHouse, houseId: this.state.currentHouseId, tasks: this.state.tasks });
 	          break;
 	        case 'housestats':
 	          content = _react2.default.createElement(_Completions2.default, { tasks: this.state.completions, house: this.state.currentHouse });
@@ -21678,7 +21679,7 @@
 	          content = _react2.default.createElement(
 	            'p',
 	            null,
-	            'No selection'
+	            'Waiting for content...'
 	          );
 	          break;
 	      }
@@ -21695,18 +21696,23 @@
 	          { className: 'row' },
 	          _react2.default.createElement(
 	            'button',
-	            { className: 'four columns', onClick: this.pageChange, value: 'complete' },
+	            { className: 'three columns', onClick: this.pageChange, value: 'complete' },
 	            'Task+'
 	          ),
 	          _react2.default.createElement(
 	            'button',
-	            { className: 'four columns' },
+	            { className: 'three columns' },
 	            'My Stats'
 	          ),
 	          _react2.default.createElement(
 	            'button',
-	            { className: 'four columns', onClick: this.pageChange, value: 'housestats' },
+	            { className: 'three columns', onClick: this.pageChange, value: 'housestats' },
 	            'House Stats'
+	          ),
+	          _react2.default.createElement(
+	            'button',
+	            { className: 'three columns', onClick: this.pageChange, value: 'create' },
+	            'Create'
 	          )
 	        ),
 	        _react2.default.createElement(
@@ -21743,8 +21749,10 @@
 	            { className: 'three columns' },
 	            _react2.default.createElement(
 	              'button',
-	              { onClick: this.pageChange, value: 'create' },
-	              'Create'
+	              { onClick: function onClick() {
+	                  document.location.href = "/logout";
+	                } },
+	              'Logout'
 	            )
 	          )
 	        )
@@ -41765,6 +41773,10 @@
 	    value: true
 	});
 
+	var _stringify = __webpack_require__(179);
+
+	var _stringify2 = _interopRequireDefault(_stringify);
+
 	var _getPrototypeOf = __webpack_require__(182);
 
 	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -41789,6 +41801,10 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _HC_tasks = __webpack_require__(329);
+
+	var _HC_tasks2 = _interopRequireDefault(_HC_tasks);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var tools = __webpack_require__(324);
@@ -41803,7 +41819,8 @@
 
 	        _this.state = {
 	            inputText: '',
-	            error: false
+	            error: false,
+	            newTasks: false
 	        };
 
 	        _this.handleChange = _this.handleChange.bind(_this);
@@ -41811,6 +41828,8 @@
 	        _this.handleKeyPress = _this.handleKeyPress.bind(_this);
 	        _this.componentDidMount = _this.componentDidMount.bind(_this);
 	        _this.taskChange = _this.taskChange.bind(_this);
+	        _this.showTaskCreation = _this.showTaskCreation.bind(_this);
+	        _this.taskCreationFinished = _this.taskCreationFinished.bind(_this);
 	        return _this;
 	    }
 
@@ -41844,6 +41863,19 @@
 	            tools.post('/post/taskcomplete', this, function (data, stateRef) {
 	                console.log('Response from completion: ', data);
 	            }, 'houseId=' + this.props.houseId + '&taskId=' + this.state.selectedTask + '&description=' + this.state.inputText);
+	            this.props.refresh();
+	        }
+	    }, {
+	        key: 'showTaskCreation',
+	        value: function showTaskCreation() {
+	            this.setState({ newTasks: true });
+	        }
+	    }, {
+	        key: 'taskCreationFinished',
+	        value: function taskCreationFinished(tasks) {
+	            tools.post('/post/taskadd', this, function (data, stateRef) {}, 'tasks=' + (0, _stringify2.default)(tasks) + '&house=' + this.props.house);
+	            this.setState({ newTasks: false });
+	            this.props.refresh();
 	        }
 	    }, {
 	        key: 'taskChange',
@@ -41863,8 +41895,7 @@
 	                    task.name
 	                );
 	            });
-
-	            return _react2.default.createElement(
+	            if (this.state.newTasks) return _react2.default.createElement(_HC_tasks2.default, { houseName: this.props.house, incrementStep: function incrementStep() {}, setTasks: this.taskCreationFinished });else return _react2.default.createElement(
 	                'div',
 	                null,
 	                _react2.default.createElement(
@@ -41873,32 +41904,49 @@
 	                    'Task Completion'
 	                ),
 	                _react2.default.createElement(
-	                    'h4',
-	                    null,
-	                    'Task'
+	                    'div',
+	                    { className: 'row' },
+	                    _react2.default.createElement(
+	                        'h4',
+	                        { className: 'three columns' },
+	                        'Task'
+	                    ),
+	                    _react2.default.createElement(
+	                        'select',
+	                        { name: 'houses', className: 'nine columns', onChange: this.taskChange },
+	                        tasklist
+	                    )
 	                ),
 	                _react2.default.createElement(
-	                    'select',
-	                    { name: 'houses', className: 'four columns', onChange: this.taskChange },
-	                    tasklist
+	                    'div',
+	                    { className: 'row' },
+	                    _react2.default.createElement(
+	                        'h4',
+	                        { className: 'four columns' },
+	                        'Description'
+	                    ),
+	                    _react2.default.createElement('input', { className: 'eight columns', type: 'text', onChange: this.handleChange, onKeyPress: this.handleKeyPress, ref: function ref(input) {
+	                            _this2.field = input;
+	                        } })
 	                ),
-	                _react2.default.createElement(
-	                    'h4',
-	                    null,
-	                    'Description'
-	                ),
-	                _react2.default.createElement('input', { type: 'text', onChange: this.handleChange, onKeyPress: this.handleKeyPress, ref: function ref(input) {
-	                        _this2.field = input;
-	                    } }),
 	                _react2.default.createElement(
 	                    'div',
 	                    null,
 	                    errorMessage
 	                ),
 	                _react2.default.createElement(
-	                    'button',
-	                    { type: 'submit', onClick: this.submit },
-	                    'Submit'
+	                    'div',
+	                    { className: 'row' },
+	                    _react2.default.createElement(
+	                        'button',
+	                        { type: 'submit', onClick: this.submit },
+	                        'Submit'
+	                    ),
+	                    _react2.default.createElement(
+	                        'button',
+	                        { type: 'submit', onClick: this.showTaskCreation },
+	                        'Create a new task'
+	                    )
 	                )
 	            );
 	        }

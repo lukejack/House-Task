@@ -1,4 +1,5 @@
 import React from 'react';
+import HC_tasks from './HC_tasks';
 let tools = require('../clientTools');
 
 class TaskCompletion extends React.Component {
@@ -7,7 +8,8 @@ class TaskCompletion extends React.Component {
 
         this.state = {
             inputText: '',
-            error: false
+            error: false,
+            newTasks: false
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -15,6 +17,8 @@ class TaskCompletion extends React.Component {
         this.handleKeyPress = this.handleKeyPress.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
         this.taskChange = this.taskChange.bind(this);
+        this.showTaskCreation = this.showTaskCreation.bind(this);
+        this.taskCreationFinished = this.taskCreationFinished.bind(this);
     }
 
     handleChange(event) {
@@ -29,7 +33,7 @@ class TaskCompletion extends React.Component {
 
     componentDidMount() {
         this.field.focus();
-        this.setState({selectedTask: (this.props.tasks.length > 0) ? this.props.tasks[0]._id : null});
+        this.setState({ selectedTask: (this.props.tasks.length > 0) ? this.props.tasks[0]._id : null });
     }
 
     submit() {
@@ -43,7 +47,18 @@ class TaskCompletion extends React.Component {
         tools.post('/post/taskcomplete', this, (data, stateRef) => {
             console.log('Response from completion: ', data);
         }, 'houseId=' + this.props.houseId + '&taskId=' + this.state.selectedTask + '&description=' + this.state.inputText);
+        this.props.refresh();
+    }
 
+    showTaskCreation(){
+        this.setState({newTasks: true});
+    }
+
+    taskCreationFinished(tasks){
+        tools.post('/post/taskadd', this, (data, stateRef) => {
+        }, 'tasks=' + JSON.stringify(tasks) + '&house=' + this.props.house);
+        this.setState({newTasks: false});
+        this.props.refresh();
     }
 
     taskChange(event) {
@@ -53,20 +68,28 @@ class TaskCompletion extends React.Component {
     render() {
         let errorMessage = this.state.error ? this.state.error : '';
         let tasklist = this.props.tasks.map((task) => <option key={task._id} value={task._id}>{task.name}</option>);
-
-        return (
-
-            <div>
-                <h2>Task Completion</h2>
-                <h4>Task</h4>
-                <select name='houses' className='four columns' onChange={this.taskChange}>
-                    {tasklist}
-                </select>
-                <h4>Description</h4><input type="text" onChange={this.handleChange} onKeyPress={this.handleKeyPress} ref={(input) => { this.field = input; } } />
-                <div>{errorMessage}</div>
-                <button type="submit" onClick={this.submit}>Submit</button>
-            </div>
-        );
+        if (this.state.newTasks) return (<HC_tasks houseName={this.props.house} incrementStep={() => { } } setTasks={this.taskCreationFinished} />)
+        else
+            return (
+                <div>
+                    <h2>Task Completion</h2>
+                    <div className='row'>
+                        <h4 className='three columns'>Task</h4>
+                        <select name='houses' className='nine columns' onChange={this.taskChange}>
+                            {tasklist}
+                        </select>
+                    </div>
+                    <div className='row'>
+                        <h4 className='four columns'>Description</h4>
+                        <input className='eight columns' type="text" onChange={this.handleChange} onKeyPress={this.handleKeyPress} ref={(input) => { this.field = input; } } />
+                    </div>
+                    <div>{errorMessage}</div>
+                    <div className='row'>
+                        <button type="submit" onClick={this.submit}>Submit</button>
+                        <button type="submit" onClick={this.showTaskCreation}>Create a new task</button>
+                    </div>
+                </div>
+            );
     }
 }
 
