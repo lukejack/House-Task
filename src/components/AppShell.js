@@ -28,6 +28,17 @@ class AppShell extends React.Component {
 
   componentDidMount() {
 
+    if (typeof (Storage) !== "undefined") {
+      let houseSelectionJSON = localStorage.getItem('houseSelection');
+      if (houseSelectionJSON) {
+        let houseSelection = JSON.parse(houseSelectionJSON);
+        this.setState({
+          currentHouse: houseSelection.name,
+          currentHouseId: houseSelection.id
+        });
+      }
+    }
+
     //Get user information
     tools.get('/json/user', this, function (data, stateRef) {
       stateRef.setState((prevState, props) => {
@@ -41,12 +52,18 @@ class AppShell extends React.Component {
     //Get all of the houses the user is a member of
     tools.get('/json/houses', this, function (data, stateRef) {
       stateRef.setState((prevState, props) => {
-        return {
-          houses: data.houses,
-          page: (data.houses.length > 0) ? 'housestats' : 'create',
-          currentHouse: (data.houses.length > 0) ? data.houses[0].name : null,
-          currentHouseId: (data.houses.length > 0) ? data.houses[0]._id : null
-        }
+        if (prevState.currentHouse && prevState.currentHouseId)
+          return {
+            houses: data.houses,
+            page: (data.houses.length > 0) ? 'housestats' : 'create',
+          }
+        else
+          return {
+            houses: data.houses,
+            page: (data.houses.length > 0) ? 'housestats' : 'create',
+            currentHouse: (data.houses.length > 0) ? data.houses[0].name : null,
+            currentHouseId: (data.houses.length > 0) ? data.houses[0]._id : null
+          }
       });
       stateRef.pullData();
     });
@@ -62,11 +79,11 @@ class AppShell extends React.Component {
 
     tools.get('/json/completions/' + this.state.currentHouse, this, (data, stateRef) => {
       stateRef.setState({ completions: data });
-      console.log('Completions: ', data);
     });
   }
 
   componentWillUnmount() {
+
   }
 
   houseChange(event) {
@@ -79,8 +96,13 @@ class AppShell extends React.Component {
 
     tools.get('/json/completions/' + eventData[0], this, (data, stateRef) => {
       stateRef.setState({ completions: data });
-      console.log('Completions: ', data);
     });
+
+    //Local storage of selection
+    if (typeof (Storage) !== 'undefined') {
+      let houseSelection = { name: eventData[0], id: eventData[1] };
+      localStorage.setItem('houseSelection', JSON.stringify(houseSelection));
+    }
   }
 
   pageChange(e) {
@@ -135,7 +157,7 @@ class AppShell extends React.Component {
             <h5 className='two columns'>
               House:
                 </h5>
-            <select name='houses' className='four columns' onChange={this.houseChange}>
+            <select name='houses' value={JSON.stringify([this.state.currentHouse, this.state.currentHouseId])} className='four columns' onChange={this.houseChange}>
               {housesList}
             </select>
             <div className='three columns'>
@@ -145,7 +167,7 @@ class AppShell extends React.Component {
             </div>
             <div className='three columns'>
               <button onClick={
-                ()=>{document.location.href="/logout"}
+                () => { document.location.href = "/logout" }
               }>
                 Logout
               </button>
