@@ -155,6 +155,7 @@ function getCompletions(houseId, user, cb) {
 
                                 thisNiceCompletion.date = completions[i].date;
                                 thisNiceCompletion.description = completions[i].description;
+                                thisNiceCompletion._id = completions[i]._id;
 
                                 niceCompletions.push(thisNiceCompletion);
                             }

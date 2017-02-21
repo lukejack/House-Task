@@ -52,6 +52,7 @@ class AppShell extends React.Component {
     //Get all of the houses the user is a member of
     tools.get('/json/houses', this, function (data, stateRef) {
       stateRef.setState((prevState, props) => {
+        console.log(data.houses);
         if (prevState.currentHouse && prevState.currentHouseId)
           return {
             houses: data.houses,
@@ -72,7 +73,6 @@ class AppShell extends React.Component {
 
   pullData() {
     //Get all the tasks for the selected house
-
     tools.get('/json/tasks/' + this.state.currentHouse, this, (data, stateRef) => {
       stateRef.setState({ tasks: data });
     });
@@ -123,7 +123,7 @@ class AppShell extends React.Component {
         content = <TaskCompletion refresh={this.componentDidMount} house={this.state.currentHouse} houseId={this.state.currentHouseId} tasks={this.state.tasks} />;
         break;
       case 'housestats':
-        content = <Completions tasks={this.state.completions} house={this.state.currentHouse} />;
+        content = <Completions tasks={this.state.completions} houseName={this.state.currentHouse} />;
         break;
       default:
         content = (<p>Waiting for content...</p>);
@@ -134,7 +134,7 @@ class AppShell extends React.Component {
 
     return (
       this.state.error ?
-        <a href='/login'>Log in to view this page</a> :
+        <a href='/login'>Log in to view this page.</a> :
         <div className='container'>
           <div className='row'>
             <button className='three columns' onClick={this.pageChange} value={'complete'}>

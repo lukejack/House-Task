@@ -21591,6 +21591,17 @@
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
 
+	      if (typeof Storage !== "undefined") {
+	        var houseSelectionJSON = localStorage.getItem('houseSelection');
+	        if (houseSelectionJSON) {
+	          var houseSelection = JSON.parse(houseSelectionJSON);
+	          this.setState({
+	            currentHouse: houseSelection.name,
+	            currentHouseId: houseSelection.id
+	          });
+	        }
+	      }
+
 	      //Get user information
 	      tools.get('/json/user', this, function (data, stateRef) {
 	        stateRef.setState(function (prevState, props) {
@@ -21604,7 +21615,11 @@
 	      //Get all of the houses the user is a member of
 	      tools.get('/json/houses', this, function (data, stateRef) {
 	        stateRef.setState(function (prevState, props) {
-	          return {
+	          console.log(data.houses);
+	          if (prevState.currentHouse && prevState.currentHouseId) return {
+	            houses: data.houses,
+	            page: data.houses.length > 0 ? 'housestats' : 'create'
+	          };else return {
 	            houses: data.houses,
 	            page: data.houses.length > 0 ? 'housestats' : 'create',
 	            currentHouse: data.houses.length > 0 ? data.houses[0].name : null,
@@ -21618,14 +21633,12 @@
 	    key: 'pullData',
 	    value: function pullData() {
 	      //Get all the tasks for the selected house
-
 	      tools.get('/json/tasks/' + this.state.currentHouse, this, function (data, stateRef) {
 	        stateRef.setState({ tasks: data });
 	      });
 
 	      tools.get('/json/completions/' + this.state.currentHouse, this, function (data, stateRef) {
 	        stateRef.setState({ completions: data });
-	        console.log('Completions: ', data);
 	      });
 	    }
 	  }, {
@@ -21643,8 +21656,13 @@
 
 	      tools.get('/json/completions/' + eventData[0], this, function (data, stateRef) {
 	        stateRef.setState({ completions: data });
-	        console.log('Completions: ', data);
 	      });
+
+	      //Local storage of selection
+	      if (typeof Storage !== 'undefined') {
+	        var houseSelection = { name: eventData[0], id: eventData[1] };
+	        localStorage.setItem('houseSelection', (0, _stringify2.default)(houseSelection));
+	      }
 	    }
 	  }, {
 	    key: 'pageChange',
@@ -21673,7 +21691,7 @@
 	          content = _react2.default.createElement(_TaskCompletion2.default, { refresh: this.componentDidMount, house: this.state.currentHouse, houseId: this.state.currentHouseId, tasks: this.state.tasks });
 	          break;
 	        case 'housestats':
-	          content = _react2.default.createElement(_Completions2.default, { tasks: this.state.completions, house: this.state.currentHouse });
+	          content = _react2.default.createElement(_Completions2.default, { tasks: this.state.completions, houseName: this.state.currentHouse });
 	          break;
 	        default:
 	          content = _react2.default.createElement(
@@ -21687,7 +21705,7 @@
 	      return this.state.error ? _react2.default.createElement(
 	        'a',
 	        { href: '/login' },
-	        'Log in to view this page'
+	        'Log in to view this page.'
 	      ) : _react2.default.createElement(
 	        'div',
 	        { className: 'container' },
@@ -21730,7 +21748,7 @@
 	          ),
 	          _react2.default.createElement(
 	            'select',
-	            { name: 'houses', className: 'four columns', onChange: this.houseChange },
+	            { name: 'houses', value: (0, _stringify2.default)([this.state.currentHouse, this.state.currentHouseId]), className: 'four columns', onChange: this.houseChange },
 	            housesList
 	          ),
 	          _react2.default.createElement(
@@ -41994,6 +42012,10 @@
 
 	var _ObjectTable2 = _interopRequireDefault(_ObjectTable);
 
+	var _CompletionRow = __webpack_require__(336);
+
+	var _CompletionRow2 = _interopRequireDefault(_CompletionRow);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var tools = __webpack_require__(324);
@@ -42030,13 +42052,24 @@
 	                errorMessage = this.state.error;
 	            } else errorMessage = '';
 
+	            var completionRows = this.props.tasks === null ? _react2.default.createElement(
+	                'tr',
+	                null,
+	                _react2.default.createElement(
+	                    'td',
+	                    null,
+	                    'Loading'
+	                )
+	            ) : this.props.tasks.map(function (completion) {
+	                return _react2.default.createElement(_CompletionRow2.default, { completion: completion, key: completion._id });
+	            });
+
 	            return _react2.default.createElement(
 	                'div',
 	                null,
 	                _react2.default.createElement(
 	                    'h2',
 	                    null,
-	                    'Task completions - ',
 	                    this.props.houseName
 	                ),
 	                _react2.default.createElement(
@@ -42044,7 +42077,15 @@
 	                    null,
 	                    'Completions by all house members'
 	                ),
-	                _react2.default.createElement(_ObjectTable2.default, { items: this.props.tasks, headings: ['fname', 'lname', 'name', 'difficulty', 'description', 'date'], 'delete': function _delete(id) {} }),
+	                _react2.default.createElement(
+	                    'table',
+	                    null,
+	                    _react2.default.createElement(
+	                        'tbody',
+	                        null,
+	                        completionRows
+	                    )
+	                ),
 	                _react2.default.createElement(
 	                    'label',
 	                    null,
@@ -42061,6 +42102,136 @@
 	}(_react2.default.Component);
 
 	exports.default = HC_members;
+
+/***/ },
+/* 336 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _getPrototypeOf = __webpack_require__(182);
+
+	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+
+	var _classCallCheck2 = __webpack_require__(207);
+
+	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+	var _createClass2 = __webpack_require__(208);
+
+	var _createClass3 = _interopRequireDefault(_createClass2);
+
+	var _possibleConstructorReturn2 = __webpack_require__(212);
+
+	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+	var _inherits2 = __webpack_require__(259);
+
+	var _inherits3 = _interopRequireDefault(_inherits2);
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var CompletionRow = function (_React$Component) {
+	    (0, _inherits3.default)(CompletionRow, _React$Component);
+
+	    function CompletionRow(props) {
+	        (0, _classCallCheck3.default)(this, CompletionRow);
+
+	        var _this = (0, _possibleConstructorReturn3.default)(this, (CompletionRow.__proto__ || (0, _getPrototypeOf2.default)(CompletionRow)).call(this, props));
+
+	        _this.state = {
+	            completion: _this.props.completion
+	        };
+
+	        _this.componentDidMount = _this.componentDidMount.bind(_this);
+	        //this.remove = this.remove.bind(this);
+	        return _this;
+	    }
+
+	    (0, _createClass3.default)(CompletionRow, [{
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {}
+
+	        /*
+	        remove(){
+	            console.log('rows remove called');
+	            this.props.removeThis(this.state.item.id);
+	        }*/
+
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var _this2 = this;
+
+	            var timeAgo = void 0;
+	            var minutesAgo = (new Date().getTime() - this.state.completion.date) / 60000;
+	            if (minutesAgo < 60) timeAgo = Math.floor(minutesAgo) + ' minutes ago';
+	            if (minutesAgo > 60 && minutesAgo < 60 * 24) timeAgo = Math.floor(minutesAgo / 60) + ' hours ago';
+	            if (minutesAgo > 60 * 24) timeAgo = Math.floor(minutesAgo / (60 * 24)) + ' days ago';
+
+	            var difficulty = this.state.completion.difficulty;
+	            var difficultyColour = void 0;
+	            switch (true) {
+	                case difficulty < 4:
+	                    difficultyColour = '#00ff00';
+	                    break;
+	                case difficulty < 7:
+	                    difficultyColour = '#ffff00';
+	                    break;
+	                default:
+	                    difficultyColour = '#ff0000';
+	                    break;
+	            }
+
+	            var rowStyle = {
+	                borderRightStyle: 'solid',
+	                borderRightWidth: '5px',
+	                borderRightColor: difficultyColour
+	            };
+
+	            return _react2.default.createElement(
+	                'tr',
+	                { style: rowStyle, onClick: function onClick() {
+	                        alert('Description: ' + _this2.state.completion.description);
+	                    } },
+	                _react2.default.createElement(
+	                    'td',
+	                    { className: 'seperator-right' },
+	                    _react2.default.createElement(
+	                        'span',
+	                        { className: 'padded-left' },
+	                        this.state.completion.name
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    'td',
+	                    { className: 'seperator-right' },
+	                    this.state.completion.fname[0].toUpperCase() + this.state.completion.lname[0].toUpperCase()
+	                ),
+	                _react2.default.createElement(
+	                    'td',
+	                    null,
+	                    _react2.default.createElement(
+	                        'span',
+	                        { className: 'padded-right' },
+	                        timeAgo
+	                    )
+	                )
+	            );
+	        }
+	    }]);
+	    return CompletionRow;
+	}(_react2.default.Component);
+
+	exports.default = CompletionRow;
 
 /***/ }
 /******/ ]);
