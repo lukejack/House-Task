@@ -60,7 +60,6 @@ class HouseCreate extends React.Component {
 
     finish() {
         //Post the house name, then add members and tasks
-        console.log()
         tools.post('/post/housecreate', this, (data, stateRef) => {
             console.log(data);
             if (data.success) {

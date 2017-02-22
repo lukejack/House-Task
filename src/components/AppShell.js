@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import HouseCreate from './HouseCreate';
 import TaskCompletion from './TaskCompletion';
 import Completions from './Completions';
+import Admin from './Admin';
 let tools = require('../clientTools');
 
 class AppShell extends React.Component {
@@ -52,7 +53,6 @@ class AppShell extends React.Component {
     //Get all of the houses the user is a member of
     tools.get('/json/houses', this, function (data, stateRef) {
       stateRef.setState((prevState, props) => {
-        console.log(data.houses);
         if (prevState.currentHouse && prevState.currentHouseId)
           return {
             houses: data.houses,
@@ -125,6 +125,9 @@ class AppShell extends React.Component {
       case 'housestats':
         content = <Completions tasks={this.state.completions} houseName={this.state.currentHouse} />;
         break;
+      case 'admin':
+        content = <Admin refresh={this.componentDidMount} house={this.state.currentHouse} houseId={this.state.currentHouseId} tasks={this.state.tasks} />;
+        break;
       default:
         content = (<p>Waiting for content...</p>);
         break;
@@ -140,14 +143,15 @@ class AppShell extends React.Component {
             <button className='three columns' onClick={this.pageChange} value={'complete'}>
               Task+
             </button>
-            <button className='three columns'>
-              My Stats
-                </button>
+
             <button className='three columns' onClick={this.pageChange} value={'housestats'}>
               House Stats
                 </button>
             <button className='three columns' onClick={this.pageChange} value={'create'}>
               Create
+                </button>
+            <button className='three columns' onClick={this.pageChange} value={'admin'}>
+              Admin
                 </button>
           </div>
           <div className='innerComponent'>

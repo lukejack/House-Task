@@ -128,6 +128,18 @@ module.exports = function (app, passport) {
                 });
         });
 
+        app.get('/json/admin/:house', isLogged, isMember, (req, res)=>{
+                House.findOne({ 'name': req.params.house }, (err, house) => {
+                        if (err) { console.log(err); res.send({ error: 'Database Error' }) }
+                        if (house.admin === req.user._id.toString()){
+                                console.log('User is admin');
+                                res.send({admin: true});
+                        } else {
+                        console.log('User is not admin');
+                        res.send({admin: false});}
+                });
+        });
+
 
 
         app.get('/json/members', isLogged, isMember, (req, res) => { //Verify
