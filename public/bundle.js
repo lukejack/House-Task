@@ -21557,6 +21557,10 @@
 
 	var _Completions2 = _interopRequireDefault(_Completions);
 
+	var _Admin = __webpack_require__(337);
+
+	var _Admin2 = _interopRequireDefault(_Admin);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var tools = __webpack_require__(324);
@@ -21591,23 +21595,26 @@
 	    key: 'componentDidMount',
 	    value: function componentDidMount() {
 
-	      if (typeof Storage !== "undefined") {
-	        var houseSelectionJSON = localStorage.getItem('houseSelection');
-	        if (houseSelectionJSON) {
-	          var houseSelection = JSON.parse(houseSelectionJSON);
-	          this.setState({
-	            currentHouse: houseSelection.name,
-	            currentHouseId: houseSelection.id
-	          });
-	        }
-	      }
-
 	      //Get user information
 	      tools.get('/json/user', this, function (data, stateRef) {
+
+	        if (typeof Storage !== "undefined") {
+	          var houseSelectionJSON = localStorage.getItem('houseSelection');
+	          if (houseSelectionJSON) {
+	            var houseSelection = JSON.parse(houseSelectionJSON);
+	            console.log('Equivalence', houseSelection.userId, data.id, houseSelection.id === data.id);
+	            if (houseSelection.userId === data.id) stateRef.setState({
+	              currentHouse: houseSelection.name,
+	              currentHouseId: houseSelection.id
+	            });
+	          }
+	        }
+
 	        stateRef.setState(function (prevState, props) {
 	          return {
 	            fname: data.fname,
-	            lname: data.lname
+	            lname: data.lname,
+	            userId: data.id
 	          };
 	        });
 	      });
@@ -21615,7 +21622,6 @@
 	      //Get all of the houses the user is a member of
 	      tools.get('/json/houses', this, function (data, stateRef) {
 	        stateRef.setState(function (prevState, props) {
-	          console.log(data.houses);
 	          if (prevState.currentHouse && prevState.currentHouseId) return {
 	            houses: data.houses,
 	            page: data.houses.length > 0 ? 'housestats' : 'create'
@@ -21660,7 +21666,7 @@
 
 	      //Local storage of selection
 	      if (typeof Storage !== 'undefined') {
-	        var houseSelection = { name: eventData[0], id: eventData[1] };
+	        var houseSelection = { userId: this.state.userId, name: eventData[0], id: eventData[1] };
 	        localStorage.setItem('houseSelection', (0, _stringify2.default)(houseSelection));
 	      }
 	    }
@@ -21693,6 +21699,9 @@
 	        case 'housestats':
 	          content = _react2.default.createElement(_Completions2.default, { tasks: this.state.completions, houseName: this.state.currentHouse });
 	          break;
+	        case 'admin':
+	          content = _react2.default.createElement(_Admin2.default, { refresh: this.componentDidMount, house: this.state.currentHouse, houseId: this.state.currentHouseId, tasks: this.state.tasks });
+	          break;
 	        default:
 	          content = _react2.default.createElement(
 	            'p',
@@ -21719,11 +21728,6 @@
 	          ),
 	          _react2.default.createElement(
 	            'button',
-	            { className: 'three columns' },
-	            'My Stats'
-	          ),
-	          _react2.default.createElement(
-	            'button',
 	            { className: 'three columns', onClick: this.pageChange, value: 'housestats' },
 	            'House Stats'
 	          ),
@@ -21731,6 +21735,11 @@
 	            'button',
 	            { className: 'three columns', onClick: this.pageChange, value: 'create' },
 	            'Create'
+	          ),
+	          _react2.default.createElement(
+	            'button',
+	            { className: 'three columns', onClick: this.pageChange, value: 'admin' },
+	            'Admin'
 	          )
 	        ),
 	        _react2.default.createElement(
@@ -28482,7 +28491,6 @@
 	        key: 'finish',
 	        value: function finish() {
 	            //Post the house name, then add members and tasks
-	            console.log();
 	            tools.post('/post/housecreate', this, function (data, stateRef) {
 	                console.log(data);
 	                if (data.success) {
@@ -28510,11 +28518,7 @@
 	                    currentStep = _react2.default.createElement(_HC_tasks2.default, { houseName: this.state.houseName, incrementStep: this.incrementStep, setTasks: this.setTasks });
 	                    break;
 	                default:
-	                    currentStep = _react2.default.createElement(
-	                        'p',
-	                        null,
-	                        'Illegal step'
-	                    );
+	                    window.location.reload();
 	                    break;
 	            }
 
@@ -28897,7 +28901,6 @@
 	            for (var i = 0; i < this.state.membersToAdd.length; i++) {
 	                memberEmails[i] = this.state.membersToAdd[i].email;
 	            }
-	            console.log(memberEmails);
 	            this.props.setMembers(memberEmails);
 	        }
 	    }, {
@@ -41877,7 +41880,7 @@
 	            if (input === '')
 	                this.setState({ error: 'Please enter a short description' });
 	            else {
-	             }*/
+	              }*/
 	            tools.post('/post/taskcomplete', this, function (data, stateRef) {
 	                console.log('Response from completion: ', data);
 	            }, 'houseId=' + this.props.houseId + '&taskId=' + this.state.selectedTask + '&description=' + this.state.inputText);
@@ -41906,13 +41909,17 @@
 	            var _this2 = this;
 
 	            var errorMessage = this.state.error ? this.state.error : '';
-	            var tasklist = this.props.tasks.map(function (task) {
+	            var tasklist = this.props.tasks && this.props.tasks.length > 0 ? this.props.tasks.map(function (task) {
 	                return _react2.default.createElement(
 	                    'option',
 	                    { key: task._id, value: task._id },
 	                    task.name
 	                );
-	            });
+	            }) : _react2.default.createElement(
+	                'span',
+	                null,
+	                'Loading...'
+	            );
 	            if (this.state.newTasks) return _react2.default.createElement(_HC_tasks2.default, { houseName: this.props.house, incrementStep: function incrementStep() {}, setTasks: this.taskCreationFinished });else return _react2.default.createElement(
 	                'div',
 	                null,
@@ -42052,6 +42059,7 @@
 	                errorMessage = this.state.error;
 	            } else errorMessage = '';
 
+	            console.log('Tasks: ', this.props.tasks);
 	            var completionRows = this.props.tasks === null ? _react2.default.createElement(
 	                'tr',
 	                null,
@@ -42232,6 +42240,140 @@
 	}(_react2.default.Component);
 
 	exports.default = CompletionRow;
+
+/***/ },
+/* 337 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _stringify = __webpack_require__(179);
+
+	var _stringify2 = _interopRequireDefault(_stringify);
+
+	var _getPrototypeOf = __webpack_require__(182);
+
+	var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
+
+	var _classCallCheck2 = __webpack_require__(207);
+
+	var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+	var _createClass2 = __webpack_require__(208);
+
+	var _createClass3 = _interopRequireDefault(_createClass2);
+
+	var _possibleConstructorReturn2 = __webpack_require__(212);
+
+	var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorReturn2);
+
+	var _inherits2 = __webpack_require__(259);
+
+	var _inherits3 = _interopRequireDefault(_inherits2);
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _HC_members = __webpack_require__(326);
+
+	var _HC_members2 = _interopRequireDefault(_HC_members);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var tools = __webpack_require__(324);
+
+	var Admin = function (_React$Component) {
+	    (0, _inherits3.default)(Admin, _React$Component);
+
+	    function Admin(props) {
+	        (0, _classCallCheck3.default)(this, Admin);
+
+	        var _this = (0, _possibleConstructorReturn3.default)(this, (Admin.__proto__ || (0, _getPrototypeOf2.default)(Admin)).call(this, props));
+
+	        _this.state = {
+	            admin: null,
+	            page: null
+	        };
+
+	        _this.componentDidMount = _this.componentDidMount.bind(_this);
+	        _this.addMembers = _this.addMembers.bind(_this);
+	        return _this;
+	    }
+
+	    (0, _createClass3.default)(Admin, [{
+	        key: 'componentDidMount',
+	        value: function componentDidMount() {
+	            tools.get('/json/admin/' + this.props.house, this, function (data, stateRef) {
+	                stateRef.setState({ admin: data.admin });
+	            });
+	        }
+	    }, {
+	        key: 'addMembers',
+	        value: function addMembers(members) {
+	            tools.post('/post/memberadd', this, function (data, stateRef) {
+	                if (data.error) {
+	                    alert('There has been an error adding members');
+	                }
+	            }, 'house=' + this.props.house + "&members=" + (0, _stringify2.default)(members));
+	            this.setState({ page: null });
+	        }
+	    }, {
+	        key: 'render',
+	        value: function render() {
+	            var _this2 = this;
+
+	            var content = void 0;
+	            switch (this.state.page) {
+	                case 'addMembers':
+	                    content = _react2.default.createElement(_HC_members2.default, { houseName: this.props.house, incrementStep: function incrementStep() {}, setMembers: this.addMembers });
+	                    break;
+	                default:
+	                    content = _react2.default.createElement(
+	                        'span',
+	                        null,
+	                        _react2.default.createElement('br', null),
+	                        'Select one of the above options'
+	                    );
+	                    break;
+	            }
+
+	            if (this.state.admin === null) {
+	                return _react2.default.createElement(
+	                    'span',
+	                    null,
+	                    'Loading...'
+	                );
+	            } else if (this.state.admin === false) {
+	                return _react2.default.createElement(
+	                    'span',
+	                    null,
+	                    'User is not admin'
+	                );
+	            } else if (this.state.admin === true) {
+	                return _react2.default.createElement(
+	                    'div',
+	                    null,
+	                    _react2.default.createElement(
+	                        'button',
+	                        { onClick: function onClick() {
+	                                _this2.setState({ page: 'addMembers' });
+	                            } },
+	                        'Add house members'
+	                    ),
+	                    content
+	                );
+	            }
+	        }
+	    }]);
+	    return Admin;
+	}(_react2.default.Component);
+
+	exports.default = Admin;
 
 /***/ }
 /******/ ]);

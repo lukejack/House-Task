@@ -86,7 +86,7 @@ class HouseCreate extends React.Component {
                 currentStep = <HC_tasks houseName={this.state.houseName} incrementStep={this.incrementStep} setTasks={this.setTasks} />
                 break;
             default:
-                currentStep = <p>Illegal step</p>
+                window.location.reload();
                 break;
         }
 

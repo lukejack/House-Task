@@ -52,6 +52,7 @@ module.exports = function (app, passport) {
         app.get('/json/user', isLogged, function (req, res) {
                 res.send(
                         {
+                                id: req.user._id,
                                 email: req.user.email,
                                 fname: req.user.fname,
                                 lname: req.user.lname
@@ -142,13 +143,14 @@ module.exports = function (app, passport) {
 
 
 
-        app.get('/json/members', isLogged, isMember, (req, res) => { //Verify
-                User.find({ 'houses': req.body.house }, (err, docs) => {
+        app.get('/json/members/:house', isLogged, isMember, (req, res) => {
+                User.find({ 'houses': req.params.house }, (err, users) => {
                         if (err) console.log(err);
-                        else if (docs) {
+                        else if (users) {
                                 let response = [];
-                                foreach(doc in docs)
-                                response.push({ fname: doc.fname, lname: doc.lname })
+                                users.forEach((user)=>{
+                                        response.push({ fname: user.fname, lname: user.lname, id: user._id.toString() })
+                                })
                                 res.send(response);
                         } else res.send({ error: 'No members found' });
                 });

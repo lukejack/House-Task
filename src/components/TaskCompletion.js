@@ -67,7 +67,7 @@ class TaskCompletion extends React.Component {
 
     render() {
         let errorMessage = this.state.error ? this.state.error : '';
-        let tasklist = this.props.tasks.map((task) => <option key={task._id} value={task._id}>{task.name}</option>);
+        let tasklist = (this.props.tasks && this.props.tasks.length > 0) ? this.props.tasks.map((task) => <option key={task._id} value={task._id}>{task.name}</option>) : <span>Loading...</span>;
         if (this.state.newTasks) return (<HC_tasks houseName={this.props.house} incrementStep={() => { } } setTasks={this.taskCreationFinished} />)
         else
             return (

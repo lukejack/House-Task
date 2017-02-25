@@ -29,23 +29,27 @@ class AppShell extends React.Component {
 
   componentDidMount() {
 
-    if (typeof (Storage) !== "undefined") {
-      let houseSelectionJSON = localStorage.getItem('houseSelection');
-      if (houseSelectionJSON) {
-        let houseSelection = JSON.parse(houseSelectionJSON);
-        this.setState({
-          currentHouse: houseSelection.name,
-          currentHouseId: houseSelection.id
-        });
-      }
-    }
-
     //Get user information
     tools.get('/json/user', this, function (data, stateRef) {
+
+      if (typeof (Storage) !== "undefined") {
+        let houseSelectionJSON = localStorage.getItem('houseSelection');
+        if (houseSelectionJSON) {
+          let houseSelection = JSON.parse(houseSelectionJSON);
+          console.log ('Equivalence', houseSelection.userId, data.id, (houseSelection.id === data.id))
+          if (houseSelection.userId === data.id)
+            stateRef.setState({
+              currentHouse: houseSelection.name,
+              currentHouseId: houseSelection.id
+            });
+        }
+      }
+
       stateRef.setState((prevState, props) => {
         return {
           fname: data.fname,
-          lname: data.lname
+          lname: data.lname,
+          userId: data.id
         }
       });
     });
@@ -100,7 +104,7 @@ class AppShell extends React.Component {
 
     //Local storage of selection
     if (typeof (Storage) !== 'undefined') {
-      let houseSelection = { name: eventData[0], id: eventData[1] };
+      let houseSelection = { userId: this.state.userId, name: eventData[0], id: eventData[1] };
       localStorage.setItem('houseSelection', JSON.stringify(houseSelection));
     }
   }
