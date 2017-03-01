@@ -10,10 +10,10 @@
 <p><%= message %></p>
 <% } %>
 
-<form action="/post/login" method="post" id="login" onsubmit="submitForm(this)">
+<form action="/post/login" method="post" id="login" onsubmit="return submitForm()">
     <div>
         <label>Email</label>
-        <input type="text" name="email"/>
+        <input type="text" name="email" type="email" autocorrect="off" autocapitalize="none"/>
     </div>
     <div>
         <label>Password</label>
@@ -21,7 +21,7 @@
     </div>
     <button id="logintrigger" type="submit">Submit</button>
 </form>
-<form action="/post/signup" method="post" id="signup" onsubmit="submitForm(this)">
+<form name="signupForm" action="/post/signup" method="post" id="signup" onsubmit="return submitForm()">
         <div>
             <label>First Name</label>
             <input type="text" name="fname"/>
@@ -32,7 +32,7 @@
         </div>
         <div>
             <label>Email</label>
-            <input type="text" name="email"/>
+            <input type="text" name="email" type="email" autocorrect="off" autocapitalize="none"/>
         </div>
         <div>
             <label>Password</label>
@@ -52,16 +52,9 @@
         }
         showLogin();
 
-        function submitForm(oFormElement){
-            var xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
-                    //Do nothing
-                }
-            };
-            xhr.open (oFormElement.method, oFormElement.action, true);
-            xhr.send (new FormData (oFormElement));
-            return false;
+        function submitForm(){
         };
+
+        
     </script>
 </body>

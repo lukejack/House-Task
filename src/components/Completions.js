@@ -32,7 +32,6 @@ class HC_members extends React.Component {
         } else
             errorMessage = '';
         
-        console.log('Tasks: ', this.props.tasks);
         let completionRows = (this.props.tasks === null) ? (<tr><td>Loading</td></tr>) : this.props.tasks.map((completion) => {
             return (<CompletionRow completion={completion} key={completion._id} />);
         });

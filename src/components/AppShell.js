@@ -36,7 +36,7 @@ class AppShell extends React.Component {
         let houseSelectionJSON = localStorage.getItem('houseSelection');
         if (houseSelectionJSON) {
           let houseSelection = JSON.parse(houseSelectionJSON);
-          console.log ('Equivalence', houseSelection.userId, data.id, (houseSelection.id === data.id))
+          
           if (houseSelection.userId === data.id)
             stateRef.setState({
               currentHouse: houseSelection.name,
