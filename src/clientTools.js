@@ -18,6 +18,7 @@ function get(URL, stateRef, callback, data) {
 
 //HTTP POST
 function post(URL, stateRef, callback, data) {
+  //console.log('POST: ', URL, data, callback);
   var http = new XMLHttpRequest();
   http.open("POST", URL, true);
 

@@ -100,7 +100,7 @@ class HC_members extends React.Component{
                 <ObjectTable items={this.state.membersToAdd} headings={['fname', 'email']} delete={(id)=>tools.delete(this, 'membersToAdd', id)}/>
                 <label>
                     User's email: 
-                    <input type="text" onChange={this.handleChange} value={this.state.currentInput} onKeyPress={this.handleKeyPress} ref={(input)=>{this.field = input;}} autocorrect="off" autocapitalize="none"/>
+                    <input type="text" onChange={this.handleChange} value={this.state.currentInput} onKeyPress={this.handleKeyPress} ref={(input)=>{this.field = input;}} autoCorrect="off" autoCapitalize="none"/>
                 <button type="submit" onClick={this.submit}>Submit</button>
                 
                 <div>{errorMessage}</div>

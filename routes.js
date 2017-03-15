@@ -170,13 +170,14 @@ module.exports = function (app, passport) {
         //Data submission routes
         app.post('/post/memberadd', isLogged, (req, res) => {
                 ops.addMembers(req.body.house, req.user, JSON.parse(req.body.members), (response) => {
-                        console.log('post memberadd response: ', response);
-                        res.send(JSON.stringify(response));
+                        res.send(response);
                 });
         });
 
         app.post('/post/housecreate', isLogged, function (req, res) {
+                console.log('Housecreate: ', req.body.house, req.user);
                 ops.createHouse(req.body.house, req.user, (response) => {
+                        console.log('Response: ', response);
                         res.send(JSON.stringify(response));
                 });
         });

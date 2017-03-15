@@ -21602,7 +21602,7 @@
 	          var houseSelectionJSON = localStorage.getItem('houseSelection');
 	          if (houseSelectionJSON) {
 	            var houseSelection = JSON.parse(houseSelectionJSON);
-	            console.log('Equivalence', houseSelection.userId, data.id, houseSelection.id === data.id);
+
 	            if (houseSelection.userId === data.id) stateRef.setState({
 	              currentHouse: houseSelection.name,
 	              currentHouseId: houseSelection.id
@@ -28474,32 +28474,40 @@
 	    }, {
 	        key: 'setTasks',
 	        value: function setTasks(tasks) {
+
 	            var tasksToSend = [];
 	            //Remove ID field from tasks for POST
 	            for (var i = 0; i < tasks.length; i++) {
 	                tasksToSend[i] = { name: tasks[i].name, difficulty: tasks[i].difficulty };
-	            }console.log(tasksToSend);
-	            this.setState(function (prevState, props) {
+	            }this.setState(function (prevState, props) {
 	                return {
 	                    tasks: tasksToSend
 	                };
 	            });
-
-	            this.finish();
+	            this.finish(tasksToSend);
 	        }
 	    }, {
 	        key: 'finish',
-	        value: function finish() {
+	        value: function finish(tasks) {
+	            var _this2 = this;
+
 	            //Post the house name, then add members and tasks
 	            tools.post('/post/housecreate', this, function (data, stateRef) {
-	                console.log(data);
 	                if (data.success) {
-	                    tools.post('/post/memberadd', stateRef, function (data, stateRef) {
-	                        //SUCCESS
-	                    }, 'house=' + stateRef.state.houseName + "&members=" + (0, _stringify2.default)(stateRef.state.members));
-	                    tools.post('/post/taskadd', stateRef, function (data, stateRef) {
-	                        //SUCCESS
-	                    }, 'tasks=' + (0, _stringify2.default)(stateRef.state.tasks) + '&house=' + stateRef.state.houseName);
+	                    tools.post('/post/memberadd', _this2, function (data, stateRef) {
+	                        if (data.error) {
+	                            alert(data.error);
+	                        }
+	                    }, 'house=' + _this2.state.houseName + "&members=" + (0, _stringify2.default)(_this2.state.members));
+	                    tools.post('/post/taskadd', _this2, function (data, stateRef) {
+	                        if (data.success) {
+	                            window.location.reload();
+	                        } else {
+	                            alert(data.error);
+	                        }
+	                    }, 'tasks=' + (0, _stringify2.default)(tasks) + '&house=' + _this2.state.houseName);
+	                } else {
+	                    alert(data.error ? data.error : 'Unfortunately, we were unable to create your house at this time. Please try again later');
 	                }
 	            }, 'house=' + this.state.houseName);
 	        }
@@ -28515,10 +28523,9 @@
 	                    currentStep = _react2.default.createElement(_HC_members2.default, { houseName: this.state.houseName, incrementStep: this.incrementStep, setMembers: this.setMembers });
 	                    break;
 	                case 2:
-	                    currentStep = _react2.default.createElement(_HC_tasks2.default, { houseName: this.state.houseName, incrementStep: this.incrementStep, setTasks: this.setTasks });
+	                    currentStep = _react2.default.createElement(_HC_tasks2.default, { houseName: this.state.houseName, incrementStep: function incrementStep() {}, setTasks: this.setTasks });
 	                    break;
 	                default:
-	                    window.location.reload();
 	                    break;
 	            }
 
@@ -28708,6 +28715,7 @@
 
 	//HTTP POST
 	function post(URL, stateRef, callback, data) {
+	  //console.log('POST: ', URL, data, callback);
 	  var http = new XMLHttpRequest();
 	  http.open("POST", URL, true);
 
@@ -28942,7 +28950,7 @@
 	                    'User\'s email:',
 	                    _react2.default.createElement('input', { type: 'text', onChange: this.handleChange, value: this.state.currentInput, onKeyPress: this.handleKeyPress, ref: function ref(input) {
 	                            _this2.field = input;
-	                        } }),
+	                        }, autoCorrect: 'off', autoCapitalize: 'none' }),
 	                    _react2.default.createElement(
 	                        'button',
 	                        { type: 'submit', onClick: this.submit },
@@ -41880,7 +41888,7 @@
 	            if (input === '')
 	                this.setState({ error: 'Please enter a short description' });
 	            else {
-	              }*/
+	             }*/
 	            tools.post('/post/taskcomplete', this, function (data, stateRef) {
 	                console.log('Response from completion: ', data);
 	            }, 'houseId=' + this.props.houseId + '&taskId=' + this.state.selectedTask + '&description=' + this.state.inputText);
@@ -42059,7 +42067,6 @@
 	                errorMessage = this.state.error;
 	            } else errorMessage = '';
 
-	            console.log('Tasks: ', this.props.tasks);
 	            var completionRows = this.props.tasks === null ? _react2.default.createElement(
 	                'tr',
 	                null,

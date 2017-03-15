@@ -43,32 +43,37 @@ class HouseCreate extends React.Component {
     }
 
     setTasks(tasks) {
+
         let tasksToSend = [];
         //Remove ID field from tasks for POST
         for (let i = 0; i < tasks.length; i++)
             tasksToSend[i] = { name: tasks[i].name, difficulty: tasks[i].difficulty };
-
-        console.log(tasksToSend);
         this.setState((prevState, props) => {
             return {
                 tasks: tasksToSend
             }
         });
-
-        this.finish();
+        this.finish(tasksToSend);
     }
 
-    finish() {
+    finish(tasks) {
         //Post the house name, then add members and tasks
         tools.post('/post/housecreate', this, (data, stateRef) => {
-            console.log(data);
             if (data.success) {
-                tools.post('/post/memberadd', stateRef, (data, stateRef) => {
-                    //SUCCESS
-                }, 'house=' + stateRef.state.houseName + "&members=" + JSON.stringify(stateRef.state.members));
-                tools.post('/post/taskadd', stateRef, (data, stateRef) => {
-                    //SUCCESS
-                }, 'tasks=' + JSON.stringify(stateRef.state.tasks) + '&house=' + stateRef.state.houseName);
+                tools.post('/post/memberadd', this, (data, stateRef) => {
+                    if (data.error){
+                        alert(data.error);
+                    }
+                }, 'house=' + this.state.houseName + "&members=" + JSON.stringify(this.state.members));
+                tools.post('/post/taskadd', this, (data, stateRef) => {
+                    if (data.success) {
+                        window.location.reload();
+                    } else {
+                        alert(data.error);
+                    }
+                }, 'tasks=' + JSON.stringify(tasks) + '&house=' + this.state.houseName);
+            } else {
+                alert(data.error ? data.error : 'Unfortunately, we were unable to create your house at this time. Please try again later');
             }
         }, 'house=' + this.state.houseName);
     }
@@ -83,10 +88,9 @@ class HouseCreate extends React.Component {
                 currentStep = <HC_members houseName={this.state.houseName} incrementStep={this.incrementStep} setMembers={this.setMembers} />
                 break;
             case 2:
-                currentStep = <HC_tasks houseName={this.state.houseName} incrementStep={this.incrementStep} setTasks={this.setTasks} />
+                currentStep = <HC_tasks houseName={this.state.houseName} incrementStep={() => { } } setTasks={this.setTasks} />
                 break;
             default:
-                window.location.reload();
                 break;
         }
 
