@@ -77,6 +77,21 @@ function addTasks(houseName, user, tasks, cb) {
 
 }
 
+function addImage(houseName, user, image, cb) {
+    House.findOne({ 'name': houseName }, (err, house) => {
+        if (err) throw err;
+        if (house) {
+            user.isMember(houseName, (member) => {
+                if (member) {
+                    house.addIcon(image);
+                    cb({ success: true });
+                } else cb({ error: 'You are not a member of this house' });
+            });
+    } else cb({error: 'Unable to find that house'});
+    });
+
+}
+
 
 function addCompletion(houseId, taskId, user, description, cb) {
     House.findOne({ '_id': mongoose.Types.ObjectId(houseId) }, (err, house) => {
@@ -169,4 +184,4 @@ function getCompletions(houseId, user, cb) {
     });
 }
 
-module.exports = { createHouse: createHouse, addMembers: addMembers, addTasks: addTasks, addCompletion: addCompletion, getCompletions: getCompletions };
+module.exports = { createHouse: createHouse, addMembers: addMembers, addTasks: addTasks, addCompletion: addCompletion, getCompletions: getCompletions, addImage: addImage };

@@ -30,7 +30,11 @@ function post(URL, stateRef, callback, data) {
       callback(JSON.parse(http.responseText), stateRef);
     }
   }
+  if (data){
   http.send(data);
+  } else {
+    http.send();
+  }
 }
 
 

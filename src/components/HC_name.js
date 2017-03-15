@@ -1,4 +1,5 @@
 import React from 'react';
+import Drop from './HC_image';
 let tools = require('../clientTools');
 
 class HC_name extends React.Component{
@@ -12,6 +13,7 @@ class HC_name extends React.Component{
         this.handleChange = this.handleChange.bind(this);
         this.submit = this.submit.bind(this);
         this.handleKeyPress = this.handleKeyPress.bind(this);
+        this.setImage = this.setImage.bind(this);
     }
 
     handleChange(event){
@@ -26,6 +28,10 @@ class HC_name extends React.Component{
     
     componentDidMount(){
         this.field.focus();
+    }
+
+    setImage(file){
+        this.setState({image: file});
     }
 
     submit(){
@@ -47,6 +53,7 @@ class HC_name extends React.Component{
             else if (data.exists === false)
             {
                 this.props.setHouseName(input);
+                this.props.setImage(this.state.image);
                 this.props.incrementStep();
             } else {
                 stateRef.setState((prevState, props)=>{ return {
@@ -66,6 +73,7 @@ class HC_name extends React.Component{
                 <h2>House creation</h2>
                 <h4>Give a name to your house: <input type="text" onChange={this.handleChange} onKeyPress={this.handleKeyPress} ref={(input)=>{this.field = input;}}/></h4>
                 <div>{errorMessage}</div>
+                <Drop setImage={this.setImage}/>
                 <button type="submit" onClick={this.submit}>Next</button>
             </div>);
     }

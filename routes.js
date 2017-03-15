@@ -174,6 +174,12 @@ module.exports = function (app, passport) {
                 });
         });
 
+        app.post('/post/imageadd', isLogged, (req, res) =>{
+                ops.addImage(req.body.house, req.user, req.body.image, (response)=>{
+                        res.send(response);
+                });
+        });
+
         app.post('/post/housecreate', isLogged, function (req, res) {
                 console.log('Housecreate: ', req.body.house, req.user);
                 ops.createHouse(req.body.house, req.user, (response) => {
