@@ -129,15 +129,16 @@ module.exports = function (app, passport) {
                 });
         });
 
-        app.get('/json/admin/:house', isLogged, isMember, (req, res)=>{
+        app.get('/json/admin/:house', isLogged, isMember, (req, res) => {
                 House.findOne({ 'name': req.params.house }, (err, house) => {
                         if (err) { console.log(err); res.send({ error: 'Database Error' }) }
-                        if (house.admin === req.user._id.toString()){
+                        if (house.admin === req.user._id.toString()) {
                                 console.log('User is admin');
-                                res.send({admin: true});
+                                res.send({ admin: true });
                         } else {
-                        console.log('User is not admin');
-                        res.send({admin: false});}
+                                console.log('User is not admin');
+                                res.send({ admin: false });
+                        }
                 });
         });
 
@@ -148,7 +149,7 @@ module.exports = function (app, passport) {
                         if (err) console.log(err);
                         else if (users) {
                                 let response = [];
-                                users.forEach((user)=>{
+                                users.forEach((user) => {
                                         response.push({ fname: user.fname, lname: user.lname, id: user._id.toString() })
                                 })
                                 res.send(response);
@@ -165,7 +166,16 @@ module.exports = function (app, passport) {
                 });
         });
 
-
+        app.get('/json/icon/:house', isLogged, isMember, (req, res) => {
+                House.findOne({ 'name': req.params.house }, (err, house) => {
+                        if (err) res.send({ error: 'Database error' })
+                        if (house.icon && (house.icon != undefined)) {
+                                res.send(JSON.stringify({ icon: house.icon }));
+                        } else {
+                                res.send({ icon: false });
+                        }
+                });
+        });
 
         //Data submission routes
         app.post('/post/memberadd', isLogged, (req, res) => {
@@ -174,8 +184,8 @@ module.exports = function (app, passport) {
                 });
         });
 
-        app.post('/post/imageadd', isLogged, (req, res) =>{
-                ops.addImage(req.body.house, req.user, req.body.image, (response)=>{
+        app.post('/post/imageadd', isLogged, (req, res) => {
+                ops.addImage(req.body.house, req.user, req.body.image, (response) => {
                         res.send(response);
                 });
         });

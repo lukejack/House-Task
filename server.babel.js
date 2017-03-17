@@ -51,7 +51,7 @@ require('./passport')(passport);
 app.use(morgan('dev'));
 app.use(cookieParser());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 
 var expressSession = session(require('./config/session'));
 app.use(expressSession);

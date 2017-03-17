@@ -30,8 +30,8 @@ class HC_name extends React.Component{
         this.field.focus();
     }
 
-    setImage(file){
-        this.setState({image: file});
+    setImage(base64){
+        this.setState({image: base64});
     }
 
     submit(){
@@ -53,7 +53,7 @@ class HC_name extends React.Component{
             else if (data.exists === false)
             {
                 this.props.setHouseName(input);
-                this.props.setImage(this.state.image);
+                this.props.setImage(stateRef.state.image);
                 this.props.incrementStep();
             } else {
                 stateRef.setState((prevState, props)=>{ return {

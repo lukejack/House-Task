@@ -67,8 +67,8 @@ class HouseCreate extends React.Component {
         //Post the house name, then add members, tasks and the image 64
         tools.post('/post/housecreate', this, (data, stateRef) => {
             if (data.success) {
-
-                if (this.state.image.preview) {
+                if (stateRef.state.image) {
+                    /*
                     //Get blob data as a base64 string
                     var request = new XMLHttpRequest();
                     request.open('GET', this.state.image.preview, true);
@@ -78,13 +78,16 @@ class HouseCreate extends React.Component {
                         reader.readAsDataURL(request.response);
                         reader.onload = function (e) {
                             let image64 = e.target.result.split(',')[1];
+                            */
                             tools.post('/post/imageadd', stateRef, (data, stateRef) => {
-                            }, 'house=' + stateRef.state.houseName + '&image=' + JSON.stringify(image64));
-                        }
+                            }, 'house=' + stateRef.state.houseName + '&image=' + JSON.stringify(stateRef.state.image));
+                    /*    
+                    }
+
                         reader.onload = reader.onload.bind(this);
                     }
                     request.onload = request.onload.bind(this);
-                    request.send();
+                    request.send();*/
                 }
                 tools.post('/post/memberadd', stateRef, (data, stateRef) => {
                     if (data.error) {

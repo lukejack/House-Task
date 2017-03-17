@@ -17,7 +17,8 @@ class AppShell extends React.Component {
       tasks: null,
       page: null,
       completions: null,
-      error: false
+      error: false,
+      icon: false
     }
 
     this.componentDidMount = this.componentDidMount.bind(this);
@@ -84,6 +85,10 @@ class AppShell extends React.Component {
     tools.get('/json/completions/' + this.state.currentHouse, this, (data, stateRef) => {
       stateRef.setState({ completions: data });
     });
+    tools.get('/json/icon/' + this.state.currentHouse, this, (data, stateRef) => {
+      stateRef.setState({ icon: data.icon });
+    });
+
   }
 
   componentWillUnmount() {
@@ -137,8 +142,8 @@ class AppShell extends React.Component {
         break;
     }
 
-
-
+    let icon = this.state.icon == false ? <div></div> : <img src={this.state.icon}/>;
+    console.log('icon base: ', this.state.icon);
     return (
       this.state.error ?
         <a href='/login'>Log in to view this page.</a> :
@@ -158,6 +163,7 @@ class AppShell extends React.Component {
               Admin
                 </button>
           </div>
+          {icon}
           <div className='innerComponent'>
             {content}
           </div>
