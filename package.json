@@ -12,7 +12,7 @@
   "author": "Luke Jackson",
   "license": "ISC",
   "dependencies": {
-    "babel-core":"^6.0.0"
+    "babel-core":"6.24.0"
     "babel-loader": "^6.2.10",
     "babel-register": "^6.18.0",
     "bcrypt-nodejs": "0.0.3",
