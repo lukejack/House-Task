@@ -3,7 +3,7 @@ var fs = require('fs');
 var express = require('express');
 var app = express();
 
-var port = process.env.port || 8080;
+var port = process.env.port || 8000;
 var mongoose = require('mongoose');
 var passport = require('passport');
 var flash = require('connect-flash');
@@ -65,5 +65,5 @@ require('./routes')(app, passport);
 app.use(express.static(__dirname + '/public/'));
 
 httpServer.listen(port);
-httpsServer.listen(8080);
+//httpsServer.listen(8000);
 console.log('Listening at port ' + port + '.');

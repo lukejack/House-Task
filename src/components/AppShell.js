@@ -37,7 +37,7 @@ class AppShell extends React.Component {
         let houseSelectionJSON = localStorage.getItem('houseSelection');
         if (houseSelectionJSON) {
           let houseSelection = JSON.parse(houseSelectionJSON);
-          
+
           if (houseSelection.userId === data.id)
             stateRef.setState({
               currentHouse: houseSelection.name,
@@ -142,7 +142,19 @@ class AppShell extends React.Component {
         break;
     }
 
-    let icon = this.state.icon == false ? <div></div> : <img src={this.state.icon}/>;
+    let icon = <div></div>
+
+    if (this.state.icon) {
+      var canvas = document.createElement('canvas');
+      var ctx = canvas.getContext("2d");
+      let image = new Image();
+      
+      image.onload = function () {
+        ctx.drawImage(image, 0, 0);
+      };
+      image.src = this.state.icon;
+      icon = canvas;
+    }
     console.log('icon base: ', this.state.icon);
     return (
       this.state.error ?

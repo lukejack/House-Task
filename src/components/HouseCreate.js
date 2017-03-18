@@ -79,8 +79,9 @@ class HouseCreate extends React.Component {
                         reader.onload = function (e) {
                             let image64 = e.target.result.split(',')[1];
                             */
+
                             tools.post('/post/imageadd', stateRef, (data, stateRef) => {
-                            }, 'house=' + stateRef.state.houseName + '&image=' + JSON.stringify(stateRef.state.image));
+                            }, 'house=' + stateRef.state.houseName + '&image=' + stateRef.state.image);
                     /*    
                     }
 

@@ -71,6 +71,7 @@ class Drop extends React.Component {
 
         } else {
             if (this.state.crop) {
+                console.log('crop: ', this.state.crop);
                 imagePreview = <img src={this.state.crop} style={{maxWidth: '70vw'}}></img>;
             } else
                 imagePreview = <p></p>;
