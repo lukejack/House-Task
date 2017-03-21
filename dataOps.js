@@ -132,9 +132,9 @@ function getCompletions(houseId, user, cb) {
                     for (let i = 0; i < completions.length; i++) {
                         let thisTaskId = mongoose.Types.ObjectId(completions[i].taskId);
                         let thisUserId = mongoose.Types.ObjectId(completions[i].userId);
-                        if (!taskIds.includes(thisTaskId))
+                        if (!includes(thisTaskId))
                             taskIds.push(thisTaskId);
-                        if (!userIds.includes(thisUserId))
+                        if (!includes(thisUserId))
                             userIds.push(thisUserId);
                     }
                     User.find({
@@ -182,6 +182,13 @@ function getCompletions(houseId, user, cb) {
             } else cb({ error: 'The user is not a member of that house' })
         });
     });
+}
+
+function includes(arr, item){
+    for (let i = 0; i < arr.length; i++)
+        if (arr[i] === item)
+            return true
+    return false
 }
 
 module.exports = { createHouse: createHouse, addMembers: addMembers, addTasks: addTasks, addCompletion: addCompletion, getCompletions: getCompletions, addImage: addImage };

@@ -143,7 +143,7 @@ class AppShell extends React.Component {
     }
 
     let icon = <div></div>
-
+/*
     if (this.state.icon) {
       var canvas = document.createElement('canvas');
       var ctx = canvas.getContext("2d");
@@ -154,8 +154,8 @@ class AppShell extends React.Component {
       };
       image.src = this.state.icon;
       icon = canvas;
-    }
-    console.log('icon base: ', this.state.icon);
+    }*/
+    //console.log('icon base: ', this.state.icon);
     return (
       this.state.error ?
         <a href='/login'>Log in to view this page.</a> :
@@ -175,7 +175,6 @@ class AppShell extends React.Component {
               Admin
                 </button>
           </div>
-          {icon}
           <div className='innerComponent'>
             {content}
           </div>
