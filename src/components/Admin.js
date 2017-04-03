@@ -1,5 +1,6 @@
 import React from 'react';
 import HC_members from './HC_members';
+import ObjectTable from './ObjectTable';
 let tools = require('../clientTools');
 
 class Admin extends React.Component {
@@ -23,21 +24,33 @@ class Admin extends React.Component {
 
     addMembers(members) {
         tools.post('/post/memberadd', this, (data, stateRef) => {
-            if (data.error){
+            if (data.error) {
                 alert('There has been an error adding members');
             }
         }, 'house=' + this.props.house + "&members=" + JSON.stringify(members));
-        this.setState({page: null});
+        this.setState({ page: null });
     }
 
     render() {
         let content;
         switch (this.state.page) {
             case 'addMembers':
-                content = <HC_members houseName={this.props.house} incrementStep={() => { }} setMembers={this.addMembers} />
+                content = <HC_members houseName={this.props.house} incrementStep={() => { } } setMembers={this.addMembers} />;
+                break;
+            case 'deleteTasks':
+                content = <div>
+                    <h2>Delete tasks from selection</h2>
+                    <ObjectTable items={this.props.tasks} headings={['name', 'difficulty']} delete={(id) => this.props.delete(id, 'tasks')} />
+                </div>
+                break;
+            case 'deleteCompletions':
+                content = <div>
+                    <h2>Delete task completions</h2>
+                    <ObjectTable items={this.props.completions} headings={['fname', 'lname', 'name', 'date']} delete={(id) => this.props.delete(id, 'completions')} />
+                </div>
                 break;
             default:
-                content = <span><br/>Select one of the above options</span>
+                content = <span><br />Select one of the above options</span>
                 break;
         }
 
@@ -48,8 +61,12 @@ class Admin extends React.Component {
         } else if (this.state.admin === true) {
             return (
                 <div>
-                    <button onClick={() => { this.setState({ page: 'addMembers' }); }}>Add house members</button>
-                    {content}
+                    <div className='row'>
+                        <button className='four columns' onClick={() => { this.setState({ page: 'addMembers' }); } }>Add house members</button>
+                        <button className='four columns' onClick={() => { this.setState({ page: 'deleteTasks' }); } }>Delete tasks</button>
+                        <button className='four columns' onClick={() => { this.setState({ page: 'deleteCompletions' }); } }>Delete completions</button>
+                    </div>
+                    <div>{content}</div>
                 </div>
             );
         }

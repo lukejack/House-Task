@@ -30,8 +30,8 @@ function post(URL, stateRef, callback, data) {
       callback(JSON.parse(http.responseText), stateRef);
     }
   }
-  if (data){
-  http.send(data);
+  if (data) {
+    http.send(data);
   } else {
     http.send();
   }
@@ -44,7 +44,7 @@ function deleteFromCollection(stateRef, collectionName, id) {
     let i = prevState[collectionName].length;
     let newTasks = prevState[collectionName];
     while (i--) {
-      if (prevState[collectionName][i].id === id) {
+      if ((prevState[collectionName][i].id === id) || (prevState[collectionName][i]._id === id)) {
         newTasks.splice(i, 1);
       }
     }

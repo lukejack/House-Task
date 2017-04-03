@@ -9,7 +9,6 @@ function genId(){
 class ObjectRow extends React.Component{
     constructor(props){
         super(props);
-
         this.state = {
             item: props.item,
             headings: props.headings
@@ -24,8 +23,7 @@ class ObjectRow extends React.Component{
     }
 
     remove(){
-        console.log('rows remove called');
-        this.props.removeThis(this.state.item.id);
+        this.props.removeThis(this.state.item.id || this.state.item._id);
     }
 
     render(){

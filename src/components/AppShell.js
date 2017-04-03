@@ -26,6 +26,7 @@ class AppShell extends React.Component {
     this.houseChange = this.houseChange.bind(this);
     this.pageChange = this.pageChange.bind(this);
     this.pullData = this.pullData.bind(this);
+    this.delete = this.delete.bind(this);
   }
 
   componentDidMount() {
@@ -81,7 +82,6 @@ class AppShell extends React.Component {
     tools.get('/json/tasks/' + this.state.currentHouse, this, (data, stateRef) => {
       stateRef.setState({ tasks: data });
     });
-
     tools.get('/json/completions/' + this.state.currentHouse, this, (data, stateRef) => {
       stateRef.setState({ completions: data });
     });
@@ -114,6 +114,16 @@ class AppShell extends React.Component {
     }
   }
 
+  delete(id, type) {
+    tools.post('/del/' + type, this, (response, stateRef) => {
+      if (response.success) {
+        tools.delete(stateRef, type, id);
+      } else {
+        alert(response.error);
+      }
+    }, 'id=' + id + '&houseId=' + this.state.currentHouseId);
+  }
+
   pageChange(e) {
     e.preventDefault();
     this.setState({ page: e.target.value });
@@ -135,7 +145,7 @@ class AppShell extends React.Component {
         content = <Completions tasks={this.state.completions} houseName={this.state.currentHouse} />;
         break;
       case 'admin':
-        content = <Admin refresh={this.componentDidMount} house={this.state.currentHouse} houseId={this.state.currentHouseId} tasks={this.state.tasks} />;
+        content = <Admin refresh={this.componentDidMount} house={this.state.currentHouse} houseId={this.state.currentHouseId} tasks={this.state.tasks} completions={this.state.completions} delete={(id, url) => { this.delete(id, url) } } />;
         break;
       default:
         content = (<p>Waiting for content...</p>);
@@ -143,18 +153,18 @@ class AppShell extends React.Component {
     }
 
     let icon = <div></div>
-/*
-    if (this.state.icon) {
-      var canvas = document.createElement('canvas');
-      var ctx = canvas.getContext("2d");
-      let image = new Image();
-      
-      image.onload = function () {
-        ctx.drawImage(image, 0, 0);
-      };
-      image.src = this.state.icon;
-      icon = canvas;
-    }*/
+    /*
+        if (this.state.icon) {
+          var canvas = document.createElement('canvas');
+          var ctx = canvas.getContext("2d");
+          let image = new Image();
+          
+          image.onload = function () {
+            ctx.drawImage(image, 0, 0);
+          };
+          image.src = this.state.icon;
+          icon = canvas;
+        }*/
     //console.log('icon base: ', this.state.icon);
     return (
       this.state.error ?
