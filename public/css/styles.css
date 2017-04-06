@@ -42,3 +42,13 @@ table {
 .activeTab {
 	background-color: #c8e6c9 ;
 }
+
+@media (max-width: 605px) {
+  .container {
+    width: 99% !important;
+  }
+}
+
+.bottom_button {
+	width: 100% ;
+}

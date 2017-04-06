@@ -31,6 +31,7 @@ class AppShell extends React.Component {
     this.pageChange = this.pageChange.bind(this);
     this.pullData = this.pullData.bind(this);
     this.delete = this.delete.bind(this);
+    this.addTasks = this.addTasks.bind(this);
   }
 
   componentDidMount() {
@@ -61,9 +62,9 @@ class AppShell extends React.Component {
     //Get all of the houses the user is a member of
     tools.get('/json/houses', this, function (data, stateRef) {
       stateRef.setState((prevState, props) => {
-        if (prevState.currentHouse && prevState.currentHouseId) 
-          return {houses: data.houses}
-        else 
+        if (prevState.currentHouse && prevState.currentHouseId)
+          return { houses: data.houses }
+        else
           return {
             houses: data.houses,
             currentHouse: (data.houses.length > 0) ? data.houses[0].name : null,
@@ -95,6 +96,13 @@ class AppShell extends React.Component {
 
   }
 
+  addTasks(){
+    //Get the new task's ID from the server and add that task to the list
+    tools.get('/json/tasks/' + this.state.currentHouse, this, (data, stateRef) => {
+      stateRef.setState({ tasks: data }, ()=>stateRef.pageChange({ target: { value: 'complete' }, preventDefault: () => { } }));
+    });
+  }
+
   houseChange(event) {
     let eventData = JSON.parse(event.target.value);
     this.setState({ currentHouse: eventData[0], currentHouseId: eventData[1] });
@@ -104,7 +112,7 @@ class AppShell extends React.Component {
     });
 
     tools.get('/json/completions/' + eventData[0], this, (data, stateRef) => {
-      stateRef.setState({ completions: data });
+      stateRef.setState({ completions: data }, ()=>stateRef.pageChange({ target: { value: 'housestats' }, preventDefault: () => { } }));
     });
 
     //Local storage of selection
@@ -136,7 +144,7 @@ class AppShell extends React.Component {
         break;
       case 'complete':
         this.setState({
-          content: <TaskCompletion refresh={this.componentDidMount} house={this.state.currentHouse} houseId={this.state.currentHouseId} tasks={this.state.tasks} />,
+          content: <TaskCompletion addTasks={this.addTasks} house={this.state.currentHouse} houseId={this.state.currentHouseId} tasks={this.state.tasks} />,
           b_t: 'activeTab', b_c: '', b_h: '', b_a: ''
         });
         break;
@@ -181,18 +189,18 @@ class AppShell extends React.Component {
         <a href='/login'>Log in to view this page.</a> :
         <div className='container'>
           <div className='row'>
-            <button className={'three columns ' + this.state.b_t} onClick={hasHouses ? this.pageChange : ()=>{}} value={'complete'}>
-              Task+
+            <button className={'three columns ' + this.state.b_t} onClick={hasHouses ? this.pageChange : () => { }} value={'complete'}>
+              Tasks
             </button>
 
-            <button className={'three columns ' + this.state.b_h} onClick={hasHouses ? this.pageChange : ()=>{}} value={'housestats'}>
-              House Stats
+            <button className={'three columns ' + this.state.b_h} onClick={hasHouses ? this.pageChange : () => { }} value={'housestats'}>
+              Completions
+                </button>
+            <button className={'three columns ' + this.state.b_a} onClick={hasHouses ? this.pageChange : () => { }} value={'admin'}>
+              Admin
                 </button>
             <button className={'three columns ' + this.state.b_c} onClick={this.pageChange} value={'create'}>
-              Create
-                </button>
-            <button className={'three columns ' + this.state.b_a} onClick={hasHouses ? this.pageChange : ()=>{}} value={'admin'}>
-              Admin
+              New House
                 </button>
           </div>
           <div className='innerComponent'>
@@ -206,9 +214,9 @@ class AppShell extends React.Component {
               {housesList}
             </select>
             <div className='three columns'>
-              <h5>
+              <h6>
                 {this.state.fname} {this.state.lname}
-              </h5>
+              </h6>
             </div>
             <div className='three columns'>
               <button onClick={

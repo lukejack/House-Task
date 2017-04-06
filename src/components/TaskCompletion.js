@@ -47,7 +47,7 @@ class TaskCompletion extends React.Component {
         tools.post('/post/taskcomplete', this, (data, stateRef) => {
             console.log('Response from completion: ', data);
         }, 'houseId=' + this.props.houseId + '&taskId=' + this.state.selectedTask + '&description=' + this.state.inputText);
-        this.props.refresh();
+        location.reload();
     }
 
     showTaskCreation(){
@@ -56,9 +56,12 @@ class TaskCompletion extends React.Component {
 
     taskCreationFinished(tasks){
         tools.post('/post/taskadd', this, (data, stateRef) => {
+            if (data.success){
+                this.props.addTasks();
+            }
         }, 'tasks=' + JSON.stringify(tasks) + '&house=' + this.props.house);
         this.setState({newTasks: false});
-        this.props.refresh();
+        
     }
 
     taskChange(event) {
@@ -72,21 +75,21 @@ class TaskCompletion extends React.Component {
         else
             return (
                 <div>
-                    <h2>Task Completion</h2>
+                    <h2>Submit Task: {this.props.house}</h2>
                     <div className='row'>
-                        <h4 className='three columns'>Task</h4>
-                        <select name='houses' className='nine columns' onChange={this.taskChange}>
+                        <h4 className='two columns'>Task</h4>
+                        <select name='houses' className='seven columns' onChange={this.taskChange}>
                             {tasklist}
                         </select>
+                        <button  className='three columns' type="submit" onClick={this.showTaskCreation}>New Task</button>
                     </div>
                     <div className='row'>
-                        <h4 className='four columns'>Description</h4>
-                        <input className='eight columns' type="text" onChange={this.handleChange} onKeyPress={this.handleKeyPress} ref={(input) => { this.field = input; } } />
+                        <h5 className='three columns'>Comment</h5>
+                        <input className='nine columns' type="text" onChange={this.handleChange} onKeyPress={this.handleKeyPress} ref={(input) => { this.field = input; } } />
                     </div>
                     <div>{errorMessage}</div>
                     <div className='row'>
-                        <button type="submit" onClick={this.submit}>Submit</button>
-                        <button type="submit" onClick={this.showTaskCreation}>Create a new task</button>
+                        <button type="submit" className='bottom_button' onClick={this.submit}>Submit</button>
                     </div>
                 </div>
             );

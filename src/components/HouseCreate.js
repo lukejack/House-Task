@@ -92,16 +92,17 @@ class HouseCreate extends React.Component {
                 }
                 tools.post('/post/memberadd', stateRef, (data, stateRef) => {
                     if (data.error) {
-                        alert(data.error);
+                        alert('Member add error: ', data.error);
                     }
                 }, 'house=' + stateRef.state.houseName + "&members=" + JSON.stringify(stateRef.state.members));
                 tools.post('/post/taskadd', stateRef, (data, stateRef) => {
                     if (data.success) {
                         window.location.reload();
                     } else {
-                        alert(data.error);
+                        alert('Task add error: ', data.error);
                     }
                 }, 'tasks=' + JSON.stringify(tasks) + '&house=' + stateRef.state.houseName);
+            alert('House created. You can select this house from the drop down menu at the bottom of site');
             } else {
                 alert(data.error ? data.error : 'Unfortunately, we were unable to create your house at this time. Please try again later');
             }

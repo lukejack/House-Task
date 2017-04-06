@@ -16,14 +16,23 @@ class HC_members extends React.Component {
         super(props);
 
         this.state = {
-            tasks: this.props.tasks
+            tasks: this.props.tasks,
+            window_width: window.innerWidth
+            || document.documentElement.clientWidth
+            || document.body.clientWidth
         };
     }
 
     componentDidMount() {
-
-        /*
-        */
+        window.onresize = (_) => {
+            if (this.state.window_width != window.innerWidth) {
+                this.setState({
+                    window_width: window.innerWidth
+                    || document.documentElement.clientWidth
+                    || document.body.clientWidth
+                });
+            }
+        };
     }
 
     render() {
@@ -39,17 +48,21 @@ class HC_members extends React.Component {
         });
 
         let barData = [];
-        if (this.props.tasks) {
-            for (let i = 0; i < this.props.tasks.length; i++) {
-                let found = false;
-                for (let b = 0; b < barData.length; b++) {
-                    if (barData[b].id === this.props.tasks[i].userId){
-                        found = true;
-                        barData[b].score = barData[b].score + this.props.tasks[i].difficulty;
+        if (this.props.tasks.length == 0) {
+            completionRows = <tr><td>You don't have any task completions. Select 'Tasks' in the top left to submit some!</td></tr>;
+        } else {
+            if (this.props.tasks) {
+                for (let i = 0; i < this.props.tasks.length; i++) {
+                    let found = false;
+                    for (let b = 0; b < barData.length; b++) {
+                        if (barData[b].id === this.props.tasks[i].userId) {
+                            found = true;
+                            barData[b].score = barData[b].score + this.props.tasks[i].difficulty;
+                        }
                     }
-                }
-                if (!found){
-                    barData.push({id: this.props.tasks[i].userId, name: this.props.tasks[i].fname, score: this.props.tasks[i].difficulty});
+                    if (!found) {
+                        barData.push({ id: this.props.tasks[i].userId, name: this.props.tasks[i].fname, score: this.props.tasks[i].difficulty });
+                    }
                 }
             }
         }
@@ -57,11 +70,7 @@ class HC_members extends React.Component {
         return (
             <div>
 
-                <h2>{this.props.houseName}</h2>
-                <h3>
-                    Completions by all house members
-                </h3>
-
+                <h2>Task Completions: {this.props.houseName}</h2>
                 <table>
                     <tbody>
                         {completionRows}
@@ -70,7 +79,7 @@ class HC_members extends React.Component {
                 <label>
                     <div>{errorMessage}</div>
                 </label>
-                <BarChart width={730} height={250} data={barData}>
+                <BarChart width={this.state.window_width * 0.75} height={250} data={barData}>
                     <XAxis dataKey="name" />
                     <YAxis />
                     <CartesianGrid strokeDasharray="3 3" />
