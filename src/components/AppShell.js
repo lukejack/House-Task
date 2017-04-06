@@ -187,6 +187,7 @@ class AppShell extends React.Component {
     return (
       this.state.error ?
         <a href='/login'>Log in to view this page.</a> :
+        <div>
         <div className='container'>
           <div className='row'>
             <button className={'three columns ' + this.state.b_t} onClick={hasHouses ? this.pageChange : () => { }} value={'complete'}>
@@ -207,9 +208,9 @@ class AppShell extends React.Component {
             {this.state.content}
           </div>
           <div className='row'>
-            <h5 className='two columns'>
+            <h6 className='two columns'>
               House:
-                </h5>
+                </h6>
             <select name='houses' value={JSON.stringify([this.state.currentHouse, this.state.currentHouseId])} className='four columns' onChange={this.houseChange}>
               {housesList}
             </select>
@@ -219,13 +220,15 @@ class AppShell extends React.Component {
               </h6>
             </div>
             <div className='three columns'>
-              <button onClick={
+              <button style={{width: '100%'}} onClick={
                 () => { document.location.href = "/logout" }
               }>
                 Logout
               </button>
             </div>
           </div>
+        </div>
+        
         </div>
     );
   }

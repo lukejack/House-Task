@@ -6,8 +6,10 @@ function get(URL, stateRef, callback, data) {
 
   xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
+  let timeOut = setTimeout(()=>{alert('The server did not respond within 5 seconds. It might be down.');}, 5000);
   xhr.addEventListener('load', function () {
     if (xhr.status === 200) {
+      clearTimeout(timeOut);
       callback(JSON.parse(xhr.response), stateRef);
     }
   }, false);
@@ -24,9 +26,10 @@ function post(URL, stateRef, callback, data) {
 
   //Send the proper header information along with the request
   http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-
+  let timeOut = setTimeout(()=>{alert('The server did not respond within 5 seconds. It might be down.');}, 5000);
   http.onreadystatechange = function () {//Call a function when the state changes.
     if (http.readyState == 4 && http.status == 200) {
+      clearTimeout(timeOut);
       callback(JSON.parse(http.responseText), stateRef);
     }
   }
