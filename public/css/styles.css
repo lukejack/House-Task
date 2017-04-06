@@ -13,29 +13,32 @@
 	margin: 0 auto;
 }
 
-		table .seperator-right {
-			border-right-style: dotted;
-			border-right-width: 1px;
-			border-right-color: black;
-		}
-		
-		table .colour-right {
-			border-right-style: solid;
-			border-right-width: 5px;
-			border-right-color: red;
-		}
-		
-		table .padded-left {
-			padding-left: 5px;
-		}
-		
-		table .padded-right {
-			padding-right: 10px;
-			font-style: italic;
-		}
-		table {
-			width: 100%;
-			border-style: solid;
-			border-width: 1px;
+table .seperator-right {
+	border-right-style: dotted;
+	border-right-width: 1px;
+	border-right-color: black;
+}
 
-		}
+table .colour-right {
+	border-right-style: solid;
+	border-right-width: 5px;
+	border-right-color: red;
+}
+
+table .padded-left {
+	padding-left: 5px;
+}
+
+table .padded-right {
+	padding-right: 10px;
+	font-style: italic;
+}
+table {
+	width: 100%;
+	border-style: solid;
+	border-width: 1px
+}
+
+.activeTab {
+	background-color: #c8e6c9 ;
+}
