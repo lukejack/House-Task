@@ -13,6 +13,9 @@ var morgan = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
+var favicon = require('serve-favicon');
+var path = require('path');
+
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -48,6 +51,8 @@ let httpServer = require('http').createServer(app);
 
 /*----------EXPRESS SETUP-----------*/
 require('./passport')(passport);
+//console.log(__dirname + '\public\favicon.ico');
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(morgan('dev'));
 app.use(cookieParser());
 app.use(bodyParser.json());
@@ -63,6 +68,8 @@ app.set('views', __dirname + '/src/static');
 
 require('./routes')(app, passport);
 app.use(express.static(__dirname + '/public/'));
+
+
 
 httpServer.listen(port);
 //httpsServer.listen(8000);

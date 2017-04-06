@@ -89,7 +89,7 @@ class TaskCompletion extends React.Component {
                     </div>
                     <div>{errorMessage}</div>
                     <div className='row'>
-                        <button type="submit" className='nine columns' onClick={this.submit}>Submit</button>
+                        <button type="submit" className='nine columns submit_button' onClick={this.submit}>Submit</button>
                         <button type="submit" className='three columns' onClick={()=>{alert('First you must create tasks using the New Task button, then select your task from the drop down and click submit. The description is visible by clicking on the completion under Completions');}}>Help</button>
                     </div>
                 </div>

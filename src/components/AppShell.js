@@ -133,6 +133,7 @@ class AppShell extends React.Component {
   }
 
   pageChange(e) {
+    window.onresize = (_)=>{};
     e.preventDefault();
     this.setState({ page: e.target.value });
     switch (e.target.value) {

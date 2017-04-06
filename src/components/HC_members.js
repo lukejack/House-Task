@@ -95,7 +95,7 @@ class HC_members extends React.Component{
                     Add people to this house
                 </h3>
                 <h5>
-                    (You can add more later)
+                    (You can add more later, and need not add yourself)
                 </h5>
                 <ObjectTable items={this.state.membersToAdd} headings={['fname', 'email']} delete={(id)=>tools.delete(this, 'membersToAdd', id)}/>
                 <label>

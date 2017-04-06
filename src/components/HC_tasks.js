@@ -112,7 +112,7 @@ class HC_tasks extends React.Component{
                     <input type="text" onChange={this.handleChange} value={this.state.currentInput} onKeyPress={this.handleKeyPress} ref={(input)=>{this.field = input;}}/>
                 </label>
                 <label>
-                    Difficulty: {this.state.currentDifficulty}
+                    Difficulty (Score): {this.state.currentDifficulty}
                 <ReactBootstrapSlider
                     value={this.state.currentDifficulty}
                     change={this.sliderChanged}
@@ -124,8 +124,8 @@ class HC_tasks extends React.Component{
                     
                 </label>
                 <div>{errorMessage}</div>
-                <button type="submit" onClick={this.submit}>Submit</button>
-                <button type="submit" onClick={this.next}>Finish</button>
+                <button type="submit" onClick={this.submit}>Add Task</button>
+                <button type="submit" className='submit_button' onClick={this.next}>Finish</button>
             </div>);
     }
 }

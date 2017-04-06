@@ -40,7 +40,7 @@ table {
 }
 
 .activeTab {
-	background-color: #c8e6c9 ;
+	background-color: #62a864 ;
 }
 
 @media (max-width: 605px) {
@@ -51,4 +51,8 @@ table {
 
 .bottom_button {
 	width: 100% ;
+}
+
+.submit_button {
+	background-color: #d4f2ff !important;
 }
