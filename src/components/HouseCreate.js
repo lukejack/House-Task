@@ -2,6 +2,7 @@ import React from 'react';
 import HC_name from './HC_name';
 import HC_members from './HC_members';
 import HC_tasks from './HC_tasks';
+var base64url = require('base64-url');
 let tools = require('../clientTools');
 
 class HouseCreate extends React.Component {
@@ -68,27 +69,8 @@ class HouseCreate extends React.Component {
         tools.post('/post/housecreate', this, (data, stateRef) => {
             if (data.success) {
                 if (stateRef.state.image) {
-                    /*
-                    //Get blob data as a base64 string
-                    var request = new XMLHttpRequest();
-                    request.open('GET', this.state.image.preview, true);
-                    request.responseType = 'blob';
-                    request.onload = function () {
-                        var reader = new FileReader();
-                        reader.readAsDataURL(request.response);
-                        reader.onload = function (e) {
-                            let image64 = e.target.result.split(',')[1];
-                            */
-
-                            tools.post('/post/imageadd', stateRef, (data, stateRef) => {
-                            }, 'house=' + stateRef.state.houseName + '&image=' + stateRef.state.image);
-                    /*    
-                    }
-
-                        reader.onload = reader.onload.bind(this);
-                    }
-                    request.onload = request.onload.bind(this);
-                    request.send();*/
+                    tools.post('/post/imageadd', stateRef, (data, stateRef) => {
+                    }, 'house=' + stateRef.state.houseName + '&image=' + base64url.escape(stateRef.state.image));
                 }
                 tools.post('/post/memberadd', stateRef, (data, stateRef) => {
                     if (data.error) {
@@ -102,7 +84,7 @@ class HouseCreate extends React.Component {
                         alert('Task add error: ', data.error);
                     }
                 }, 'tasks=' + JSON.stringify(tasks) + '&house=' + stateRef.state.houseName);
-            alert('House created. You can select this house from the drop down menu at the bottom of site');
+                alert('House created. You can select this house from the drop down menu at the bottom of site');
             } else {
                 alert(data.error ? data.error : 'Unfortunately, we were unable to create your house at this time. Please try again later');
             }
@@ -120,7 +102,7 @@ class HouseCreate extends React.Component {
                 currentStep = <HC_members houseName={this.state.houseName} incrementStep={this.incrementStep} setMembers={this.setMembers} />
                 break;
             case 2:
-                currentStep = <HC_tasks houseName={this.state.houseName} incrementStep={() => { } } setTasks={this.setTasks} />
+                currentStep = <HC_tasks houseName={this.state.houseName} incrementStep={() => { }} setTasks={this.setTasks} />
                 break;
             default:
                 break;

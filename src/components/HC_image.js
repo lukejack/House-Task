@@ -3,6 +3,7 @@ var Dropzone = require('react-dropzone');
 import Crop from 'react-image-crop';
 
 //Component using http://okonet.ru/react-dropzone/
+//IMPLEMENT CAN CONTINUE
 class Drop extends React.Component {
     constructor(props) {
         super(props);
@@ -11,19 +12,20 @@ class Drop extends React.Component {
             cropTemp: {
                         aspect: 1
                     },
-            cropSpec: null
+            cropSpec: null,
+            can_continue: true
         };
         this.onDrop = this.onDrop.bind(this);
         this.onCropChange = this.onCropChange.bind(this);
         this.cropFinish = this.cropFinish.bind(this);
     }
     onDrop(files) {
-        this.setState({ prev: files[0].preview });
+        this.setState({ prev: files[0].preview, can_continue: false });
         this.props.setImage(files[0]);
     }
 
     onCropChange(crop, pixelCrop) {
-        this.setState({ cropSpec: pixelCrop, croptemp: pixelCrop });
+        this.setState({ cropSpec: pixelCrop, cropTemp: crop });
 
     }
 
@@ -55,6 +57,7 @@ class Drop extends React.Component {
         }
         //console.log('Bottom setting image: ', this.state.crop);
         this.props.setImage(newImg);
+        this.setState({can_continue: true});
     }
 
     render() {
@@ -63,7 +66,7 @@ class Drop extends React.Component {
             //imagePreview = <img src={this.state.prev} style={{maxWidth: "100px", maxHeight: "100px", objectFit: "contain"}}/>
             imagePreview =
                 <div>
-                    <p>Please drag to crop your image into a square</p>
+                    <p>Please drag to crop your image into a square before continuing</p>
                     <button onClick={this.cropFinish}>Crop</button>
                     <Crop src={this.state.prev} onComplete={this.onCropChange} minWidth={20} minHeight={20} crop={this.state.cropTemp} style={{width: '200px'}}/>
                     
@@ -71,7 +74,6 @@ class Drop extends React.Component {
 
         } else {
             if (this.state.crop) {
-                console.log('crop: ', this.state.crop);
                 imagePreview = <img src={this.state.crop} style={{maxWidth: '70vw'}}></img>;
             } else
                 imagePreview = <p></p>;

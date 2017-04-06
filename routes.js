@@ -4,6 +4,7 @@ let Task = require('./models/task');
 let TaskDone = require('./models/taskDone');
 let ops = require('./dataOps');
 let mongoose = require('mongoose');
+var base64url = require('base64-url');
 
 module.exports = function (app, passport) {
 
@@ -175,7 +176,7 @@ module.exports = function (app, passport) {
                 House.findOne({ 'name': req.params.house }, (err, house) => {
                         if (err) res.send({ error: 'Database error' })
                         if (house.icon && (house.icon != undefined)) {
-                                res.send(JSON.stringify({ icon: house.icon }));
+                                res.send(JSON.stringify({ icon: base64url.escape(house.icon) }));
                         } else {
                                 res.send({ icon: false });
                         }
@@ -190,7 +191,8 @@ module.exports = function (app, passport) {
         });
 
         app.post('/post/imageadd', isLogged, (req, res) => {
-                ops.addImage(req.body.house, req.user, req.body.image, (response) => {
+                ops.addImage(req.body.house, req.user, base64url.unescape(req.body.image), (response) => {
+
                         res.send(response);
                 });
         });

@@ -14,7 +14,6 @@ function genId() {
 class HC_members extends React.Component {
     constructor(props) {
         super(props);
-
         this.state = {
             tasks: this.props.tasks,
             window_width: window.innerWidth
@@ -42,8 +41,7 @@ class HC_members extends React.Component {
             errorMessage = this.state.error;
         } else
             errorMessage = '';
-
-        let completionRows = (this.props.tasks === null) ? (<tr><td>Loading</td></tr>) : this.props.tasks.map((completion) => {
+        let completionRows = (this.props.tasks.map === null) ? (<tr><td>Loading</td></tr>) : this.props.tasks.map((completion) => {
             return (<CompletionRow completion={completion} key={completion._id} />);
         });
 
@@ -67,10 +65,13 @@ class HC_members extends React.Component {
             }
         }
 
+        let img = this.props.icon ? <img className='two columns icon' src={this.props.icon}/> : <div></div>;
         return (
             <div>
-
-                <h2>Task Completions: {this.props.houseName}</h2>
+                <div className='row'>
+                    <h2 className='ten columns'>Task Completions: {this.props.houseName}</h2>
+                    {img}
+                </div>
                 <table>
                     <tbody>
                         {completionRows}

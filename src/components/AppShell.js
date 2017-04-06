@@ -4,6 +4,7 @@ import HouseCreate from './HouseCreate';
 import TaskCompletion from './TaskCompletion';
 import Completions from './Completions';
 import Admin from './Admin';
+var base64url = require('base64-url');
 let tools = require('../clientTools');
 
 class AppShell extends React.Component {
@@ -87,7 +88,8 @@ class AppShell extends React.Component {
       });
     });
     tools.get('/json/icon/' + this.state.currentHouse, this, (data, stateRef) => {
-      stateRef.setState({ icon: data.icon });
+    
+      data.icon && stateRef.setState({ icon: base64url.unescape(data.icon)});
     });
 
   }
@@ -113,6 +115,10 @@ class AppShell extends React.Component {
 
     tools.get('/json/completions/' + eventData[0], this, (data, stateRef) => {
       stateRef.setState({ completions: data }, ()=>stateRef.pageChange({ target: { value: 'housestats' }, preventDefault: () => { } }));
+    });
+
+     tools.get('/json/icon/' + this.state.currentHouse, this, (data, stateRef) => {
+        data.icon && stateRef.setState({ icon: base64url.unescape(data.icon)});
     });
 
     //Local storage of selection
@@ -151,7 +157,7 @@ class AppShell extends React.Component {
         break;
       case 'housestats':
         this.setState({
-          content: <Completions tasks={this.state.completions} houseName={this.state.currentHouse} />,
+          content: <Completions tasks={this.state.completions} houseName={this.state.currentHouse} icon={this.state.icon} />,
           b_t: '', b_c: '', b_h: 'activeTab', b_a: ''
         });
         break;
@@ -171,20 +177,6 @@ class AppShell extends React.Component {
     let housesList = this.state.houses.map((house) => <option key={house.name} value={JSON.stringify([house.name, house._id])}>{house.name}</option>);
     let hasHouses = (this.state.houses.length != 0);
 
-    let icon = <div></div>;
-    /*
-        if (this.state.icon) {
-          var canvas = document.createElement('canvas');
-          var ctx = canvas.getContext("2d");
-          let image = new Image();
-          
-          image.onload = function () {
-            ctx.drawImage(image, 0, 0);
-          };
-          image.src = this.state.icon;
-          icon = canvas;
-        }*/
-    //console.log('icon base: ', this.state.icon);
     return (
       this.state.error ?
         <a href='/login'>Log in to view this page.</a> :
@@ -194,7 +186,6 @@ class AppShell extends React.Component {
             <button className={'three columns ' + this.state.b_t} onClick={hasHouses ? this.pageChange : () => { }} value={'complete'}>
               Tasks
             </button>
-
             <button className={'three columns ' + this.state.b_h} onClick={hasHouses ? this.pageChange : () => { }} value={'housestats'}>
               Completions
                 </button>
