@@ -75,7 +75,7 @@ class HC_name extends React.Component {
 
         return (
 
-            <div>
+            <div className="pad">
                 <div className='comp_title'>
                     <h2 className='float_left expand'>House creation</h2>
                 </div>

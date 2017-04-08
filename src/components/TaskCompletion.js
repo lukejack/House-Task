@@ -74,7 +74,7 @@ class TaskCompletion extends React.Component {
         if (this.state.newTasks) return (<HC_tasks houseName={this.props.house} incrementStep={() => { }} setTasks={this.taskCreationFinished} />)
         else
             return (
-                <div>
+                <div className="pad">
                     <div className='comp_title'>
                         <h2 className='float_left expand'>Submit Task: {this.props.house}</h2>
                     </div>

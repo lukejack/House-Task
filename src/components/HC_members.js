@@ -88,7 +88,7 @@ class HC_members extends React.Component{
             errorMessage = '';
         
         return(
-            <div>
+            <div className="pad">
                 <div className='comp_title'>
                         <h2 className='float_left expand'>Add Members: {this.state.houseName}</h2>
                     </div>
@@ -103,7 +103,7 @@ class HC_members extends React.Component{
                 
                 <div>{errorMessage}</div>
                 </label>
-                <button type="submit" onClick={this.next}>Next</button>
+                <button  type="submit" onClick={this.next}>Next</button>
             </div>);
     }
 }

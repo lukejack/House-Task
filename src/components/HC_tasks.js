@@ -96,7 +96,7 @@ class HC_tasks extends React.Component{
         
 
         return(
-            <div>
+            <div className="pad">
                 <div className='comp_title'>
                         <h2 className='float_left expand'>Create tasks: {this.props.houseName}</h2>
                     </div>
@@ -105,12 +105,12 @@ class HC_tasks extends React.Component{
                 </h5>
 
                 <ObjectTable items={this.state.tasksToAdd} headings={['name', 'difficulty']} delete={(id)=>tools.delete(this, 'tasksToAdd', id)}/>
-                
-                <label>
-                    Task name: 
-                    <input type="text" onChange={this.handleChange} value={this.state.currentInput} onKeyPress={this.handleKeyPress} ref={(input)=>{this.field = input;}}/>
-                </label>
-                <label>
+                <div className="row">
+                <h6 className="two columns">
+                    Name:
+                </h6 >
+                <input className="six columns" type="text" onChange={this.handleChange} value={this.state.currentInput} onKeyPress={this.handleKeyPress} ref={(input)=>{this.field = input;}}/>
+                <label className="three columns">
                     Difficulty (Score): {this.state.currentDifficulty}
                 <ReactBootstrapSlider
                     value={this.state.currentDifficulty}
@@ -122,6 +122,7 @@ class HC_tasks extends React.Component{
                 />
                     
                 </label>
+                </div>
                 <div>{errorMessage}</div>
                 <button type="submit" onClick={this.submit}>Add Task</button>
                 <button type="submit" className='submit_button' onClick={this.next}>Finish</button>

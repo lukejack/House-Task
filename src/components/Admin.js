@@ -40,14 +40,18 @@ class Admin extends React.Component {
                 content = <HC_members houseName={this.props.house} incrementStep={() => { }} setMembers={this.addMembers} />;
                 break;
             case 'deleteTasks':
-                content = <div>
-                    <h2>Delete tasks from selection</h2>
+                content = <div className="pad">
+                    <div className='comp_title'>
+                    <h2 className='float_left expand'>Delete tasks from selection</h2>
+                    </div>
                     <ObjectTable items={this.props.tasks} headings={['name', 'difficulty']} delete={(id) => this.props.delete(id, 'tasks')} />
                 </div>
                 break;
             case 'deleteCompletions':
-                content = <div>
+                content = <div className="pad">
+                    <div className='comp_title'>
                     <h2>Delete task completions</h2>
+                    </div>
                     <ObjectTable items={this.props.completions} headings={['fname', 'lname', 'name', 'date']} delete={(id) => this.props.delete(id, 'completions')} />
                 </div>
                 break;
@@ -63,14 +67,12 @@ class Admin extends React.Component {
         } else if (this.state.admin === true) {
             return (
                 <div>
-                    <div className='comp_title'>
-                        <h2 className='float_left expand'>Admin Tools: {this.props.house}</h2>
-                    </div>
                     <div className='row'>
                         <button className='four columns' onClick={() => { this.setState({ page: 'addMembers' }); }}>Add house members</button>
                         <button className='four columns' onClick={() => { this.setState({ page: 'deleteTasks' }); }}>Delete tasks</button>
                         <button className='four columns' onClick={() => { this.setState({ page: 'deleteCompletions' }); }}>Delete completions</button>
                     </div>
+                    
                     <div>{content}</div>
                 </div>
             );

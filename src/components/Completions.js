@@ -67,7 +67,7 @@ class HC_members extends React.Component {
 
         let img = this.props.icon ? <img className='icon' src={this.props.icon}/> : <div></div>;
         return (
-            <div>
+            <div className="pad">
                 <div className='comp_title'>
                     <h2 className='float_left'>Completions: {this.props.houseName}</h2>
                     {img}
