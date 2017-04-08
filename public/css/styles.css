@@ -69,6 +69,7 @@ table {
 }
 
 .comp_title{
+	padding-left: 10px;
 	height: 90px !important;
 	width: 100%;
 }
