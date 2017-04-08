@@ -1,60 +1,114 @@
 <!DOCTYPE HTML>
+
 <head>
+    <style>
+        .in_box {
+            width: 400px;
+            margin: 0 auto;
+        }
+        .text_box{
+            float: right;
+            width: 100%;
+            height: 20px;
+            padding: 0px;
+        }
+
+        .label{
+            width: 100%;
+        }
+
+        .line{
+            width: 100%;
+        }
+    </style>
 </head>
+
 <body>
+    <div class="in_box">
+        <button onclick="showLogin()" id="loginbtn" style="width: 49%">Log In</button>
+        <button onclick="showSignup()" id="signupbtn" style="width: 49%">Sign Up</button>
 
-<button onclick="showLogin()" id="loginbtn">Log In</button>
-<button onclick="showSignup()" id="signupbtn">Sign Up</button>
+        <% if (message) { %>
+            <p><%= message %></p>
+        <% } %>
 
-<% if (message) { %>
-<p><%= message %></p>
-<% } %>
+        <form action="/post/login" method="post" id="login" onsubmit="return submitForm()">
+            <table style="width: 100%">
+                <tr>
+                <td>
+                <div class="label">Email: </div>
+                </td>
+                <td>
+                <input class="text_box" type="text" name="email" type="email" autocorrect="off" autocapitalize="none" />
+                </td>
+                </tr>
+                <tr>
+                <td>
+                <div class="label">Password: </div>
+                </td>
+                <td>
+                <input class="text_box" type="password" name="password" />
+                </td>
+                </tr>
+            </table>
+            <button id="logintrigger" type="submit" style="width: 100%; margin-top: 15px;">Submit</button>
+        </form>
+        <form name="signupForm" action="/post/signup" method="post" id="signup" onsubmit="return submitForm()">
+            <table style="width: 100%">
 
-<form action="/post/login" method="post" id="login" onsubmit="return submitForm()">
-    <div>
-        <label>Email</label>
-        <input type="text" name="email" type="email" autocorrect="off" autocapitalize="none"/>
+                <tr>
+                <td>
+                <div class="label">First Name: </div>
+                </td>
+                <td>
+                <input class="text_box" type="text" name="fname" />
+                </td>
+                </tr>
+                
+                
+                <tr>
+                <td>
+                <div class="label">Surname: </div>
+                </td>
+                <td>
+                <input class="text_box" type="text" name="lname" />
+                </td>
+                </tr>
+            
+                <tr>
+                <td>
+                <div class="label">Email: </div>
+                </td>
+                <td>
+                <input class="text_box" type="text" name="email" type="email" autocorrect="off" autocapitalize="none" />
+                </td>
+                </tr>
+                
+                <tr>
+                <td>
+                <div class="label">Password: </div>
+                </td>
+                <td>
+                <input class="text_box" type="password" name="password" />
+                </td>
+                </tr>
+
+            </table>
+            <button type="submit" style="width: 100%; margin-top: 15px;">Submit</button>
+        </form>
     </div>
-    <div>
-        <label>Password</label>
-        <input type="password" name="password"/>
-    </div>
-    <button id="logintrigger" type="submit">Submit</button>
-</form>
-<form name="signupForm" action="/post/signup" method="post" id="signup" onsubmit="return submitForm()">
-        <div>
-            <label>First Name</label>
-            <input type="text" name="fname"/>
-        </div>
-        <div>
-            <label>Surname</label>
-            <input type="text" name="lname"/>
-        </div>
-        <div>
-            <label>Email</label>
-            <input type="text" name="email" type="email" autocorrect="off" autocapitalize="none"/>
-        </div>
-        <div>
-            <label>Password</label>
-            <input type="password" name="password"/>
-        </div>
-        <button type="submit">Submit</button>
-        
-    </form>
     <script>
-        function showLogin(){
-            document.getElementById('login').style.visibility = "visible";
-            document.getElementById('signup').style.visibility = "hidden";
-        }
-        function showSignup(){
-            document.getElementById('signup').style.visibility = "visible";
-            document.getElementById('login').style.visibility = "hidden";
-        }
-        showLogin();
+                                                                                          function showLogin() {
+                                                                                              document.getElementById('login').style.display = "block";
+                                                                                              document.getElementById('signup').style.display = "none";
+                                                                                          }
+                                                                                          function showSignup() {
+                                                                                              document.getElementById('signup').style.display = "block";
+                                                                                              document.getElementById('login').style.display = "none";
+                                                                                          }
+                                                                                          showLogin();
 
-        function submitForm(){
-        };
-
-        
+                                                                                          function submitForm() {
+                                                                                          };
     </script>
 </body>

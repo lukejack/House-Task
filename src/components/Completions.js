@@ -65,11 +65,11 @@ class HC_members extends React.Component {
             }
         }
 
-        let img = this.props.icon ? <img className='two columns icon' src={this.props.icon}/> : <div></div>;
+        let img = this.props.icon ? <img className='icon' src={this.props.icon}/> : <div></div>;
         return (
             <div>
-                <div className='row'>
-                    <h2 className='ten columns'>Task Completions: {this.props.houseName}</h2>
+                <div className='comp_title'>
+                    <h2 className='float_left'>Completions: {this.props.houseName}</h2>
                     {img}
                 </div>
                 <table>
@@ -80,7 +80,7 @@ class HC_members extends React.Component {
                 <label>
                     <div>{errorMessage}</div>
                 </label>
-                <BarChart width={this.state.window_width * 0.75} height={250} data={barData}>
+                <BarChart width={(this.state.window_width) > 1300 ?  910 : this.state.window_width * 0.75} height={250} data={barData}>
                     <XAxis dataKey="name" />
                     <YAxis />
                     <CartesianGrid strokeDasharray="3 3" />

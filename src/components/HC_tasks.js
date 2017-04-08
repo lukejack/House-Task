@@ -97,10 +97,9 @@ class HC_tasks extends React.Component{
 
         return(
             <div>
-                <h2>House creation - {this.props.houseName}</h2>
-                <h3>
-                    Create some tasks for your house
-                </h3>
+                <div className='comp_title'>
+                        <h2 className='float_left expand'>Create tasks: {this.props.houseName}</h2>
+                    </div>
                 <h5>
                     You can add more later
                 </h5>

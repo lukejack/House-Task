@@ -198,9 +198,7 @@ module.exports = function (app, passport) {
         });
 
         app.post('/post/housecreate', isLogged, function (req, res) {
-                console.log('Housecreate: ', req.body.house, req.user);
                 ops.createHouse(req.body.house, req.user, (response) => {
-                        console.log('Response: ', response);
                         res.send(JSON.stringify(response));
                 });
         });

@@ -1,6 +1,8 @@
 import React from 'react';
 import HC_members from './HC_members';
 import ObjectTable from './ObjectTable';
+var Loader = require('halogen/MoonLoader');
+var spinner_css = require('../react-styles.js').spinner;
 let tools = require('../clientTools');
 
 class Admin extends React.Component {
@@ -35,7 +37,7 @@ class Admin extends React.Component {
         let content;
         switch (this.state.page) {
             case 'addMembers':
-                content = <HC_members houseName={this.props.house} incrementStep={() => { } } setMembers={this.addMembers} />;
+                content = <HC_members houseName={this.props.house} incrementStep={() => { }} setMembers={this.addMembers} />;
                 break;
             case 'deleteTasks':
                 content = <div>
@@ -50,21 +52,24 @@ class Admin extends React.Component {
                 </div>
                 break;
             default:
-                content = <span><br />Select one of the above options</span>
+                content = <div></div>
                 break;
         }
 
         if (this.state.admin === null) {
-            return (<span>Loading...</span>);
+            return (<div style={spinner_css}><Loader color={'#000000'}/></div>);
         } else if (this.state.admin === false) {
             return (<span>User is not admin</span>);
         } else if (this.state.admin === true) {
             return (
                 <div>
+                    <div className='comp_title'>
+                        <h2 className='float_left expand'>Admin Tools: {this.props.house}</h2>
+                    </div>
                     <div className='row'>
-                        <button className='four columns' onClick={() => { this.setState({ page: 'addMembers' }); } }>Add house members</button>
-                        <button className='four columns' onClick={() => { this.setState({ page: 'deleteTasks' }); } }>Delete tasks</button>
-                        <button className='four columns' onClick={() => { this.setState({ page: 'deleteCompletions' }); } }>Delete completions</button>
+                        <button className='four columns' onClick={() => { this.setState({ page: 'addMembers' }); }}>Add house members</button>
+                        <button className='four columns' onClick={() => { this.setState({ page: 'deleteTasks' }); }}>Delete tasks</button>
+                        <button className='four columns' onClick={() => { this.setState({ page: 'deleteCompletions' }); }}>Delete completions</button>
                     </div>
                     <div>{content}</div>
                 </div>
@@ -72,5 +77,7 @@ class Admin extends React.Component {
         }
     }
 }
+
+
 
 export default Admin;

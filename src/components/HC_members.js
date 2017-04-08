@@ -89,11 +89,9 @@ class HC_members extends React.Component{
         
         return(
             <div>
-                
-                <h2>House creation - {this.state.houseName}</h2>
-                <h3>
-                    Add people to this house
-                </h3>
+                <div className='comp_title'>
+                        <h2 className='float_left expand'>Add Members: {this.state.houseName}</h2>
+                    </div>
                 <h5>
                     (You can add more later, and need not add yourself)
                 </h5>

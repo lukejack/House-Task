@@ -6,12 +6,16 @@ import Completions from './Completions';
 import Admin from './Admin';
 var base64url = require('base64-url');
 let tools = require('../clientTools');
+var Loader = require('halogen/MoonLoader');
+var spinner_css = require('../react-styles.js').spinner;
+
 
 class AppShell extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
+      content: <div style={spinner_css}><Loader color={'#000000'} /></div>,
       fname: '...',
       lname: '...',
       houses: [],
@@ -106,6 +110,7 @@ class AppShell extends React.Component {
   }
 
   houseChange(event) {
+    this.pageChange({ target: { value: 'spinner' }, preventDefault: () => { } });
     let eventData = JSON.parse(event.target.value);
     this.setState({ currentHouse: eventData[0], currentHouseId: eventData[1] });
 
@@ -139,6 +144,7 @@ class AppShell extends React.Component {
   }
 
   pageChange(e) {
+
     window.onresize = (_)=>{};
     e.preventDefault();
     this.setState({ page: e.target.value });
@@ -168,7 +174,7 @@ class AppShell extends React.Component {
         });
         break;
       default:
-        this.setState({ content: (<p>Waiting for content...</p>) });
+        this.setState({ content: <div style={spinner_css}><Loader color={'#000000'}/></div>});
         break;
     }
   }
@@ -176,6 +182,9 @@ class AppShell extends React.Component {
   render() {
     let housesList = this.state.houses.map((house) => <option key={house.name} value={JSON.stringify([house.name, house._id])}>{house.name}</option>);
     let hasHouses = (this.state.houses.length != 0);
+
+
+
 
     return (
       this.state.error ?
@@ -222,6 +231,7 @@ class AppShell extends React.Component {
         </div>
         
         </div>
+
     );
   }
 }
