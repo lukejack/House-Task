@@ -36,7 +36,6 @@ class TaskCompletion extends React.Component {
     }
 
     componentDidMount() {
-        this.field.focus();
         this.setState({ selectedTask: (this.props.tasks.length > 0) ? this.props.tasks[0]._id : undefined });
     }
 

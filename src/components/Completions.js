@@ -42,13 +42,13 @@ class Completions extends React.Component {
             errorMessage = '';
         let completionRows = (this.props.tasks === null) ? (<tr><td>Loading</td></tr>) : this.props.tasks.map((completion) => {
             return (<CompletionRow completion={completion} key={completion._id} />);
-        });
+        }).reverse();
 
         let barData = [];
         let use_last_week = false;
 
         if (this.props.tasks.length === 0) {
-            completionRows = <tr><td>You don't have any task completions. Select 'Tasks' in the top left to submit some!</td></tr>;
+            completionRows = <tr><td>You don't have any task completions. Select 'Tasks' from the top to submit some!</td></tr>;
         } else {
             if (this.props.tasks) {
                 let date = new Date();

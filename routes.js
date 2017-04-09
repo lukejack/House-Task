@@ -243,7 +243,7 @@ module.exports = function (app, passport) {
                 House.findOne({ '_id': mongoose.Types.ObjectId(req.params.house) }, (err, house) => {
                         if (err) { console.log(err); res.send({ error: 'Database Error' }) }
                         if (house.admin === req.user._id.toString()) {
-                                User.findOne(req.body.id, (err, user)=>{
+                                User.findOne({houses: req.body.id}, (err, user)=>{
                                         if (err) { console.log(err); res.send({ error: 'Database Error' }) };
                                         user.removeHouseId(req.body.id);
                                         res.send({sucess: true});

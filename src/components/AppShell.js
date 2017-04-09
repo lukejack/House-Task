@@ -37,6 +37,7 @@ class AppShell extends React.Component {
     this.pullData = this.pullData.bind(this);
     this.delete = this.delete.bind(this);
     this.addTasks = this.addTasks.bind(this);
+    this.getIcon = this.getIcon.bind(this);
   }
 
   componentDidMount() {
@@ -90,10 +91,19 @@ class AppShell extends React.Component {
         stateRef.pageChange({ target: { value: (houseData.houses.length > 0) ? 'housestats' : 'create' }, preventDefault: () => { } });
       });
     });
+    /*
     tools.get('/json/icon/' + this.state.currentHouse, this, (data, stateRef) => {
-    
-      data.icon && stateRef.setState({ icon: base64url.unescape(data.icon)});
-    });
+      if (data.icon) {
+        console.log('Got an icon!');
+        let icon = base64url.unescape(data.icon);
+        while(icon.charAt(icon.length - 1) === '='){
+            icon = icon.slice(0, icon.length - 1);
+        };
+
+        data.icon && stateRef.setState({ icon: icon});
+      }
+    });*/
+    this.getIcon(this.state.currentHouse);
 
   }
 
@@ -101,29 +111,54 @@ class AppShell extends React.Component {
 
   }
 
-  addTasks(){
+  addTasks() {
     //Get the new task's ID from the server and add that task to the list
     tools.get('/json/tasks/' + this.state.currentHouse, this, (data, stateRef) => {
-      stateRef.setState({ tasks: data }, ()=>stateRef.pageChange({ target: { value: 'complete' }, preventDefault: () => { } }));
+      stateRef.setState({ tasks: data }, () => stateRef.pageChange({ target: { value: 'complete' }, preventDefault: () => { } }));
+    });
+  }
+
+  getIcon(house){
+    tools.get('/json/icon/' + house, this, (data, stateRef) => {
+      if (data.icon) {
+        let icon = base64url.unescape(data.icon);
+        while(icon.charAt(icon.length - 1) === '='){
+            icon = icon.slice(0, icon.length - 1);
+        };
+        data.icon && stateRef.setState({ icon: icon});
+      } else {
+        this.setState({icon: false});
+      }
     });
   }
 
   houseChange(event) {
     this.pageChange({ target: { value: 'spinner' }, preventDefault: () => { } });
     let eventData = JSON.parse(event.target.value);
-    this.setState({ currentHouse: eventData[0], currentHouseId: eventData[1] });
+    this.setState({ currentHouse: eventData[0], currentHouseId: eventData[1], icon: false });
 
     tools.get('/json/tasks/' + eventData[0], this, (data, stateRef) => {
       stateRef.setState({ tasks: data });
     });
 
     tools.get('/json/completions/' + eventData[0], this, (data, stateRef) => {
-      stateRef.setState({ completions: data }, ()=>stateRef.pageChange({ target: { value: 'housestats' }, preventDefault: () => { } }));
+      stateRef.setState({ completions: data }, () => stateRef.pageChange({ target: { value: 'housestats' }, preventDefault: () => { } }));
     });
-
-     tools.get('/json/icon/' + this.state.currentHouse, this, (data, stateRef) => {
-        data.icon && stateRef.setState({ icon: base64url.unescape(data.icon)});
-    });
+    this.getIcon(eventData[0]);
+    /*
+    tools.get('/json/icon/' + this.state.currentHouse, this, (data, stateRef) => {
+      console.log('Data from server: ', data);
+      if (data.icon) {
+        console.log('Got an icon!');
+        let icon = base64url.unescape(data.icon);
+        while(icon.charAt(icon.length - 1) === '='){
+            icon = icon.slice(0, icon.length - 1);
+        };
+        data.icon && stateRef.setState({ icon: icon});
+      } else {
+        this.setState({icon: false});
+      }
+    });*/
 
     //Local storage of selection
     if (typeof (Storage) !== 'undefined') {
@@ -143,9 +178,9 @@ class AppShell extends React.Component {
   }
 
   pageChange(e) {
-    window.onresize = (_)=>{};
+    window.onresize = (_) => { };
     e.preventDefault();
-    this.setState({page: e.target.value});
+    this.setState({ page: e.target.value });
     switch (e.target.value) {
       case 'create':
         this.setState({
@@ -177,21 +212,21 @@ class AppShell extends React.Component {
     let hasHouses = (this.state.houses.length != 0);
 
     let content;
-    switch (this.state.page){
+    switch (this.state.page) {
       case 'create':
-          content =  <HouseCreate />;
+        content = <HouseCreate />;
         break;
       case 'complete':
-          content = <TaskCompletion addTasks={this.addTasks} house={this.state.currentHouse} houseId={this.state.currentHouseId} tasks={this.state.tasks} />;
+        content = <TaskCompletion addTasks={this.addTasks} house={this.state.currentHouse} houseId={this.state.currentHouseId} tasks={this.state.tasks} />;
         break;
       case 'housestats':
-          content = <Completions id={this.state.userId} tasks={this.state.completions} houseName={this.state.currentHouse} icon={this.state.icon} />;
+        content = <Completions id={this.state.userId} tasks={this.state.completions} houseName={this.state.currentHouse} icon={this.state.icon} />;
         break;
       case 'admin':
-          content = <Admin refresh={this.componentDidMount} house={this.state.currentHouse} houseId={this.state.currentHouseId} tasks={this.state.tasks} completions={this.state.completions} delete={(id, url) => { this.delete(id, url) }} />;
+        content = <Admin refresh={this.componentDidMount} house={this.state.currentHouse} houseId={this.state.currentHouseId} tasks={this.state.tasks} completions={this.state.completions} delete={(id, url) => { this.delete(id, url) }} />;
         break;
       default:
-         content = <div style={spinner_css}><Loader color={'#000000'}/></div>;
+        content = <div style={spinner_css}><Loader color={'#000000'} /></div>;
         break;
     }
 
@@ -200,46 +235,46 @@ class AppShell extends React.Component {
       this.state.error ?
         <a href='/login'>Log in to view this page.</a> :
         <div>
-        <div className='container'>
-          <div className='row'>
-            <button className={'three columns ' + this.state.b_t} onClick={hasHouses ? this.pageChange : () => { }} value={'complete'}>
-              Tasks
+          <div className='container'>
+            <div className='row'>
+              <button className={'three columns ' + this.state.b_t} onClick={hasHouses ? this.pageChange : () => { }} value={'complete'}>
+                Tasks
             </button>
-            <button className={'three columns ' + this.state.b_h} onClick={hasHouses ? this.pageChange : () => { }} value={'housestats'}>
-              Completions
+              <button className={'three columns ' + this.state.b_h} onClick={hasHouses ? this.pageChange : () => { }} value={'housestats'}>
+                Completions
                 </button>
-            <button className={'three columns ' + this.state.b_a} onClick={hasHouses ? this.pageChange : () => { }} value={'admin'}>
-              Admin
+              <button className={'three columns ' + this.state.b_a} onClick={hasHouses ? this.pageChange : () => { }} value={'admin'}>
+                Admin
                 </button>
-            <button className={'three columns ' + this.state.b_c} onClick={this.pageChange} value={'create'}>
-              New House
+              <button className={'three columns ' + this.state.b_c} onClick={this.pageChange} value={'create'}>
+                New House
                 </button>
-          </div>
-          <div className='innerComponent'>
-            {content}
-          </div>
-          <div className='row'>
-            <h6 className='two columns'>
-              House:
+            </div>
+            <div className='innerComponent'>
+              {content}
+            </div>
+            <div className='row'>
+              <h6 className='two columns'>
+                House:
                 </h6>
-            <select name='houses' value={JSON.stringify([this.state.currentHouse, this.state.currentHouseId])} className='four columns' onChange={this.houseChange}>
-              {housesList}
-            </select>
-            <div className='three columns'>
-              <h6>
-                {this.state.fname} {this.state.lname}
-              </h6>
-            </div>
-            <div className='three columns'>
-              <button style={{width: '100%'}} onClick={
-                () => { document.location.href = "/logout" }
-              }>
-                Logout
+              <select name='houses' value={JSON.stringify([this.state.currentHouse, this.state.currentHouseId])} className='four columns' onChange={this.houseChange}>
+                {housesList}
+              </select>
+              <div className='three columns'>
+                <h6>
+                  {this.state.fname} {this.state.lname}
+                </h6>
+              </div>
+              <div className='three columns'>
+                <button style={{ width: '100%' }} onClick={
+                  () => { document.location.href = "/logout" }
+                }>
+                  Logout
               </button>
+              </div>
             </div>
           </div>
-        </div>
-        
+
         </div>
 
     );
