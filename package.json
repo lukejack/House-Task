@@ -31,6 +31,7 @@
     "express-mongoose-store": "^1.0.7",
     "express-session": "^1.14.2",
     "halogen": "^0.2.0",
+    "jquery": "^3.2.1",
     "method-override": "^2.3.7",
     "mongodb": "^2.2.21",
     "mongoose": "^4.7.7",

@@ -44,9 +44,14 @@ class TaskCompletion extends React.Component {
         else {
 
         }*/
-        tools.post('/post/taskcomplete', this, (data, stateRef) => {
-            console.log('Response from completion: ', data);
-        }, 'houseId=' + this.props.houseId + '&taskId=' + this.state.selectedTask + '&description=' + this.state.inputText);
+        if (this.props.tasks.length === 1) {
+            tools.post('/post/taskcomplete', this, (data, stateRef) => {
+                console.log('Response from completion: ', data);
+            }, 'houseId=' + this.props.houseId + '&taskId=' + this.props.tasks[0]._id + '&description=' + this.state.inputText);
+        } else
+            tools.post('/post/taskcomplete', this, (data, stateRef) => {
+                console.log('Response from completion: ', data);
+            }, 'houseId=' + this.props.houseId + '&taskId=' + this.state.selectedTask + '&description=' + this.state.inputText);
         location.reload();
     }
 
@@ -57,6 +62,7 @@ class TaskCompletion extends React.Component {
     taskCreationFinished(tasks) {
         tools.post('/post/taskadd', this, (data, stateRef) => {
             if (data.success) {
+                console.log('Success adding task');
                 this.props.addTasks();
             }
         }, 'tasks=' + JSON.stringify(tasks) + '&house=' + this.props.house);
@@ -69,6 +75,7 @@ class TaskCompletion extends React.Component {
     }
 
     render() {
+        console.log('Tasks in inner render: ', this.props.tasks);
         let errorMessage = this.state.error ? this.state.error : '';
         let tasklist = (this.props.tasks && this.props.tasks.length > 0) ? this.props.tasks.map((task) => <option key={task._id} value={task._id}>{task.name}</option>) : <span>Loading...</span>;
         if (this.state.newTasks) return (<HC_tasks houseName={this.props.house} incrementStep={() => { }} setTasks={this.taskCreationFinished} />)

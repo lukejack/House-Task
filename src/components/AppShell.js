@@ -40,7 +40,6 @@ class AppShell extends React.Component {
   }
 
   componentDidMount() {
-
     //Get user information
     tools.get('/json/user', this, function (data, stateRef) {
       if (typeof (Storage) !== "undefined") {
@@ -105,7 +104,7 @@ class AppShell extends React.Component {
   addTasks(){
     //Get the new task's ID from the server and add that task to the list
     tools.get('/json/tasks/' + this.state.currentHouse, this, (data, stateRef) => {
-      console.log('TAsks back from server: ', data);
+      console.log('Server tasks: ', data);
       stateRef.setState({ tasks: data }, ()=>stateRef.pageChange({ target: { value: 'complete' }, preventDefault: () => { } }));
     });
   }
@@ -136,7 +135,6 @@ class AppShell extends React.Component {
 
   delete(id, type) {
     tools.post('/del/' + type, this, (response, stateRef) => {
-      console.log(response);
       if (response.success) {
         tools.delete(stateRef, type, id);
       } else {
@@ -149,34 +147,29 @@ class AppShell extends React.Component {
 
     window.onresize = (_)=>{};
     e.preventDefault();
-    this.setState({ page: e.target.value });
+    this.setState({page: e.target.value});
     switch (e.target.value) {
       case 'create':
         this.setState({
-          content: <HouseCreate />,
           b_t: '', b_c: 'activeTab', b_h: '', b_a: ''
         });
         break;
       case 'complete':
         this.setState({
-          content: <TaskCompletion addTasks={this.addTasks} house={this.state.currentHouse} houseId={this.state.currentHouseId} tasks={this.state.tasks} />,
           b_t: 'activeTab', b_c: '', b_h: '', b_a: ''
         });
         break;
       case 'housestats':
         this.setState({
-          content: <Completions id={this.state.userId} tasks={this.state.completions} houseName={this.state.currentHouse} icon={this.state.icon} />,
           b_t: '', b_c: '', b_h: 'activeTab', b_a: ''
         });
         break;
       case 'admin':
         this.setState({
-          content: <Admin refresh={this.componentDidMount} house={this.state.currentHouse} houseId={this.state.currentHouseId} tasks={this.state.tasks} completions={this.state.completions} delete={(id, url) => { this.delete(id, url) }} />,
           b_t: '', b_c: '', b_h: '', b_a: 'activeTab'
         });
         break;
       default:
-        this.setState({ content: <div style={spinner_css}><Loader color={'#000000'}/></div>});
         break;
     }
   }
@@ -185,7 +178,25 @@ class AppShell extends React.Component {
     let housesList = this.state.houses.map((house) => <option key={house.name} value={JSON.stringify([house.name, house._id])}>{house.name}</option>);
     let hasHouses = (this.state.houses.length != 0);
 
-
+    let content;
+    console.log('Tasks in state: ', this.state.tasks);
+    switch (this.state.page){
+      case 'create':
+          content =  <HouseCreate />;
+        break;
+      case 'complete':
+          content = <TaskCompletion addTasks={this.addTasks} house={this.state.currentHouse} houseId={this.state.currentHouseId} tasks={this.state.tasks} />;
+        break;
+      case 'housestats':
+          content = <Completions id={this.state.userId} tasks={this.state.completions} houseName={this.state.currentHouse} icon={this.state.icon} />;
+        break;
+      case 'admin':
+          content = <Admin refresh={this.componentDidMount} house={this.state.currentHouse} houseId={this.state.currentHouseId} tasks={this.state.tasks} completions={this.state.completions} delete={(id, url) => { this.delete(id, url) }} />;
+        break;
+      default:
+         content = <div style={spinner_css}><Loader color={'#000000'}/></div>;
+        break;
+    }
 
 
     return (
@@ -208,7 +219,7 @@ class AppShell extends React.Component {
                 </button>
           </div>
           <div className='innerComponent'>
-            {this.state.content}
+            {content}
           </div>
           <div className='row'>
             <h6 className='two columns'>
