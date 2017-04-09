@@ -25,7 +25,7 @@ class ObjectTable extends React.Component {
 
     render() {
         let itemList = this.props.items ? this.props.items.map((item) => { return (<ObjectRow key={genId()} item={item} headings={this.props.headings} removeThis={(id) => this.props.delete(id)} />) }) : <tr></tr>;
-        let headings = this.props.headings.map((heading) => { return (<th key={genId()}>{heading}</th>) });
+        let headings = this.props.headings.map((heading) => { return (<th key={genId()}>{heading.charAt(0).toUpperCase() + heading.slice(1)}</th>) });
         let table = this.props.items.length > 0 ? <table className="u-full-width">
             <thead>
                 <tr>

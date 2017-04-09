@@ -1,4 +1,5 @@
 import React from 'react';
+let time_format = require('../clientTools.js').time;
 
 class CompletionRow extends React.Component {
     constructor(props) {
@@ -23,15 +24,6 @@ class CompletionRow extends React.Component {
     }*/
 
     render() {
-        let timeAgo;
-        let minutesAgo = ((new Date().getTime()) - this.state.completion.date) / 60000;
-        if (minutesAgo < 60)
-            timeAgo = Math.floor(minutesAgo) + ' minutes ago';
-        if ((minutesAgo > 60) && (minutesAgo < (60 * 24)))
-            timeAgo = Math.floor((minutesAgo / 60)) + ' hours ago';
-        if (minutesAgo > (60 * 24))
-            timeAgo = Math.floor((minutesAgo / (60 * 24))) + ' days ago';
-        
         let difficulty = this.state.completion.difficulty;
         let difficultyColour;
         switch(true){
@@ -65,7 +57,7 @@ class CompletionRow extends React.Component {
                 </td>
                 <td>
                     <span className="padded-right">
-                        {(timeAgo)}
+                        {(time_format(this.state.completion.date))}
                     </span>
                 </td>
             </tr>

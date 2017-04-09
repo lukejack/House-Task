@@ -12,9 +12,6 @@ function genId(){
 class HC_tasks extends React.Component{
     constructor(props){
         super(props);
-
-        
-
         this.handleChange = this.handleChange.bind(this);
         this.handleKeyPress = this.handleKeyPress.bind(this);
         this.submit = this.submit.bind(this);

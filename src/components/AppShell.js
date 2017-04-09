@@ -105,6 +105,7 @@ class AppShell extends React.Component {
   addTasks(){
     //Get the new task's ID from the server and add that task to the list
     tools.get('/json/tasks/' + this.state.currentHouse, this, (data, stateRef) => {
+      console.log('TAsks back from server: ', data);
       stateRef.setState({ tasks: data }, ()=>stateRef.pageChange({ target: { value: 'complete' }, preventDefault: () => { } }));
     });
   }
@@ -135,6 +136,7 @@ class AppShell extends React.Component {
 
   delete(id, type) {
     tools.post('/del/' + type, this, (response, stateRef) => {
+      console.log(response);
       if (response.success) {
         tools.delete(stateRef, type, id);
       } else {
@@ -163,7 +165,7 @@ class AppShell extends React.Component {
         break;
       case 'housestats':
         this.setState({
-          content: <Completions tasks={this.state.completions} houseName={this.state.currentHouse} icon={this.state.icon} />,
+          content: <Completions id={this.state.userId} tasks={this.state.completions} houseName={this.state.currentHouse} icon={this.state.icon} />,
           b_t: '', b_c: '', b_h: 'activeTab', b_a: ''
         });
         break;

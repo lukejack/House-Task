@@ -1,13 +1,14 @@
 import React from 'react';
+let time_format = require('../clientTools.js').time;
 
 let id = 0;
 
-function genId(){
+function genId() {
     return id++;
 }
 
-class ObjectRow extends React.Component{
-    constructor(props){
+class ObjectRow extends React.Component {
+    constructor(props) {
         super(props);
         this.state = {
             item: props.item,
@@ -18,25 +19,29 @@ class ObjectRow extends React.Component{
         this.remove = this.remove.bind(this);
     }
 
-    componentDidMount(){
-        
+    componentDidMount() {
+
     }
 
-    remove(){
+    remove() {
         this.props.removeThis(this.state.item.id || this.state.item._id);
     }
 
-    render(){
+    render() {
         let rowItems = [];
-        for (let i = 0; i < this.state.headings.length; i++){
-            rowItems.push(<td key={genId()}>{this.state.item[this.state.headings[i]]}</td>);
+        for (let i = 0; i < this.state.headings.length; i++) {
+            if (this.state.headings[i] === 'date') {
+                rowItems.push(<td key={genId()}>{time_format(this.state.item[this.state.headings[i]])}</td>);
+            } else {
+                rowItems.push(<td key={genId()}>{this.state.item[this.state.headings[i]]}</td>);
+            }
         }
 
         return (
             <tr>
                 {rowItems}
                 <td>
-                    <button type="submit" onClick={()=>this.remove()}>X</button>
+                    <button type="submit" onClick={() => this.remove()}>X</button>
                 </td>
             </tr>
         );

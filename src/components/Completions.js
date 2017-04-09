@@ -46,11 +46,17 @@ class HC_members extends React.Component {
         });
 
         let barData = [];
-        if (this.props.tasks.length == 0) {
+        let use_last_week = false;
+
+        if (this.props.tasks.length === 0) {
             completionRows = <tr><td>You don't have any task completions. Select 'Tasks' in the top left to submit some!</td></tr>;
         } else {
             if (this.props.tasks) {
+                let date = new Date();
                 for (let i = 0; i < this.props.tasks.length; i++) {
+                    if ((this.props.tasks[i].userId === this.props.id) && ((date.getTime() - this.props.tasks[i].date ) / 1000 < 604800)){
+                        use_last_week = true;
+                    }
                     let found = false;
                     for (let b = 0; b < barData.length; b++) {
                         if (barData[b].id === this.props.tasks[i].userId) {
@@ -65,6 +71,8 @@ class HC_members extends React.Component {
             }
         }
 
+        
+
         let img = this.props.icon ? <img className='icon' src={this.props.icon}/> : <div></div>;
         return (
             <div className="pad">
@@ -77,6 +85,7 @@ class HC_members extends React.Component {
                         {completionRows}
                     </tbody>
                 </table>
+                <div>{use_last_week ? '' : this.props.tasks.length > 0 ? 'You might want to consider completing a task as you haven\'t done any this past week' : ''}</div>
                 <label>
                     <div>{errorMessage}</div>
                 </label>
@@ -88,6 +97,7 @@ class HC_members extends React.Component {
                     <Legend />
                     <Bar dataKey="score" fill="#228B22" />
                 </BarChart>
+
             </div>);
     }
 }

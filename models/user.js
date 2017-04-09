@@ -21,7 +21,15 @@ userSchema.methods.validPassword = function (password) {
 userSchema.methods.addHouseId = function (id) {
     this.houseIds.push(id);
     this.save();
-}
+};
+
+userSchema.methods.removeHouseId = function (id) {
+    for (let i = 0; i < this.houseIds.length; i++){
+        if (this.houseIds[i] == id){
+            this.houseIds.splice(i, 1);
+        }
+    }
+};
 
 userSchema.methods.isMember = function (houseName, cb) {
     let found = false;
@@ -32,7 +40,7 @@ userSchema.methods.isMember = function (houseName, cb) {
         });
         cb(found);
     });
-}
+};
 
 userSchema.methods.getHouseNames = function (cb) {
     let houseIds = [];
@@ -54,6 +62,6 @@ userSchema.methods.getHouseNames = function (cb) {
             cb(houseNames);
         }
     });
-}
+};
 
 module.exports = mongoose.model('User', userSchema);

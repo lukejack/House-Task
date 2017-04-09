@@ -6,7 +6,7 @@ function get(URL, stateRef, callback, data) {
 
   xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
-  let timeOut = setTimeout(()=>{alert('The server did not respond within 5 seconds. It might be down.');}, 5000);
+  let timeOut = setTimeout(() => { alert('The server did not respond within 5 seconds. It might be down.'); }, 5000);
   xhr.addEventListener('load', function () {
     if (xhr.status === 200) {
       clearTimeout(timeOut);
@@ -26,7 +26,7 @@ function post(URL, stateRef, callback, data) {
 
   //Send the proper header information along with the request
   http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  let timeOut = setTimeout(()=>{alert('The server did not respond within 5 seconds. It might be down.');}, 5000);
+  let timeOut = setTimeout(() => { alert('The server did not respond within 5 seconds. It might be down.'); }, 5000);
   http.onreadystatechange = function () {//Call a function when the state changes.
     if (http.readyState == 4 && http.status == 200) {
       clearTimeout(timeOut);
@@ -51,6 +51,7 @@ function deleteFromCollection(stateRef, collectionName, id) {
         newTasks.splice(i, 1);
       }
     }
+    console.log('Setting state to new tasks: ', newTasks);
     return {
       [collectionName]: newTasks
     };
@@ -66,4 +67,16 @@ function find(collection, attribute, value) {
   return false;
 }
 
-module.exports = { get: get, delete: deleteFromCollection, find: find, post: post };
+function time(time) {
+  let timeAgo;
+  let minutesAgo = ((new Date().getTime()) - time) / 60000;
+  if (minutesAgo < 60)
+    timeAgo = Math.floor(minutesAgo) + ' minute' +  (Math.floor((minutesAgo)) === 1 ? '' : 's') + ' ago';
+  if ((minutesAgo > 60) && (minutesAgo < (60 * 24)))
+    timeAgo = Math.floor((minutesAgo / 60)) + ' hour' + ((Math.floor((minutesAgo / 60)) === 1 ) ? '' : 's') + ' ago';
+  if (minutesAgo > (60 * 24))
+    timeAgo = Math.floor((minutesAgo / (60 * 24))) + ' day' + ((Math.floor((minutesAgo / (60 * 24))) === 1) ? '' : 's' ) + ' ago';
+  return timeAgo;
+}
+
+module.exports = { get: get, delete: deleteFromCollection, find: find, post: post , time: time};

@@ -35,24 +35,64 @@ class Admin extends React.Component {
 
     render() {
         let content;
+        let b_m = '';
+        let b_t = '';
+        let b_c = '';
+        let b_d = '';
+        console.log(this.props.completions);
         switch (this.state.page) {
+            
             case 'addMembers':
-                content = <HC_members houseName={this.props.house} incrementStep={() => { }} setMembers={this.addMembers} />;
+                b_m = 'activeTab';
+                b_t = '';
+                b_c = '';
+                b_d = '';
+                content =  <div><HC_members houseName={this.props.house} incrementStep={() => { }} setMembers={this.addMembers} />
+                </div>;
                 break;
             case 'deleteTasks':
+                b_m = '';
+                b_t = 'activeTab';
+                b_c = '';
+                b_d = '';
                 content = <div className="pad">
                     <div className='comp_title'>
-                    <h2 className='float_left expand'>Delete tasks from selection</h2>
+                        <h2 className='float_left expand'>Delete tasks from selection</h2>
                     </div>
                     <ObjectTable items={this.props.tasks} headings={['name', 'difficulty']} delete={(id) => this.props.delete(id, 'tasks')} />
                 </div>
                 break;
+                
             case 'deleteCompletions':
+                b_m = '';
+                b_t = '';
+                b_c = 'activeTab';
+                b_d = '';
                 content = <div className="pad">
                     <div className='comp_title'>
-                    <h2>Delete task completions</h2>
+                        <h2 className='float_left expand'>Delete task completions</h2>
                     </div>
                     <ObjectTable items={this.props.completions} headings={['fname', 'lname', 'name', 'date']} delete={(id) => this.props.delete(id, 'completions')} />
+                </div>
+                break;
+            case 'deleteHouse':
+                b_m = '';
+                b_t = '';
+                b_c = '';
+                b_d = 'activeTab';
+                content = <div className="pad">
+                    <div className='comp_title'>
+                        <h2 className='float_left expand'>Delete {this.props.house}</h2>
+                    </div>
+                    <h4>WARNING: THIS CANNOT BE UNDONE</h4>
+                    <button onClick={() => {
+                        this.props.delete(this.props.houseId, 'houses'); 
+                        if (typeof (Storage) !== 'undefined') {
+                            localStorage.removeItem('houseSelection');
+                        }
+                        setTimeout(()=>location.reload(), 1000);
+                    }}>Delete</button>
+
                 </div>
                 break;
             default:
@@ -61,18 +101,19 @@ class Admin extends React.Component {
         }
 
         if (this.state.admin === null) {
-            return (<div style={spinner_css}><Loader color={'#000000'}/></div>);
+            return (<div style={spinner_css}><Loader color={'#000000'} /></div>);
         } else if (this.state.admin === false) {
             return (<span>User is not admin</span>);
         } else if (this.state.admin === true) {
             return (
                 <div>
                     <div className='row'>
-                        <button className='four columns' onClick={() => { this.setState({ page: 'addMembers' }); }}>Add house members</button>
-                        <button className='four columns' onClick={() => { this.setState({ page: 'deleteTasks' }); }}>Delete tasks</button>
-                        <button className='four columns' onClick={() => { this.setState({ page: 'deleteCompletions' }); }}>Delete completions</button>
+                        <button className={'three columns ' + b_m} onClick={() => { this.setState({ page: 'addMembers' }); }}>Members</button>
+                        <button className={'three columns ' + b_t} onClick={() => { this.setState({ page: 'deleteTasks' }); }}>Tasks</button>
+                        <button className={'three columns ' + b_c} onClick={() => { this.setState({ page: 'deleteCompletions' }); }}>Completions</button>
+                        <button className={'three columns ' + b_d} onClick={() => { this.setState({ page: 'deleteHouse' }); }}>Delete house</button>
                     </div>
-                    
+
                     <div>{content}</div>
                 </div>
             );
