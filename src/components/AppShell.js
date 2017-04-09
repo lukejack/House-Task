@@ -104,7 +104,6 @@ class AppShell extends React.Component {
   addTasks(){
     //Get the new task's ID from the server and add that task to the list
     tools.get('/json/tasks/' + this.state.currentHouse, this, (data, stateRef) => {
-      console.log('Server tasks: ', data);
       stateRef.setState({ tasks: data }, ()=>stateRef.pageChange({ target: { value: 'complete' }, preventDefault: () => { } }));
     });
   }
@@ -144,7 +143,6 @@ class AppShell extends React.Component {
   }
 
   pageChange(e) {
-
     window.onresize = (_)=>{};
     e.preventDefault();
     this.setState({page: e.target.value});
@@ -179,7 +177,6 @@ class AppShell extends React.Component {
     let hasHouses = (this.state.houses.length != 0);
 
     let content;
-    console.log('Tasks in state: ', this.state.tasks);
     switch (this.state.page){
       case 'create':
           content =  <HouseCreate />;

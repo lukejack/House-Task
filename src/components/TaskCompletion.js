@@ -31,9 +31,13 @@ class TaskCompletion extends React.Component {
         }
     }
 
+    componentWillReceiveProps(nextProps) {
+        this.setState({ selectedTask: (this.props.tasks.length > 0) ? this.props.tasks[this.props.tasks.length - 1]._id : undefined });
+    }
+
     componentDidMount() {
         this.field.focus();
-        this.setState({ selectedTask: (this.props.tasks.length > 0) ? this.props.tasks[0]._id : null });
+        this.setState({ selectedTask: (this.props.tasks.length > 0) ? this.props.tasks[0]._id : undefined });
     }
 
     submit() {
@@ -44,15 +48,15 @@ class TaskCompletion extends React.Component {
         else {
 
         }*/
-        if (this.props.tasks.length === 1) {
-            tools.post('/post/taskcomplete', this, (data, stateRef) => {
-                console.log('Response from completion: ', data);
-            }, 'houseId=' + this.props.houseId + '&taskId=' + this.props.tasks[0]._id + '&description=' + this.state.inputText);
-        } else
-            tools.post('/post/taskcomplete', this, (data, stateRef) => {
-                console.log('Response from completion: ', data);
-            }, 'houseId=' + this.props.houseId + '&taskId=' + this.state.selectedTask + '&description=' + this.state.inputText);
-        location.reload();
+        if (this.state.selectedTask !== undefined) {
+            if (this.props.tasks.length === 1) {
+                tools.post('/post/taskcomplete', this, (data, stateRef) => {
+                }, 'houseId=' + this.props.houseId + '&taskId=' + this.props.tasks[0]._id + '&description=' + this.state.inputText);
+            } else
+                tools.post('/post/taskcomplete', this, (data, stateRef) => {
+                }, 'houseId=' + this.props.houseId + '&taskId=' + this.state.selectedTask + '&description=' + this.state.inputText);
+            location.reload();
+        }
     }
 
     showTaskCreation() {
@@ -62,12 +66,10 @@ class TaskCompletion extends React.Component {
     taskCreationFinished(tasks) {
         tools.post('/post/taskadd', this, (data, stateRef) => {
             if (data.success) {
-                console.log('Success adding task');
                 this.props.addTasks();
             }
         }, 'tasks=' + JSON.stringify(tasks) + '&house=' + this.props.house);
         this.setState({ newTasks: false });
-
     }
 
     taskChange(event) {
@@ -75,7 +77,6 @@ class TaskCompletion extends React.Component {
     }
 
     render() {
-        console.log('Tasks in inner render: ', this.props.tasks);
         let errorMessage = this.state.error ? this.state.error : '';
         let tasklist = (this.props.tasks && this.props.tasks.length > 0) ? this.props.tasks.map((task) => <option key={task._id} value={task._id}>{task.name}</option>) : <span>Loading...</span>;
         if (this.state.newTasks) return (<HC_tasks houseName={this.props.house} incrementStep={() => { }} setTasks={this.taskCreationFinished} />)
@@ -87,7 +88,7 @@ class TaskCompletion extends React.Component {
                     </div>
                     <div className='row'>
                         <h4 className='two columns'>Task</h4>
-                        <select name='houses' className='seven columns' onChange={this.taskChange}>
+                        <select name='houses' value={this.state.selectedTask} className='seven columns' onChange={this.taskChange}>
                             {tasklist}
                         </select>
                         <button className='three columns' type="submit" onClick={this.showTaskCreation}>New Task</button>

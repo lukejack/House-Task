@@ -11,11 +11,10 @@ function genId() {
     return id++;
 }
 
-class HC_members extends React.Component {
+class Completions extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            tasks: this.props.tasks,
             window_width: window.innerWidth
             || document.documentElement.clientWidth
             || document.body.clientWidth
@@ -102,4 +101,4 @@ class HC_members extends React.Component {
     }
 }
 
-export default HC_members;
+export default Completions;

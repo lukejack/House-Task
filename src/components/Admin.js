@@ -39,7 +39,6 @@ class Admin extends React.Component {
         let b_t = '';
         let b_c = '';
         let b_d = '';
-        console.log(this.props.completions);
         switch (this.state.page) {
             
             case 'addMembers':
