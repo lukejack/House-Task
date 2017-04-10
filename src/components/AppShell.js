@@ -22,6 +22,7 @@ class AppShell extends React.Component {
       tasks: null,
       page: null,
       completions: null,
+      members: null,
       error: false,
       icon: false,
       b_t: '',
@@ -38,6 +39,7 @@ class AppShell extends React.Component {
     this.delete = this.delete.bind(this);
     this.addTasks = this.addTasks.bind(this);
     this.getIcon = this.getIcon.bind(this);
+    this.getMembers = this.getMembers.bind(this);
   }
 
   componentDidMount() {
@@ -76,7 +78,11 @@ class AppShell extends React.Component {
             currentHouseId: (data.houses.length > 0) ? data.houses[0]._id : null
           }
       });
-      stateRef.pullData(data);
+      if (data.houses.length > 0) {
+        stateRef.pullData(data)
+      } else {
+        stateRef.pageChange({ target: { value: 'create' }, preventDefault: () => { } });
+      };
     });
   }
 
@@ -87,24 +93,12 @@ class AppShell extends React.Component {
     });
     tools.get('/json/completions/' + this.state.currentHouse, this, (data, stateRef) => {
       stateRef.setState({ completions: data }, () => {
-        //Now we have all the data, we can decide whether to show the stats or house creation interface (wrapping for event function)
-        stateRef.pageChange({ target: { value: (houseData.houses.length > 0) ? 'housestats' : 'create' }, preventDefault: () => { } });
+        stateRef.pageChange({ target: { value: 'housestats' }, preventDefault: () => { } });
       });
     });
-    /*
-    tools.get('/json/icon/' + this.state.currentHouse, this, (data, stateRef) => {
-      if (data.icon) {
-        console.log('Got an icon!');
-        let icon = base64url.unescape(data.icon);
-        while(icon.charAt(icon.length - 1) === '='){
-            icon = icon.slice(0, icon.length - 1);
-        };
 
-        data.icon && stateRef.setState({ icon: icon});
-      }
-    });*/
     this.getIcon(this.state.currentHouse);
-
+    this.getMembers(this.state.currentHouse);
   }
 
   componentWillUnmount() {
@@ -118,16 +112,26 @@ class AppShell extends React.Component {
     });
   }
 
-  getIcon(house){
+  getMembers(house) {
+    tools.get('/json/members/' + house, this, (data, stateRef) => {
+      if (data.members) {
+        this.setState({ members: data.members });
+      } else {
+        //alert('An error has occured while downloading house member details. ', data.error);
+      }
+    });
+  }
+
+  getIcon(house) {
     tools.get('/json/icon/' + house, this, (data, stateRef) => {
       if (data.icon) {
         let icon = base64url.unescape(data.icon);
-        while(icon.charAt(icon.length - 1) === '='){
-            icon = icon.slice(0, icon.length - 1);
+        while (icon.charAt(icon.length - 1) === '=') {
+          icon = icon.slice(0, icon.length - 1);
         };
-        data.icon && stateRef.setState({ icon: icon});
+        data.icon && stateRef.setState({ icon: icon });
       } else {
-        this.setState({icon: false});
+        this.setState({ icon: false });
       }
     });
   }
@@ -144,21 +148,9 @@ class AppShell extends React.Component {
     tools.get('/json/completions/' + eventData[0], this, (data, stateRef) => {
       stateRef.setState({ completions: data }, () => stateRef.pageChange({ target: { value: 'housestats' }, preventDefault: () => { } }));
     });
+
+    this.getMembers(eventData[0]);
     this.getIcon(eventData[0]);
-    /*
-    tools.get('/json/icon/' + this.state.currentHouse, this, (data, stateRef) => {
-      console.log('Data from server: ', data);
-      if (data.icon) {
-        console.log('Got an icon!');
-        let icon = base64url.unescape(data.icon);
-        while(icon.charAt(icon.length - 1) === '='){
-            icon = icon.slice(0, icon.length - 1);
-        };
-        data.icon && stateRef.setState({ icon: icon});
-      } else {
-        this.setState({icon: false});
-      }
-    });*/
 
     //Local storage of selection
     if (typeof (Storage) !== 'undefined') {
@@ -168,13 +160,23 @@ class AppShell extends React.Component {
   }
 
   delete(id, type) {
-    tools.post('/del/' + type, this, (response, stateRef) => {
-      if (response.success) {
-        tools.delete(stateRef, type, id);
-      } else {
-        alert(response.error);
-      }
-    }, 'id=' + id + '&houseId=' + this.state.currentHouseId);
+    if (type === 'members') {
+      tools.post('/remove_member/' + this.state.currentHouse, this, (response, stateRef) => {
+        if (response.success) {
+          tools.delete(stateRef, type, id);
+        } else {
+          alert(response.error);
+        }
+      }, 'id=' + id);
+    } else {
+      tools.post('/del/' + type, this, (response, stateRef) => {
+        if (response.success) {
+          tools.delete(stateRef, type, id);
+        } else {
+          alert(response.error);
+        }
+      }, 'id=' + id + '&houseId=' + this.state.currentHouseId);
+    }
   }
 
   pageChange(e) {
@@ -223,7 +225,7 @@ class AppShell extends React.Component {
         content = <Completions id={this.state.userId} tasks={this.state.completions} houseName={this.state.currentHouse} icon={this.state.icon} />;
         break;
       case 'admin':
-        content = <Admin refresh={this.componentDidMount} house={this.state.currentHouse} houseId={this.state.currentHouseId} tasks={this.state.tasks} completions={this.state.completions} delete={(id, url) => { this.delete(id, url) }} />;
+        content = <Admin refresh={this.componentDidMount} house={this.state.currentHouse} houseId={this.state.currentHouseId} tasks={this.state.tasks} completions={this.state.completions} members={this.state.members} getMembers={this.getMembers} delete={(id, url) => { this.delete(id, url) }} />;
         break;
       default:
         content = <div style={spinner_css}><Loader color={'#000000'} /></div>;

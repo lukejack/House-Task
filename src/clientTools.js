@@ -26,7 +26,7 @@ function post(URL, stateRef, callback, data) {
 
   //Send the proper header information along with the request
   http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  let timeOut = setTimeout(() => { alert('The server did not respond within 5 seconds. It might be down.'); }, 5000);
+  let timeOut = setTimeout(() => { alert('The server did not respond within 20 seconds. It might be down.'); }, 20000);
   http.onreadystatechange = function () {//Call a function when the state changes.
     if (http.readyState == 4 && http.status == 200) {
       clearTimeout(timeOut);

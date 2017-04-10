@@ -139,10 +139,8 @@ module.exports = function (app, passport) {
                 House.findOne({ 'name': req.params.house }, (err, house) => {
                         if (err) { console.log(err); res.send({ error: 'Database Error' }) }
                         if (house.admin === req.user._id.toString()) {
-                                console.log('User is admin');
                                 res.send({ admin: true });
                         } else {
-                                console.log('User is not admin');
                                 res.send({ admin: false });
                         }
                 });
@@ -151,15 +149,22 @@ module.exports = function (app, passport) {
 
 
         app.get('/json/members/:house', isLogged, isMember, (req, res) => {
-                User.find({ 'houses': req.params.house }, (err, users) => {
-                        if (err) console.log(err);
-                        else if (users) {
-                                let response = [];
-                                users.forEach((user) => {
-                                        response.push({ fname: user.fname, lname: user.lname, id: user._id.toString() })
-                                })
-                                res.send(response);
-                        } else res.send({ error: 'No members found' });
+                House.findOne({ 'name': req.params.house }, (err, house) => {
+                        if (err) res.send({ error: 'Database error' });
+                        if (house) {
+                                User.find({ 'houseIds': house._id.toString() }, (err, users) => {
+                                        if (err) console.log(err);
+                                        else if (users) {
+                                                let response = [];
+                                                users.forEach((user) => {
+                                                        response.push({ fname: user.fname, lname: user.lname, id: user._id.toString(), email: user.email })
+                                                })
+                                                res.send({ members: response });
+                                        } else res.send({ error: 'No members found' });
+                                });
+                        } else {
+                                res.send({ error: 'Unable to find a house by that name' });
+                        }
                 });
         });
 
@@ -216,21 +221,18 @@ module.exports = function (app, passport) {
                 });
         });
 
-        app.post('/del/:from', isLogged, function (req, res) {
-                House.findOne({ '_id': mongoose.Types.ObjectId(req.body.houseId) }, (err, house) => {
+        //Url: house name, req.body.id: user id to remove
+        app.post('/remove_member/:house', isLogged, (req, res) => {
+                House.findOne({ 'name': req.params.house }, (err, house) => {
                         if (err) { console.log(err); res.send({ error: 'Database Error' }) }
                         if (house.admin === req.user._id.toString()) {
-                                //User is admin
-                                let from;
-                                if (req.params.from === 'completions'){from = TaskDone;};
-                                if (req.params.from === 'tasks'){from = Task;};
-                                if (req.params.from === 'houses'){from = House;};
-                                from.findByIdAndRemove(req.body.id, (err, item)=>{
-                                        if (err){res.send({error: 'Database error'})};
-                                        if (item){
-                                                res.send({success: true});
+                                User.findOne({ '_id': mongoose.Types.ObjectId(req.body.id), 'houseIds': house._id.toString() }, (err, user) => {
+                                        if (err) { console.log(err); res.send({ error: 'Database Error' }) };
+                                        if (user) {
+                                                user.removeHouseId(house._id.toString());
+                                                res.send({ success: true });
                                         } else {
-                                                res.send({error: 'Unable to find item with Id'});
+                                                res.send({error: 'Could not find that user as a member of that house'});
                                         }
                                 });
                         } else {
@@ -239,20 +241,30 @@ module.exports = function (app, passport) {
                 });
         });
 
-        app.post('/remove_member/:house', isLogged, (req, res)=>{
-                House.findOne({ '_id': mongoose.Types.ObjectId(req.params.house) }, (err, house) => {
+        app.post('/del/:from', isLogged, function (req, res) {
+                House.findOne({ '_id': mongoose.Types.ObjectId(req.body.houseId) }, (err, house) => {
                         if (err) { console.log(err); res.send({ error: 'Database Error' }) }
                         if (house.admin === req.user._id.toString()) {
-                                User.findOne({houses: req.body.id}, (err, user)=>{
-                                        if (err) { console.log(err); res.send({ error: 'Database Error' }) };
-                                        user.removeHouseId(req.body.id);
-                                        res.send({sucess: true});
+                                //User is admin
+                                let from;
+                                if (req.params.from === 'completions') { from = TaskDone; };
+                                if (req.params.from === 'tasks') { from = Task; };
+                                if (req.params.from === 'houses') { from = House; };
+                                from.findByIdAndRemove(req.body.id, (err, item) => {
+                                        if (err) { res.send({ error: 'Database error' }) };
+                                        if (item) {
+                                                res.send({ success: true });
+                                        } else {
+                                                res.send({ error: 'Unable to find item with Id' });
+                                        }
                                 });
                         } else {
                                 res.send({ error: 'You are not the admin for this house' });
                         }
                 });
         });
+
+        
 
         app.get('/logout', function (req, res) {
                 req.logout();

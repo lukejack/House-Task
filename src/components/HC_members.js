@@ -76,6 +76,7 @@ class HC_members extends React.Component{
             memberEmails[i] = this.state.membersToAdd[i].email;
         }
         this.props.setMembers(memberEmails);
+        this.setState({membersToAdd: []});
     }
 
     render(){
@@ -103,7 +104,7 @@ class HC_members extends React.Component{
                 
                 <div>{errorMessage}</div>
                 </label>
-                <button  type="submit" onClick={this.next}>Next</button>
+                <button  type="submit" onClick={this.next}>Add All</button>
             </div>);
     }
 }

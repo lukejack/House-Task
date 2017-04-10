@@ -11,7 +11,7 @@ class Admin extends React.Component {
 
         this.state = {
             admin: null,
-            page: null
+            page: 'addMembers'
         };
 
         this.componentDidMount = this.componentDidMount.bind(this);
@@ -28,9 +28,11 @@ class Admin extends React.Component {
         tools.post('/post/memberadd', this, (data, stateRef) => {
             if (data.error) {
                 alert('There has been an error adding members');
+            } else {
+                this.props.getMembers(this.props.house);
             }
         }, 'house=' + this.props.house + "&members=" + JSON.stringify(members));
-        this.setState({ page: null });
+        //this.setState({ page: 'addMembers' });
     }
 
     render() {
@@ -40,14 +42,16 @@ class Admin extends React.Component {
         let b_c = '';
         let b_d = '';
         switch (this.state.page) {
-            
             case 'addMembers':
                 b_m = 'activeTab';
                 b_t = '';
                 b_c = '';
                 b_d = '';
-                content =  <div><HC_members houseName={this.props.house} incrementStep={() => { }} setMembers={this.addMembers} />
-                </div>;
+                content =  <div>
+                    <HC_members houseName={this.props.house} incrementStep={() => { }} setMembers={this.addMembers} />
+                    {/*Add member removal HTTP call here*/}
+                    <div className="pad"><ObjectTable  items={this.props.members} headings={['fname', 'lname', 'email']} delete={(id) => {this.props.delete(id, 'members');}} /></div>
+                </div>
                 break;
             case 'deleteTasks':
                 b_m = '';

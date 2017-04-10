@@ -24,9 +24,15 @@ userSchema.methods.addHouseId = function (id) {
 };
 
 userSchema.methods.removeHouseId = function (id) {
-    for (let i = 0; i < this.houseIds.length; i++){
-        if (this.houseIds[i] == id){
+    console.log('To compare: ', id);
+    for (let i = 0; i < this.houseIds.length; i++) {
+        console.log('Comparing: ', this.houseIds[i]);
+        if (this.houseIds[i] === id) {
+            console.log('Spliced!');
+            console.log(this.houseIds);
             this.houseIds.splice(i, 1);
+            console.log(this.houseIds);
+            this.save();
         }
     }
 };
