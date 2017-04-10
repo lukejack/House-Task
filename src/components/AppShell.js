@@ -15,7 +15,6 @@ class AppShell extends React.Component {
     super(props);
 
     this.state = {
-      content: <div style={spinner_css}><Loader color={'#000000'} /></div>,
       fname: '...',
       lname: '...',
       houses: [],

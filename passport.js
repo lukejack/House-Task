@@ -14,6 +14,12 @@ module.exports = function (passport) {
         return (false);
     }
 
+    function passwordValid(pass){
+        if (pass.length >= 8){
+            return true;
+        }
+        return false;
+    }
 
     // =========================================================================
     // passport session setup ==================================================
@@ -52,8 +58,15 @@ module.exports = function (passport) {
             process.nextTick(function () {
 
                 if (!mailValid(email)){
-                    console.log('email invalid');
-                    return done(null, false, req.flash('loginMessage', 'That is not a valid email'))
+                    return done(null, false, req.flash('loginMessage', 'Your email does not meet the requirements'));
+                }
+
+                if (!passwordValid(password)){
+                    return done(null, false, req.flash('loginMessage', 'Your password does not meet the requirements'));
+                }
+
+                if (!((req.body.fname && (req.body.fname != '')) && (req.body.lname && (req.body.lname != '')))){
+                    return done(null, false, req.flash('loginMessage', 'You must enter a first and last name'));
                 }
 
                 // find a user whose email is the same as the forms email
