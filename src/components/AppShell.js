@@ -224,7 +224,7 @@ class AppShell extends React.Component {
         content = <Completions id={this.state.userId} tasks={this.state.completions} houseName={this.state.currentHouse} icon={this.state.icon} />;
         break;
       case 'admin':
-        content = <Admin refresh={this.componentDidMount} house={this.state.currentHouse} houseId={this.state.currentHouseId} tasks={this.state.tasks} completions={this.state.completions} members={this.state.members} getMembers={this.getMembers} delete={(id, url) => { this.delete(id, url) }} />;
+        content = <Admin refresh={this.componentDidMount} pageChange={this.pageChange} getIcon={this.getIcon} house={this.state.currentHouse} houseId={this.state.currentHouseId} tasks={this.state.tasks} completions={this.state.completions} members={this.state.members} getMembers={this.getMembers} delete={(id, url) => { this.delete(id, url) }} />;
         break;
       default:
         content = <div style={spinner_css}><Loader color={'#000000'} /></div>;

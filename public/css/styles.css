@@ -109,3 +109,15 @@ table {
 .expand {
 	width: 100%;
 }
+
+.one-fifth_button{
+	width: 20% !important;
+	padding: 0;
+}
+
+@media (max-width: 549px){
+	.one-fifth_button{
+	width: 100% !important;
+	padding: 0;
+	}
+}

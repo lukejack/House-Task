@@ -6,7 +6,7 @@ function get(URL, stateRef, callback, data) {
 
   xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 
-  let timeOut = setTimeout(() => { alert('The server did not respond within 5 seconds. It might be down.'); }, 5000);
+  let timeOut = setTimeout(() => { alert('The server did not respond within 20 seconds. It might be down.'); }, 20000);
   xhr.addEventListener('load', function () {
     if (xhr.status === 200) {
       clearTimeout(timeOut);
