@@ -8,6 +8,7 @@ var mongoose = require('mongoose');
 var passport = require('passport');
 var flash = require('connect-flash');
 var passportSocketIo = require("passport.socketio");
+var schedule = require('node-schedule');
 
 var morgan = require('morgan');
 var cookieParser = require('cookie-parser');
@@ -42,9 +43,9 @@ connectDB();
 
 /*----------CERTIFICATION-----------*/
 
-let privateKey  = fs.readFileSync('sslcert/localhost.key', 'utf8');
+let privateKey = fs.readFileSync('sslcert/localhost.key', 'utf8');
 let certificate = fs.readFileSync('sslcert/localhost.crt', 'utf8');
-let credentials = {key: privateKey, cert: certificate};
+let credentials = { key: privateKey, cert: certificate };
 
 let httpsServer = require('https').createServer(credentials, app);
 let httpServer = require('http').createServer(app);
@@ -69,6 +70,25 @@ app.set('views', __dirname + '/src/static');
 require('./routes')(app, passport);
 app.use(express.static(__dirname + '/public/'));
 
+
+let clean_users = () => {
+  User.find({ mail_valid: { $ne: 'True' } }, (err, users) => {
+    let date = new Date();
+    for (let i = 0; i < users.length; i++) {
+      if ((date.getTime() - users[i].sign_time) > 604800000) {
+        console.log('Removing user ' + users[i].email);
+        users[i].remove();
+
+      }
+    }
+  });
+};
+
+//Delete accounts who have not verified for a week, check every day at midnight
+clean_users();
+var j = schedule.scheduleJob('0 0 0 * * *', function () {
+  clean_users();
+});
 
 
 httpServer.listen(port);

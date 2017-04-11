@@ -188,6 +188,21 @@ module.exports = function (app, passport) {
                 });
         });
 
+        app.get('/verif/:token', (req, res)=>{
+                User.findOne({mail_valid: req.params.token}, (err, user)=>{
+                        if (err) {res.send('There appears to have been a server-side error.')};
+                        if (user){
+                                user.mail_valid = 'True';
+                                user.save((err)=>{
+                                        if (err) res.send('There has been an error verifying your email')
+                                        else res.redirect('/');
+                                });
+                        } else {
+                                res.send('We were unable to find that user');
+                        }
+                });
+        });
+
         //Data submission routes
         app.post('/post/memberadd', isLogged, (req, res) => {
                 ops.addMembers(req.body.house, req.user, JSON.parse(req.body.members), (response) => {
@@ -272,7 +287,7 @@ module.exports = function (app, passport) {
         });
 
         app.post('/post/signup', passport.authenticate('local-signup', {
-                successRedirect: '/', // redirect to the secure profile section
+                successRedirect: '/login', // redirect to the secure profile section
                 failureRedirect: '/login', // redirect back to the signup page if there is an error
                 failureFlash: true // allow flash messages
         }));

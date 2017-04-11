@@ -1,4 +1,7 @@
 var LocalStrategy = require('passport-local').Strategy;
+var randomstring = require('randomstring');
+const nodemailer = require('nodemailer');
+const mail_config = require('./config/mail_verif.js');
 
 // load up the user model
 var User = require('./models/user');
@@ -14,8 +17,8 @@ module.exports = function (passport) {
         return (false);
     }
 
-    function passwordValid(pass){
-        if (pass.length >= 8){
+    function passwordValid(pass) {
+        if (pass.length >= 8) {
             return true;
         }
         return false;
@@ -57,15 +60,15 @@ module.exports = function (passport) {
             // User.findOne wont fire unless data is sent back
             process.nextTick(function () {
 
-                if (!mailValid(email)){
+                if (!mailValid(email)) {
                     return done(null, false, req.flash('loginMessage', 'Your email does not meet the requirements'));
                 }
 
-                if (!passwordValid(password)){
+                if (!passwordValid(password)) {
                     return done(null, false, req.flash('loginMessage', 'Your password does not meet the requirements'));
                 }
 
-                if (!((req.body.fname && (req.body.fname != '')) && (req.body.lname && (req.body.lname != '')))){
+                if (!((req.body.fname && (req.body.fname != '')) && (req.body.lname && (req.body.lname != '')))) {
                     return done(null, false, req.flash('loginMessage', 'You must enter a first and last name'));
                 }
 
@@ -84,6 +87,7 @@ module.exports = function (passport) {
                         // if there is no user with that email
                         // create the user
                         var newUser = new User();
+                        let date = new Date();
 
                         // set the user's local credentials
                         newUser.email = email;
@@ -91,11 +95,34 @@ module.exports = function (passport) {
                         newUser.fname = req.body.fname;
                         newUser.lname = req.body.lname;
 
+                        //Email verification properties
+                        newUser.sign_time = date.getTime();
+                        let verif_token = randomstring.generate({ length: 20, charset: 'alphabetic' });
+                        newUser.mail_valid = verif_token;
+                        let transporter = nodemailer.createTransport({
+                            service: 'gmail',
+                            auth: mail_config
+                        });
+
+                        let mailOptions = {
+                            from: '"House-Task" <' + mail_config.user + '>', // sender address
+                            to: email, // list of receivers
+                            subject: 'House-Task Email Verification', // Subject line
+                            text: 'Thank you for signing up to House-Task! Please click the link below to confirm your registration:\nhttp://localhost:8000/verif/' + verif_token // plain text body
+                        };
+
+                        transporter.sendMail(mailOptions, (error, info) => {
+                            if (error) {
+                                return console.log(error);
+                            }
+                            console.log('Message %s sent: %s', info.messageId, info.response);
+                        });
+
                         // save the user
                         newUser.save(function (err) {
                             if (err)
                                 throw err;
-                            return done(null, newUser);
+                            return done(null, false, req.flash('loginMessage', 'Please click the email verification link'));
                         });
                     }
 
@@ -123,13 +150,15 @@ module.exports = function (passport) {
                 // if no user is found, return the message
                 if (!user)
                     return done(null, false, req.flash('loginMessage', 'No user found.')); // req.flash is the way to set flashdata using connect-flash
-
+                
                 // if the user is found but the password is wrong
                 if (!user.validPassword(password))
                     return done(null, false, req.flash('loginMessage', 'Wrong password.')); // create the loginMessage and save it to session as flashdata
 
-                // all is well, return successful user
-                return done(null, user);
+                if (user.mail_valid === 'True')
+                    return done(null, user);
+                else
+                    return done(null, false, req.flash('loginMessage', 'You need to click the verification link in the email we sent you'));
             });
 
         }));

@@ -7,7 +7,9 @@ var userSchema = mongoose.Schema({
     password: String,
     fname: String,
     lname: String,
-    houseIds: [String]
+    houseIds: [String],
+    mail_valid: String,
+    sign_time: Number
 });
 
 userSchema.methods.generateHash = function (password) {
@@ -24,14 +26,9 @@ userSchema.methods.addHouseId = function (id) {
 };
 
 userSchema.methods.removeHouseId = function (id) {
-    console.log('To compare: ', id);
     for (let i = 0; i < this.houseIds.length; i++) {
-        console.log('Comparing: ', this.houseIds[i]);
         if (this.houseIds[i] === id) {
-            console.log('Spliced!');
-            console.log(this.houseIds);
             this.houseIds.splice(i, 1);
-            console.log(this.houseIds);
             this.save();
         }
     }

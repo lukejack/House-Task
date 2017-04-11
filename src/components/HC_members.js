@@ -104,7 +104,7 @@ class HC_members extends React.Component{
                 
                 <div>{errorMessage}</div>
                 </label>
-                <button  type="submit" onClick={this.next}>Add All</button>
+                <button  type="submit" onClick={this.next}>Add All/ Continue</button>
             </div>);
     }
 }
