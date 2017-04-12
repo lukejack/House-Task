@@ -38,3 +38,6 @@ jspm_packages
 
 # bundle
 public/bundle.js
+
+#log
+log.txt

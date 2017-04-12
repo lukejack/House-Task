@@ -7,7 +7,6 @@ var port = process.env.port || 8000;
 var mongoose = require('mongoose');
 var passport = require('passport');
 var flash = require('connect-flash');
-var passportSocketIo = require("passport.socketio");
 var schedule = require('node-schedule');
 
 var morgan = require('morgan');
@@ -52,7 +51,21 @@ let httpServer = require('http').createServer(app);
 
 /*----------EXPRESS SETUP-----------*/
 require('./passport')(passport);
-//console.log(__dirname + '\public\favicon.ico');
+
+//Log data to the server
+app.use((req, res, next) => {
+  let date = new Date();
+  let line = date.getDate() + '/' + date.getMonth() + '/' + date.getFullYear() + ' (' + date.getHours() + ':' + date.getMinutes()
+    + ") " + (req.headers['x-forwarded-for'] ||
+    req.connection.remoteAddress ||
+    req.socket.remoteAddress ||
+    req.connection.socket.remoteAddress) + ' ' + req.originalUrl + '\n';
+  fs.appendFile('log.txt', line, function (err) {
+    if (err) console.log(err);
+  });
+  next();
+});
+
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(morgan('dev'));
 app.use(cookieParser());
@@ -69,6 +82,7 @@ app.set('views', __dirname + '/src/static');
 
 require('./routes')(app, passport);
 app.use(express.static(__dirname + '/public/'));
+
 
 
 let clean_users = () => {

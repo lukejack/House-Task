@@ -1,5 +1,7 @@
 import React from 'react';
 import HC_tasks from './HC_tasks';
+var Loader = require('halogen/MoonLoader');
+var spinner_css = require('../react-styles.js').spinner;
 let tools = require('../clientTools');
 
 class TaskCompletion extends React.Component {
@@ -77,7 +79,7 @@ class TaskCompletion extends React.Component {
 
     render() {
         let errorMessage = this.state.error ? this.state.error : '';
-        let tasklist = (this.props.tasks && this.props.tasks.length > 0) ? this.props.tasks.map((task) => <option key={task._id} value={task._id}>{task.name}</option>) : <span>Loading...</span>;
+        let tasklist = (this.props.tasks && this.props.tasks.length > 0) ? this.props.tasks.map((task) => <option key={task._id} value={task._id}>{task.name}</option>) : <option></option>;
         if (this.state.newTasks) return (<HC_tasks houseName={this.props.house} incrementStep={() => { }} setTasks={this.taskCreationFinished} />)
         else
             return (
