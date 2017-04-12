@@ -22,9 +22,18 @@ class Admin extends React.Component {
     }
 
     componentDidMount() {
-        tools.get('/json/admin/' + this.props.house, this, (data, stateRef) => {
-            stateRef.setState({ admin: data.admin });
-        });
+        let sesh = JSON.parse(sessionStorage.getItem(this.props.house));
+        if (!sesh){sesh = {}};
+        if (sesh.admin) {
+            this.setState({ admin: sesh.admin });
+        } else {
+            tools.get('/json/admin/' + this.props.house, this, (data, stateRef) => {
+                sesh.admin = data.admin;
+                sessionStorage.removeItem(this.props.house);
+                sessionStorage.setItem(this.props.house, JSON.stringify(sesh));
+                stateRef.setState({ admin: data.admin });
+            });
+        }
     }
 
     addMembers(members) {
@@ -151,6 +160,8 @@ class Admin extends React.Component {
                     <div>{content}</div>
                 </div>
             );
+        } else{
+            console.log('Admin: ', this.state.admin);
         }
     }
 }
