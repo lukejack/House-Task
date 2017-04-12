@@ -86,16 +86,17 @@ class AppShell extends React.Component {
   }
 
   pullData(houseData) {
-    //Get all the tasks for the selected house
-    tools.get('/json/tasks/' + this.state.currentHouse, this, (data, stateRef) => {
-      stateRef.setState({ tasks: data });
-    });
+
     tools.get('/json/completions/' + this.state.currentHouse, this, (data, stateRef) => {
       stateRef.setState({ completions: data }, () => {
         stateRef.pageChange({ target: { value: 'housestats' }, preventDefault: () => { } });
       });
     });
 
+    //Get all the tasks for the selected house
+    tools.get('/json/tasks/' + this.state.currentHouse, this, (data, stateRef) => {
+      stateRef.setState({ tasks: data });
+    });
     this.getIcon(this.state.currentHouse);
     this.getMembers(this.state.currentHouse);
   }
@@ -122,17 +123,24 @@ class AppShell extends React.Component {
   }
 
   getIcon(house) {
-    tools.get('/json/icon/' + house, this, (data, stateRef) => {
-      if (data.icon) {
-        let icon = base64url.unescape(data.icon);
-        while (icon.charAt(icon.length - 1) === '=') {
-          icon = icon.slice(0, icon.length - 1);
-        };
-        data.icon && stateRef.setState({ icon: icon });
-      } else {
-        this.setState({ icon: false });
-      }
-    });
+    const sesh = sessionStorage.getItem(house);
+    if (sesh) {
+      this.setState({icon: JSON.parse(sesh).icon});
+    } else {
+      tools.get('/json/icon/' + house, this, (data, stateRef) => {
+        if (data.icon) {
+          let icon = base64url.unescape(data.icon);
+          while (icon.charAt(icon.length - 1) === '=') {
+            icon = icon.slice(0, icon.length - 1);
+          };
+          stateRef.setState({ icon: icon });
+          sessionStorage.setItem(house, JSON.stringify({ icon: icon }));
+        } else {
+          this.setState({ icon: false });
+          sessionStorage.setItem(house, JSON.stringify({ icon: false }));
+        }
+      });
+    }
   }
 
   houseChange(event) {

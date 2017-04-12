@@ -39,6 +39,7 @@ class Admin extends React.Component {
 
     setImage(image) {
         if (!image.preview) {
+            sessionStorage.setItem(this.props.house, JSON.stringify({ icon: image }));
             tools.post('/post/imageadd', this, (data, stateRef) => {
                 stateRef.props.getIcon(stateRef.props.house);
                 stateRef.props.pageChange({ target: { value: 'housestats' }, preventDefault: () => { } });

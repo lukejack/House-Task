@@ -10,8 +10,8 @@ class Drop extends React.Component {
         this.state = {
             prev: false,
             cropTemp: {
-                        aspect: 1
-                    },
+                aspect: 1
+            },
             cropSpec: null,
             can_continue: true
         };
@@ -36,7 +36,7 @@ class Drop extends React.Component {
 
         imgObject.src = this.state.prev;
         var newImg = getImagePortion(imgObject, this.state.cropSpec.width, this.state.cropSpec.height, this.state.cropSpec.x, this.state.cropSpec.y, 1);
-        this.setState({ prev: false, crop: newImg});
+        this.setState({ prev: false, crop: newImg });
         function getImagePortion(imgObj, newWidth, newHeight, startX, startY, ratio) {
             /* the parameters: - the image element - the new width - the new height - the x point we start taking pixels - the y point we start taking pixels - the ratio */
             //set up canvas for thumbnail
@@ -52,12 +52,11 @@ class Drop extends React.Component {
             bufferContext.drawImage(imgObj, 0, 0);
 
             /* now we use the drawImage method to take the pixels from our bufferCanvas and draw them into our thumbnail canvas */
-            tnCanvasContext.drawImage(bufferCanvas, startX, startY, newWidth * ratio, newHeight * ratio, 0, 0, newWidth, newHeight);
+            tnCanvasContext.drawImage(bufferCanvas, startX, startY, newWidth * ratio, newHeight * ratio, 0, 0, 100, 100);
             return tnCanvas.toDataURL();
         }
-        //console.log('Bottom setting image: ', this.state.crop);
         this.props.setImage(newImg);
-        this.setState({can_continue: true});
+        this.setState({ can_continue: true });
     }
 
     render() {
@@ -68,13 +67,13 @@ class Drop extends React.Component {
                 <div>
                     <p>Please drag to crop your image into a square before continuing</p>
                     <button onClick={this.cropFinish}>Crop</button>
-                    <Crop src={this.state.prev} onComplete={this.onCropChange} minWidth={20} minHeight={20} crop={this.state.cropTemp} style={{width: '200px'}}/>
-                    
+                    <Crop src={this.state.prev} onComplete={this.onCropChange} minWidth={20} minHeight={20} crop={this.state.cropTemp} style={{ width: '200px' }} />
+
                 </div>;
 
         } else {
             if (this.state.crop) {
-                imagePreview = <img src={this.state.crop} style={{maxWidth: '70vw'}}></img>;
+                imagePreview = <img src={this.state.crop} style={{ maxWidth: '70vw' }}></img>;
             } else
                 imagePreview = <p></p>;
         }

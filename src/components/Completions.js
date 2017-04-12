@@ -72,7 +72,7 @@ class Completions extends React.Component {
 
         
 
-        let img = this.props.icon ? <img className='icon' src={this.props.icon}/> : <div></div>;
+        let img = this.props.icon ? <div className='icon' style={{backgroundImage: 'url(' + this.props.icon + ')'}}></div> : <div></div>;
         return (
             <div className="pad">
                 <div className='comp_title'>
