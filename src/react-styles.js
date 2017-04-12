@@ -1,3 +1,5 @@
+//Stles as react style objects
+
 let spinner = {
     display: '-webkit-flex',
     display: 'flex',

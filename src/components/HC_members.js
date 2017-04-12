@@ -1,15 +1,18 @@
+//Component to add members to a house
+
 import React from 'react';
 import ObjectTable from './ObjectTable';
 let tools = require('../clientTools');
 
 let id = 0;
 
-function genId(){
+function genId() {
+    //Generate an ID unique to this component
     return id++;
 }
 
-class HC_members extends React.Component{
-    constructor(props){
+class HC_members extends React.Component {
+    constructor(props) {
         super(props);
 
         this.state = {
@@ -21,90 +24,94 @@ class HC_members extends React.Component{
             field: ''
         };
 
+        //Function bindings
         this.handleChange = this.handleChange.bind(this);
         this.handleKeyPress = this.handleKeyPress.bind(this);
         this.submit = this.submit.bind(this);
         this.next = this.next.bind(this);
     }
 
-    handleChange(event){
-        
+    handleChange(event) {
+        //Input text change 
         event.persist();
-        this.setState((prevState, props)=>{return {currentInput: event.target.value}});
+        this.setState((prevState, props) => { return { currentInput: event.target.value } });
     }
 
-    componentDidMount(){
+    componentDidMount() {
+        //Select input box immediately
         this.field.focus();
     }
 
-    submit(){
-        if (this.state.currentInput == '')
-        {
+    submit() {
+        if (this.state.currentInput == '') {
             this.setState({
                 error: 'There is no text in the box'
             });
         } else
-        tools.get('/json/getuser/' + this.state.currentInput, this, function(data, stateRef){
-            if (data.error)
-                stateRef.setState((prevState, props)=>{return {error: data.error}});
-            else
-                {
-                    stateRef.setState((prevState, props)=>{
+            //Get this user's details from the server and load them into the state
+            tools.get('/json/getuser/' + this.state.currentInput, this, function (data, stateRef) {
+                if (data.error)
+                    stateRef.setState((prevState, props) => { return { error: data.error } });
+                else {
+                    stateRef.setState((prevState, props) => {
                         let currentMembers = prevState.membersToAdd;
-                        currentMembers.push({email: prevState.currentInput, fname: data.fname, lname: data.lname, id: genId()});
-                        
+                        currentMembers.push({ email: prevState.currentInput, fname: data.fname, lname: data.lname, id: genId() });
+
                         return {
                             membersToAdd: currentMembers,
                             error: false
                         }
                     });
-                    stateRef.setState({currentInput : ''})
+                    //Wipe text box
+                    stateRef.setState({ currentInput: '' })
                 }
-        });
+            });
     }
 
     handleKeyPress(target) {
-        if(target.charCode==13){
+        //Submit on enter pressed
+        if (target.charCode == 13) {
             this.submit();
         }
     }
 
-    next(){
+    next() {
+        //Go to the next step determined by the parent
         this.props.incrementStep();
         let memberEmails = [];
-        for (let i = 0; i < this.state.membersToAdd.length; i++){
+        for (let i = 0; i < this.state.membersToAdd.length; i++) {
             memberEmails[i] = this.state.membersToAdd[i].email;
         }
         this.props.setMembers(memberEmails);
-        this.setState({membersToAdd: []});
+        this.setState({ membersToAdd: [] });
     }
 
-    render(){
-        
-        let errorMessage;
+    render() {
 
+        //Display an error message if it exists
+        let errorMessage;
         if (this.state.error) {
             errorMessage = this.state.error;
         } else
             errorMessage = '';
-        
-        return(
+
+        return (
             <div className="pad">
                 <div className='comp_title'>
-                        <h2 className='float_left expand'>Add Members: {this.state.houseName}</h2>
-                    </div>
+                    <h2 className='float_left expand'>Add Members: {this.state.houseName}</h2>
+                </div>
                 <h5>
                     (You can add more later, and need not add yourself)
                 </h5>
-                <ObjectTable items={this.state.membersToAdd} headings={['fname', 'email']} delete={(id)=>tools.delete(this, 'membersToAdd', id)}/>
+                <ObjectTable items={this.state.membersToAdd} headings={['fname', 'email']} delete={(id) => tools.delete(this, 'membersToAdd', id)} />
                 <label>
-                    User's email: 
-                    <input type="text" onChange={this.handleChange} value={this.state.currentInput} onKeyPress={this.handleKeyPress} ref={(input)=>{this.field = input;}} autoCorrect="off" autoCapitalize="none"/>
-                <button type="submit" onClick={this.submit}>Submit</button>
-                
-                <div>{errorMessage}</div>
+                    User's email:
+                    <input type="text" onChange={this.handleChange} value={this.state.currentInput} onKeyPress={this.handleKeyPress} ref={(input) => { this.field = input; }} autoCorrect="off" autoCapitalize="none" />
+                    <button type="submit" onClick={this.submit}>Submit</button>
+
+                    <div>{errorMessage}</div>
                 </label>
-                <button  type="submit" onClick={this.next}>Add All/ Continue</button>
+                <button type="submit" onClick={this.next}>Add All/ Continue</button>
             </div>);
     }
 }

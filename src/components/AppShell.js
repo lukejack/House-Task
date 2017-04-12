@@ -1,5 +1,6 @@
+//Root component of web app
+
 import React from 'react';
-import { Link } from 'react-router';
 import HouseCreate from './HouseCreate';
 import TaskCompletion from './TaskCompletion';
 import Completions from './Completions';
@@ -30,8 +31,8 @@ class AppShell extends React.Component {
       b_a: ''
     }
 
+    //Function binding
     this.componentDidMount = this.componentDidMount.bind(this);
-    this.componentWillUnmount = this.componentWillUnmount.bind(this);
     this.houseChange = this.houseChange.bind(this);
     this.pageChange = this.pageChange.bind(this);
     this.pullData = this.pullData.bind(this);
@@ -42,7 +43,7 @@ class AppShell extends React.Component {
   }
 
   componentDidMount() {
-    //Get user information
+    //Get user information into state
     tools.get('/json/user', this, function (data, stateRef) {
       if (typeof (Storage) !== "undefined") {
         let houseSelectionJSON = localStorage.getItem('houseSelection');
@@ -66,7 +67,7 @@ class AppShell extends React.Component {
     });
 
     //Get all of the houses the user is a member of
-    tools.get('/json/houses', this, function (data, stateRef) {
+    tools.get('/json/houses', this, (data, stateRef) => {
       stateRef.setState((prevState, props) => {
         if (prevState.currentHouse && prevState.currentHouseId)
           return { houses: data.houses }
@@ -78,15 +79,17 @@ class AppShell extends React.Component {
           }
       });
       if (data.houses.length > 0) {
+        //If there are houses, pull data
         stateRef.pullData(data)
       } else {
+        //Otherwise go to the house creation
         stateRef.pageChange({ target: { value: 'create' }, preventDefault: () => { } });
       };
     });
   }
 
   pullData(houseData) {
-
+    //Get tasks, completions, members, and icon for house
     tools.get('/json/completions/' + this.state.currentHouse, this, (data, stateRef) => {
       stateRef.setState({ completions: data }, () => {
         stateRef.pageChange({ target: { value: 'housestats' }, preventDefault: () => { } });
@@ -101,10 +104,6 @@ class AppShell extends React.Component {
     this.getMembers(this.state.currentHouse);
   }
 
-  componentWillUnmount() {
-
-  }
-
   addTasks() {
     //Get the new task's ID from the server and add that task to the list
     tools.get('/json/tasks/' + this.state.currentHouse, this, (data, stateRef) => {
@@ -113,18 +112,20 @@ class AppShell extends React.Component {
   }
 
   getMembers(house) {
+    //Get all members of house
     tools.get('/json/members/' + house, this, (data, stateRef) => {
       if (data.members) {
         this.setState({ members: data.members });
       } else {
-        //alert('An error has occured while downloading house member details. ', data.error);
+        if (data.error) { alert(data.error) };
       }
     });
   }
 
   getIcon(house) {
+    //Use icon in session storage, or download new icon
     let sesh = JSON.parse(sessionStorage.getItem(house));
-    if (!sesh){sesh = {}};
+    if (!sesh) { sesh = {} };
     if (sesh && sesh.icon) {
       this.setState({ icon: sesh.icon });
     } else {
@@ -148,6 +149,7 @@ class AppShell extends React.Component {
   }
 
   houseChange(event) {
+    //Get data for new changed house
     this.pageChange({ target: { value: 'spinner' }, preventDefault: () => { } });
     let eventData = JSON.parse(event.target.value);
     this.setState({ currentHouse: eventData[0], currentHouseId: eventData[1], icon: false });
@@ -171,7 +173,9 @@ class AppShell extends React.Component {
   }
 
   delete(id, type) {
+    //Used to delete an item server side and client side
     if (type === 'members') {
+      //Members removal
       tools.post('/remove_member/' + this.state.currentHouse, this, (response, stateRef) => {
         if (response.success) {
           tools.delete(stateRef, type, id);
@@ -180,6 +184,7 @@ class AppShell extends React.Component {
         }
       }, 'id=' + id);
     } else {
+      //Any other removal
       tools.post('/del/' + type, this, (response, stateRef) => {
         if (response.success) {
           tools.delete(stateRef, type, id);
@@ -191,9 +196,13 @@ class AppShell extends React.Component {
   }
 
   pageChange(e) {
+    //New page is selected from the top
+
+    //Set window resize to nothing so that it does call functions in unmounted components
     window.onresize = (_) => { };
     e.preventDefault();
     this.setState({ page: e.target.value });
+    //Set tab selection css
     switch (e.target.value) {
       case 'create':
         this.setState({
@@ -221,9 +230,11 @@ class AppShell extends React.Component {
   }
 
   render() {
+    //Map houses for drop down selection
     let housesList = this.state.houses.map((house) => <option key={house.name} value={JSON.stringify([house.name, house._id])}>{house.name}</option>);
     let hasHouses = (this.state.houses.length != 0);
 
+    //Set main page content
     let content;
     switch (this.state.page) {
       case 'create':

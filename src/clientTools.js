@@ -68,6 +68,7 @@ function find(collection, attribute, value) {
 }
 
 function time(time) {
+  //Format time into the time since that time
   let timeAgo;
   let minutesAgo = ((new Date().getTime()) - time) / 60000;
   if (minutesAgo < 60)

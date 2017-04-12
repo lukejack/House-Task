@@ -1,3 +1,5 @@
+//Component to set the name of the house
+
 import React from 'react';
 import Drop from './HC_image';
 let tools = require('../clientTools');

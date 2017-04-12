@@ -1,3 +1,5 @@
+//Row in the task completions page
+
 import React from 'react';
 let time_format = require('../clientTools.js').time;
 
@@ -10,20 +12,14 @@ class CompletionRow extends React.Component {
         };
 
         this.componentDidMount = this.componentDidMount.bind(this);
-        //this.remove = this.remove.bind(this);
     }
 
     componentDidMount() {
 
     }
 
-    /*
-    remove(){
-        console.log('rows remove called');
-        this.props.removeThis(this.state.item.id);
-    }*/
-
     render() {
+        //Set difficulty colour as one of 3 values
         let difficulty = this.state.completion.difficulty;
         let difficultyColour;
         switch(true){

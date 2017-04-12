@@ -1,3 +1,5 @@
+//Page for submitting a task completion
+
 import React from 'react';
 import HC_tasks from './HC_tasks';
 var Loader = require('halogen/MoonLoader');
@@ -14,6 +16,7 @@ class TaskCompletion extends React.Component {
             newTasks: false
         };
 
+        //Function bindings
         this.handleChange = this.handleChange.bind(this);
         this.submit = this.submit.bind(this);
         this.handleKeyPress = this.handleKeyPress.bind(this);
@@ -24,62 +27,72 @@ class TaskCompletion extends React.Component {
     }
 
     handleChange(event) {
+        //Description input changed text
         this.setState({ inputText: event.target.value });
     }
 
     handleKeyPress(target) {
+        //Enter button submission key shortcut
         if (target.charCode == 13) {
             this.submit();
         }
     }
 
     componentWillReceiveProps(nextProps) {
+        //Properties changed (new task added, select this newly added task)
         this.setState({ selectedTask: (this.props.tasks.length > 0) ? this.props.tasks[this.props.tasks.length - 1]._id : undefined });
     }
 
     componentDidMount() {
+        //Set the selected task if any tasks exist
         this.setState({ selectedTask: (this.props.tasks.length > 0) ? this.props.tasks[0]._id : undefined });
     }
 
     submit() {
         const input = this.state.inputText;
-        /*
-        if (input === '')
-            this.setState({ error: 'Please enter a short description' });
-        else {
-
-        }*/
         if (this.state.selectedTask !== undefined) {
+            //Send to server
             if (this.props.tasks.length === 1) {
                 tools.post('/post/taskcomplete', this, (data, stateRef) => {
                 }, 'houseId=' + this.props.houseId + '&taskId=' + this.props.tasks[0]._id + '&description=' + this.state.inputText);
             } else
                 tools.post('/post/taskcomplete', this, (data, stateRef) => {
                 }, 'houseId=' + this.props.houseId + '&taskId=' + this.state.selectedTask + '&description=' + this.state.inputText);
+            //Reload the page
             location.reload();
         }
     }
 
     showTaskCreation() {
+        //Change state to task creation mode
         this.setState({ newTasks: true });
     }
 
     taskCreationFinished(tasks) {
+        //Add new tasks to server and sync these new tasks with the client
         tools.post('/post/taskadd', this, (data, stateRef) => {
             if (data.success) {
                 this.props.addTasks();
             }
         }, 'tasks=' + JSON.stringify(tasks) + '&house=' + this.props.house);
+
+        //Go back to normal mode displaying completion submission
         this.setState({ newTasks: false });
     }
 
     taskChange(event) {
+        //New task selected from the dropdown
         this.setState({ selectedTask: event.target.value });
     }
 
     render() {
+        //Display an error message if it exists
         let errorMessage = this.state.error ? this.state.error : '';
+        
+        //Map tasks to the drop down box
         let tasklist = (this.props.tasks && this.props.tasks.length > 0) ? this.props.tasks.map((task) => <option key={task._id} value={task._id}>{task.name}</option>) : <option></option>;
+        
+        //Display task creation if it has been selected
         if (this.state.newTasks) return (<HC_tasks houseName={this.props.house} incrementStep={() => { }} setTasks={this.taskCreationFinished} />)
         else
             return (

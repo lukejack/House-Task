@@ -1,9 +1,10 @@
+//Icon upload component
+
 var React = require('react');
 var Dropzone = require('react-dropzone');
 import Crop from 'react-image-crop';
 
 //Component using http://okonet.ru/react-dropzone/
-//IMPLEMENT CAN CONTINUE
 class Drop extends React.Component {
     constructor(props) {
         super(props);
@@ -62,7 +63,6 @@ class Drop extends React.Component {
     render() {
         let imagePreview;
         if (this.state.prev) {
-            //imagePreview = <img src={this.state.prev} style={{maxWidth: "100px", maxHeight: "100px", objectFit: "contain"}}/>
             imagePreview =
                 <div>
                     <p>Please drag to crop your image into a square before continuing</p>

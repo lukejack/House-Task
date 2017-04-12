@@ -1,3 +1,5 @@
+//House creation 'wizard' parent component
+
 import React from 'react';
 import HC_name from './HC_name';
 import HC_members from './HC_members';
@@ -18,6 +20,7 @@ class HouseCreate extends React.Component {
             tasks: []
         };
 
+        //Function bindings
         this.incrementStep = this.incrementStep.bind(this);
         this.setHouseName = this.setHouseName.bind(this);
         this.setMembers = this.setMembers.bind(this);
@@ -27,6 +30,7 @@ class HouseCreate extends React.Component {
     }
 
     incrementStep() {
+        //Change step in state which affects the current page
         this.setState((prevState, props) => {
             return {
                 step: prevState.step + 1
@@ -35,6 +39,7 @@ class HouseCreate extends React.Component {
     }
 
     setHouseName(name) {
+        //Set the name of the house from child component
         this.setState((prevState, props) => {
             return {
                 houseName: name
@@ -43,11 +48,12 @@ class HouseCreate extends React.Component {
     }
 
     setMembers(members) {
+        //Set the members of the house from child component
         this.setState((prevState, props) => { return { members: members } });
     }
 
     setTasks(tasks) {
-
+        //Set tasks from the child component and call finishing function to upload to server
         let tasksToSend = [];
         //Remove ID field from tasks for POST
         for (let i = 0; i < tasks.length; i++)
@@ -61,6 +67,7 @@ class HouseCreate extends React.Component {
     }
 
     setImage(file) {
+        //Set the image of a house from child component
         this.setState({ image: file });
     }
 
@@ -96,6 +103,8 @@ class HouseCreate extends React.Component {
     }
 
     render() {
+
+        //Page is based on the step in state, so incrementing the step goes to the next stage of the 'wizard'
         let currentStep;
         switch (this.state.step) {
             case 0:

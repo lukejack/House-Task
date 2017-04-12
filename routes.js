@@ -24,7 +24,6 @@ module.exports = function (app, passport) {
         };
 
         //Page routes
-
         app.get('/', function (req, res, next) {
                 if (req.isAuthenticated())
                         res.sendFile(__dirname + '/public/index.html');
@@ -38,12 +37,6 @@ module.exports = function (app, passport) {
                 else
                         res.redirect('/login');
         });
-
-        /*
-        app.get('/entry.ejs', function (req, res) {
-                res.sendFile(__dirname + '/src/static/entry.ejs');
-        });*/
-
         app.get('/login', function (req, res, next) {
                 res.render('entry', { message: req.flash('loginMessage') });
         });

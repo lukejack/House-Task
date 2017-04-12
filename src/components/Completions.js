@@ -1,3 +1,5 @@
+//House completions page
+
 import React from 'react';
 import ObjectTable from './ObjectTable';
 import CompletionRow from './CompletionRow';
@@ -14,6 +16,8 @@ function genId() {
 class Completions extends React.Component {
     constructor(props) {
         super(props);
+
+        //Put window dimensions in state for javascript-sized elements
         this.state = {
             window_width: window.innerWidth
             || document.documentElement.clientWidth
@@ -22,6 +26,7 @@ class Completions extends React.Component {
     }
 
     componentDidMount() {
+        //Set window resize function to trigger resizing of javascript-sized elements
         window.onresize = (_) => {
             if (this.state.window_width != window.innerWidth) {
                 this.setState({
@@ -34,19 +39,21 @@ class Completions extends React.Component {
     }
 
     render() {
+        //Display an error message if an error exists
         let errorMessage;
-
         if (this.state.error) {
             errorMessage = this.state.error;
         } else
             errorMessage = '';
+
+        //Map house task completions
         let completionRows = (this.props.tasks === null) ? (<tr><td>Loading</td></tr>) : this.props.tasks.map((completion) => {
             return (<CompletionRow completion={completion} key={completion._id} />);
         }).reverse();
 
+        //Construct bar chart and determine if the user has completed a task recently for a reminder
         let barData = [];
         let use_last_week = false;
-
         if (this.props.tasks.length === 0) {
             completionRows = <tr><td>You don't have any task completions. Select 'Tasks' from the top to submit some!</td></tr>;
         } else {
@@ -71,7 +78,7 @@ class Completions extends React.Component {
         }
 
         
-
+        //Display house icon if it exists
         let img = this.props.icon ? <div className='icon' style={{backgroundImage: 'url(' + this.props.icon + ')'}}></div> : <div></div>;
         return (
             <div className="pad">

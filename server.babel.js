@@ -16,7 +16,6 @@ var session = require('express-session');
 var favicon = require('serve-favicon');
 var path = require('path');
 
-
 import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactDOMServer from 'react-dom/server';
@@ -83,8 +82,7 @@ app.set('views', __dirname + '/src/static');
 require('./routes')(app, passport);
 app.use(express.static(__dirname + '/public/'));
 
-
-
+//Delete unverified users not verified after a week
 let clean_users = () => {
   User.find({ mail_valid: { $ne: 'True' } }, (err, users) => {
     let date = new Date();

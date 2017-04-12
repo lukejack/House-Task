@@ -7,6 +7,7 @@ const mail_config = require('./config/mail_verif.js');
 var User = require('./models/user');
 
 // expose this function to our app using module.exports
+//https://scotch.io/tutorials/easy-node-authentication-setup-and-local
 module.exports = function (passport) {
 
     function mailValid(mail) {
@@ -104,6 +105,7 @@ module.exports = function (passport) {
                             auth: mail_config
                         });
 
+                        //Email verification link
                         let mailOptions = {
                             from: '"House-Task" <' + mail_config.user + '>', // sender address
                             to: email, // list of receivers
@@ -115,13 +117,13 @@ module.exports = function (passport) {
                             if (error) {
                                 return console.log(error);
                             }
-                            console.log('Message %s sent: %s', info.messageId, info.response);
                         });
 
                         // save the user
                         newUser.save(function (err) {
                             if (err)
                                 throw err;
+                            //Tell them to check their email
                             return done(null, false, req.flash('loginMessage', 'Please click the email verification link'));
                         });
                     }
@@ -150,7 +152,7 @@ module.exports = function (passport) {
                 // if no user is found, return the message
                 if (!user)
                     return done(null, false, req.flash('loginMessage', 'No user found.')); // req.flash is the way to set flashdata using connect-flash
-                
+
                 // if the user is found but the password is wrong
                 if (!user.validPassword(password))
                     return done(null, false, req.flash('loginMessage', 'Wrong password.')); // create the loginMessage and save it to session as flashdata

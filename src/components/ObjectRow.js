@@ -1,9 +1,12 @@
+//Component to display a row in an ObjectTable
+
 import React from 'react';
 let time_format = require('../clientTools.js').time;
 
 let id = 0;
 
 function genId() {
+    //Create ID unique to this component
     return id++;
 }
 
@@ -15,15 +18,11 @@ class ObjectRow extends React.Component {
             headings: props.headings
         };
 
-        this.componentDidMount = this.componentDidMount.bind(this);
         this.remove = this.remove.bind(this);
     }
 
-    componentDidMount() {
-
-    }
-
     remove() {
+        //Delete this item from its collection via an ID
         this.props.removeThis(this.state.item.id || this.state.item._id);
     }
 

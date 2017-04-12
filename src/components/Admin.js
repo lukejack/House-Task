@@ -1,3 +1,5 @@
+//Admin page
+
 import React from 'react';
 import HC_members from './HC_members';
 import HC_image from './HC_image';
@@ -11,17 +13,20 @@ class Admin extends React.Component {
     constructor(props) {
         super(props);
 
+        //Set default page to addMembers
         this.state = {
             admin: null,
             page: 'addMembers'
         };
 
+        //Function binding
         this.componentDidMount = this.componentDidMount.bind(this);
         this.addMembers = this.addMembers.bind(this);
         this.setImage = this.setImage.bind(this);
     }
 
     componentDidMount() {
+        //Find out whether the user is the admin of the house from session / server
         let sesh = JSON.parse(sessionStorage.getItem(this.props.house));
         if (!sesh){sesh = {}};
         if (sesh.admin) {
@@ -37,6 +42,7 @@ class Admin extends React.Component {
     }
 
     addMembers(members) {
+        //Add members then sync our member list with the server
         tools.post('/post/memberadd', this, (data, stateRef) => {
             if (data.error) {
                 alert('There has been an error adding members');
@@ -47,7 +53,9 @@ class Admin extends React.Component {
     }
 
     setImage(image) {
+        //Set image if it does not have the preview property (incomplete cropping)
         if (!image.preview) {
+            //Set in session and on server
             sessionStorage.setItem(this.props.house, JSON.stringify({ icon: image }));
             tools.post('/post/imageadd', this, (data, stateRef) => {
                 stateRef.props.getIcon(stateRef.props.house);
@@ -58,11 +66,15 @@ class Admin extends React.Component {
 
     render() {
         let content;
+
+        //Variables for selected button styling
         let b_m = '';
         let b_t = '';
         let b_c = '';
         let b_d = '';
         let b_i = '';
+
+        //Select which component to display based on the selected page
         switch (this.state.page) {
             case 'addMembers':
                 b_m = 'activeTab';
@@ -72,7 +84,6 @@ class Admin extends React.Component {
                 b_i = '';
                 content = <div>
                     <HC_members houseName={this.props.house} incrementStep={() => { }} setMembers={this.addMembers} />
-                    {/*Add member removal HTTP call here*/}
                     <div className="pad"><ObjectTable items={this.props.members} headings={['fname', 'lname', 'email']} delete={(id) => { this.props.delete(id, 'members'); }} /></div>
                 </div>
                 break;
@@ -143,6 +154,7 @@ class Admin extends React.Component {
         }
 
         if (this.state.admin === null) {
+            //Admin state has not been determined yet, display spinner
             return (<div style={spinner_css}><Loader color={'#000000'} /></div>);
         } else if (this.state.admin === false) {
             return (<span>User is not admin</span>);
@@ -160,8 +172,6 @@ class Admin extends React.Component {
                     <div>{content}</div>
                 </div>
             );
-        } else{
-            console.log('Admin: ', this.state.admin);
         }
     }
 }
