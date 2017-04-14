@@ -110,7 +110,7 @@ module.exports = function (passport) {
                             from: '"House-Task" <' + mail_config.user + '>', // sender address
                             to: email, // list of receivers
                             subject: 'House-Task Email Verification', // Subject line
-                            text: 'Thank you for signing up to House-Task! Please click the link below to confirm your registration:\nhttp://localhost:8000/verif/' + verif_token // plain text body
+                            text: 'Thank you for signing up to House-Task! Please click the link below to confirm your registration:\nhttp://http://82.25.22.122/verif/' + verif_token // plain text body
                         };
 
                         transporter.sendMail(mailOptions, (error, info) => {

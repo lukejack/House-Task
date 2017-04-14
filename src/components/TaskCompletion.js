@@ -51,15 +51,28 @@ class TaskCompletion extends React.Component {
     submit() {
         const input = this.state.inputText;
         if (this.state.selectedTask !== undefined) {
-            //Send to server
+            //Send to server, start spinner
             if (this.props.tasks.length === 1) {
+            
                 tools.post('/post/taskcomplete', this, (data, stateRef) => {
+                    if (data.error){
+                        alert(data.error);
+                    }
+                    if (data.completion){
+                        stateRef.props.addCompletion(data.completion);
+                    }
                 }, 'houseId=' + this.props.houseId + '&taskId=' + this.props.tasks[0]._id + '&description=' + this.state.inputText);
             } else
                 tools.post('/post/taskcomplete', this, (data, stateRef) => {
+                    if (data.error){
+                        alert(data.error);
+                    }
+                    if (data.completion){
+                        stateRef.props.addCompletion(data.completion);
+                    }
                 }, 'houseId=' + this.props.houseId + '&taskId=' + this.state.selectedTask + '&description=' + this.state.inputText);
             //Reload the page
-            location.reload();
+            this.props.pageChange({ target: { value: 'housestats' }, preventDefault: () => { } });
         }
     }
 

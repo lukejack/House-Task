@@ -57,6 +57,7 @@ class Admin extends React.Component {
         if (!image.preview) {
             //Set in session and on server
             sessionStorage.setItem(this.props.house, JSON.stringify({ icon: image }));
+            this.setState({page: 'spinner'});
             tools.post('/post/imageadd', this, (data, stateRef) => {
                 stateRef.props.getIcon(stateRef.props.house);
                 stateRef.props.pageChange({ target: { value: 'housestats' }, preventDefault: () => { } });
@@ -147,6 +148,9 @@ class Admin extends React.Component {
                     </div>
                     <HC_image setImage={this.setImage} />
                 </div>
+                break;
+            case 'spinner':
+                content = <div style={spinner_css}><Loader color={'#000000'} /></div>
                 break;
             default:
                 content = <div></div>

@@ -105,11 +105,22 @@ function addCompletion(houseId, taskId, user, description, cb) {
                     completion.taskId = task._id.toString();
                     completion.date = date.getTime();
                     completion.description = description;
+
+                    let niceCompletion = {
+                        fname: user.fname,
+                        lname: user.lname,
+                        userId: user._id.toString(),
+                        name: task.name,
+                        difficulty: task.difficulty,
+                        date: completion.date,
+                        description: completion.description,
+                        _id: completion._id
+                    };
                     completion.save(function (err) {
                         if (err) {
                             throw err;
                             cb({ error: 'Database error' });
-                        } else cb({ success: true });
+                        } else cb({ success: true , completion: niceCompletion});
                     });
 
                 } else cb({ error: 'Invalid house or task' });

@@ -40,6 +40,7 @@ class AppShell extends React.Component {
     this.addTasks = this.addTasks.bind(this);
     this.getIcon = this.getIcon.bind(this);
     this.getMembers = this.getMembers.bind(this);
+    this.addCompletion = this.addCompletion.bind(this);
   }
 
   componentDidMount() {
@@ -91,6 +92,7 @@ class AppShell extends React.Component {
   pullData(houseData) {
     //Get tasks, completions, members, and icon for house
     tools.get('/json/completions/' + this.state.currentHouse, this, (data, stateRef) => {
+      //console.log('Completions: ', data);
       stateRef.setState({ completions: data }, () => {
         stateRef.pageChange({ target: { value: 'housestats' }, preventDefault: () => { } });
       });
@@ -195,6 +197,14 @@ class AppShell extends React.Component {
     }
   }
 
+  addCompletion(completion){
+    this.setState((prevState, props)=>{
+      let newCompletions = prevState.completions;
+      newCompletions.push(completion);
+      return {completions: newCompletions};
+    });
+  }
+
   pageChange(e) {
     //New page is selected from the top
 
@@ -241,7 +251,7 @@ class AppShell extends React.Component {
         content = <HouseCreate />;
         break;
       case 'complete':
-        content = <TaskCompletion addTasks={this.addTasks} house={this.state.currentHouse} houseId={this.state.currentHouseId} tasks={this.state.tasks} />;
+        content = <TaskCompletion addTasks={this.addTasks} house={this.state.currentHouse} houseId={this.state.currentHouseId} tasks={this.state.tasks} addCompletion={this.addCompletion} pageChange={this.pageChange}/>;
         break;
       case 'housestats':
         content = <Completions id={this.state.userId} tasks={this.state.completions} houseName={this.state.currentHouse} icon={this.state.icon} />;
