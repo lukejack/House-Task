@@ -106,10 +106,14 @@ class AppShell extends React.Component {
     this.getMembers(this.state.currentHouse);
   }
 
-  addTasks() {
-    //Get the new task's ID from the server and add that task to the list
-    tools.get('/json/tasks/' + this.state.currentHouse, this, (data, stateRef) => {
-      stateRef.setState({ tasks: data }, () => stateRef.pageChange({ target: { value: 'complete' }, preventDefault: () => { } }));
+  addTasks(tasks) {
+    //Add this new task to our state
+    this.setState((prevState, props)=>{
+      let newTasks = prevState.tasks;
+      tasks.forEach((task)=>{
+        newTasks.push(task);
+      });
+      return {tasks: newTasks};
     });
   }
 

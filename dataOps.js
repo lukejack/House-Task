@@ -59,6 +59,7 @@ function addTasks(houseName, user, tasks, cb) {
         if (house) {
             user.isMember(houseName, (member) => {
                 if (member) {
+                    let tasksToReturn = [];
                     tasks.forEach((task) => {
                         var newTask = new Task();
                         newTask.name = task.name;
@@ -67,9 +68,12 @@ function addTasks(houseName, user, tasks, cb) {
                         newTask.difficulty = task.difficulty;
                         newTask.save(function (err) {
                             if (err) throw err;
+                            tasksToReturn.push(newTask);
+                            if (tasksToReturn.length === tasks.length){
+                                cb({ success: true , tasks: tasksToReturn});
+                            }
                         });
                     });
-                    cb({ success: true });
                 } else cb({ error: 'You are not a member of this house' });
             });
         }
