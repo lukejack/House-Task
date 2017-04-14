@@ -39,7 +39,7 @@ class HC_members extends React.Component {
 
     componentDidMount() {
         //Select input box immediately
-        this.field.focus();
+        if (!this.props.noFocus) {this.field.focus(); console.log('Focus')}
     }
 
     submit() {

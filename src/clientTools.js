@@ -20,7 +20,6 @@ function get(URL, stateRef, callback, data) {
 
 //HTTP POST
 function post(URL, stateRef, callback, data) {
-  //console.log('POST: ', URL, data, callback);
   var http = new XMLHttpRequest();
   http.open("POST", URL, true);
 
@@ -51,7 +50,6 @@ function deleteFromCollection(stateRef, collectionName, id) {
         newTasks.splice(i, 1);
       }
     }
-    console.log('Setting state to new tasks: ', newTasks);
     return {
       [collectionName]: newTasks
     };

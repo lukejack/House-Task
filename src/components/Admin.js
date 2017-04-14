@@ -84,7 +84,7 @@ class Admin extends React.Component {
                 b_d = '';
                 b_i = '';
                 content = <div>
-                    <HC_members houseName={this.props.house} incrementStep={() => { }} setMembers={this.addMembers} />
+                    <HC_members houseName={this.props.house} incrementStep={() => { }} setMembers={this.addMembers} noFocus={true}/>
                     <div className="pad"><ObjectTable items={this.props.members} headings={['fname', 'lname', 'email']} delete={(id) => { this.props.delete(id, 'members'); }} /></div>
                 </div>
                 break;

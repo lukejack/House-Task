@@ -92,7 +92,6 @@ class AppShell extends React.Component {
   pullData(houseData) {
     //Get tasks, completions, members, and icon for house
     tools.get('/json/completions/' + this.state.currentHouse, this, (data, stateRef) => {
-      //console.log('Completions: ', data);
       stateRef.setState({ completions: data }, () => {
         stateRef.pageChange({ target: { value: 'housestats' }, preventDefault: () => { } });
       });
