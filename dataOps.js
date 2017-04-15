@@ -20,8 +20,7 @@ function createHouse(name, user, cb) {
                 if (err) {
                     cb({ error: 'Database error' });
                 } else {
-                    user.addHouseId(createdHouse._id.toString());
-                    cb({ success: 'true' });
+                    user.addHouseId(createdHouse._id.toString(), ()=>{cb({ success: 'true' });});
                 }
             });
         }
@@ -29,55 +28,63 @@ function createHouse(name, user, cb) {
 }
 
 function addMembers(house, user, members, cb) {
-    user.isMember(house, (member) => {
-        if (member) {
-            House.findOne({ 'admin': user._id, 'name': house }, (err, foundHouse) => {
-                if (err) { console.log(err); cb({ error: 'Database error' }); }
-                if (foundHouse) {
-                    User.find({
-                        'email': {
-                            $in: members
-                        }
-                    }, function (err, usersGot) {
-                        if (err) { console.log(err); cb({ error: 'Database error' }) }
-                        usersGot.forEach((one) => {
-                            one.isMember(foundHouse.name, (is) => {
-                                if (!is) one.addHouseId(foundHouse._id.toString());
-                            })
+    if (members && members.length > 0) {
+        user.isMember(house, (member) => {
+            if (member) {
+                House.findOne({ 'admin': user._id, 'name': house }, (err, foundHouse) => {
+                    if (err) { console.log(err); cb({ error: 'Database error' }); }
+                    if (foundHouse) {
+                        User.find({
+                            'email': {
+                                $in: members
+                            }
+                        }, function (err, usersGot) {
+                            if (err) { console.log(err); cb({ error: 'Database error' }) }
+                            usersGot.forEach((one) => {
+                                one.isMember(foundHouse.name, (is) => {
+                                    if (!is) one.addHouseId(foundHouse._id.toString());
+                                })
+                            });
+                            cb({ success: true });
                         });
-                        cb({ success: true });
-                    });
-                } else cb({ error: 'You are not the administrator of this house' });
-            });
-        } else cb({ error: 'You are not a member of this house' });
-    });
+                    } else cb({ error: 'You are not the administrator of this house' });
+                });
+            } else cb({ error: 'You are not a member of this house' });
+        });
+    } else {
+        cb({ success: true });
+    }
 }
 
 function addTasks(houseName, user, tasks, cb) {
-    House.findOne({ 'name': houseName }, (err, house) => {
-        if (err) throw err;
-        if (house) {
-            user.isMember(houseName, (member) => {
-                if (member) {
-                    let tasksToReturn = [];
-                    tasks.forEach((task) => {
-                        var newTask = new Task();
-                        newTask.name = task.name;
-                        newTask.houseId = house._id.toString();
-                        newTask.description = task.description;
-                        newTask.difficulty = task.difficulty;
-                        newTask.save(function (err) {
-                            if (err) throw err;
-                            tasksToReturn.push(newTask);
-                            if (tasksToReturn.length === tasks.length){
-                                cb({ success: true , tasks: tasksToReturn});
-                            }
+    if (tasks && tasks.length > 0) {
+        House.findOne({ 'name': houseName }, (err, house) => {
+            if (err) throw err;
+            if (house) {
+                user.isMember(houseName, (member) => {
+                    if (member) {
+                        let tasksToReturn = [];
+                        tasks.forEach((task) => {
+                            var newTask = new Task();
+                            newTask.name = task.name;
+                            newTask.houseId = house._id.toString();
+                            newTask.description = task.description;
+                            newTask.difficulty = task.difficulty;
+                            newTask.save(function (err) {
+                                if (err) throw err;
+                                tasksToReturn.push(newTask);
+                                if (tasksToReturn.length === tasks.length) {
+                                    cb({ success: true, tasks: tasksToReturn });
+                                }
+                            });
                         });
-                    });
-                } else cb({ error: 'You are not a member of this house' });
-            });
-        }
-    });
+                    } else cb({ error: 'You are not a member of this house' });
+                });
+            }
+        });
+    } else {
+        cb({success: true});
+    }
 
 }
 
@@ -91,7 +98,7 @@ function addImage(houseName, user, image, cb) {
                     cb({ success: true });
                 } else cb({ error: 'You are not a member of this house' });
             });
-    } else cb({error: 'Unable to find that house'});
+        } else cb({ error: 'Unable to find that house' });
     });
 
 }
@@ -124,7 +131,7 @@ function addCompletion(houseId, taskId, user, description, cb) {
                         if (err) {
                             throw err;
                             cb({ error: 'Database error' });
-                        } else cb({ success: true , completion: niceCompletion});
+                        } else cb({ success: true, completion: niceCompletion });
                     });
 
                 } else cb({ error: 'Invalid house or task' });
@@ -199,7 +206,7 @@ function getCompletions(houseId, user, cb) {
     });
 }
 
-function includes(arr, item){
+function includes(arr, item) {
     for (let i = 0; i < arr.length; i++)
         if (arr[i] === item)
             return true

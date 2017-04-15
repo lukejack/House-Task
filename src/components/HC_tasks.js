@@ -42,7 +42,7 @@ class HC_tasks extends React.Component {
         this.field.focus();
     }
 
-    submit() {
+    submit(cb) {
         const input = this.state.currentInput;
         if (input === '') {
             this.setState({
@@ -63,11 +63,12 @@ class HC_tasks extends React.Component {
                 lastTasks.push(thisTask)
 
                 return {
-                    tasksToAdd: lastTasks
+                    tasksToAdd: lastTasks,
+                    currentInput: '',
+                     currentDifficulty: 5
                 }
-            }
+            }, cb
             );
-            this.setState({ currentInput: '', currentDifficulty: 5 });
         }
     }
 
@@ -85,8 +86,16 @@ class HC_tasks extends React.Component {
 
     next() {
         //Go to next determined by parent
-        this.props.incrementStep();
-        this.props.setTasks(this.state.tasksToAdd);
+        const input = this.state.currentInput;
+        if (input === ''){
+            this.props.incrementStep();
+            this.props.setTasks(this.state.tasksToAdd);
+        } else {
+            this.submit(()=>{
+                this.props.incrementStep();
+                this.props.setTasks(this.state.tasksToAdd);
+            });
+        }
     }
 
     render() {

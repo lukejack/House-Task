@@ -76,25 +76,28 @@ class HouseCreate extends React.Component {
         this.setState({ step: 'Spinner' });
         tools.post('/post/housecreate', this, (data, stateRef) => {
             if (data.success) {
-                setTimeout(() => {
-                    if (stateRef.state.image) {
-                        tools.post('/post/imageadd', stateRef, (data, stateRef) => {
-                        }, 'house=' + stateRef.state.houseName + '&image=' + base64url.escape(stateRef.state.image));
+                tools.post('/post/memberadd', stateRef, (data, stateRef) => {
+                    if (data.error) {
+                        alert('Member add error: ', data.error);
+                    } else {
+                        tools.post('/post/taskadd', stateRef, (data, stateRef) => {
+                            if (data.success) {
+                                if (stateRef.state.image) {
+                                    tools.post('/post/imageadd', stateRef, (data, stateRef) => {
+                                        window.location.reload();
+                                        alert('Your house is being created, please wait a moment');
+                                    }, 'house=' + stateRef.state.houseName + '&image=' + base64url.escape(stateRef.state.image));
+                                } else {
+                                    window.location.reload();
+                                    alert('Your house is being created, please wait a moment');
+                                }
+                            } else {
+                                alert('Task add error: ', data.error);
+                            }
+                        }, 'tasks=' + JSON.stringify(tasks) + '&house=' + stateRef.state.houseName);
                     }
-                    tools.post('/post/memberadd', stateRef, (data, stateRef) => {
-                        if (data.error) {
-                            alert('Member add error: ', data.error);
-                        }
-                    }, 'house=' + stateRef.state.houseName + "&members=" + JSON.stringify(stateRef.state.members));
-                    tools.post('/post/taskadd', stateRef, (data, stateRef) => {
-                        if (data.success) {
-                            window.location.reload();
-                        } else {
-                            alert('Task add error: ', data.error);
-                        }
-                    }, 'tasks=' + JSON.stringify(tasks) + '&house=' + stateRef.state.houseName);
-                    alert('House created. You can select this house from the drop down menu at the bottom of site');
-                }, 4000);
+                }, 'house=' + stateRef.state.houseName + "&members=" + JSON.stringify(stateRef.state.members));
+
             } else {
                 alert(data.error ? data.error : 'Unfortunately, we were unable to create your house at this time. Please try again later');
             }

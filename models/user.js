@@ -20,9 +20,10 @@ userSchema.methods.validPassword = function (password) {
     return bcrypt.compareSync(password, this.password);
 };
 
-userSchema.methods.addHouseId = function (id) {
+userSchema.methods.addHouseId = function (id, cb) {
     this.houseIds.push(id);
     this.save();
+    if (cb){cb()};
 };
 
 userSchema.methods.removeHouseId = function (id) {
