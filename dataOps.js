@@ -141,30 +141,42 @@ function addCompletion(houseId, taskId, user, description, cb) {
 
 }
 
+//Get the completions of a house via the house Id and the requesting user
 function getCompletions(houseId, user, cb) {
+    //Find the house by that ID
     House.findOne({ '_id': mongoose.Types.ObjectId(houseId) }, (err, house) => {
+        //If the user is a member of the house they are requesting
         user.isMember(house.name, (is) => {
             if (house && is) {
+                //Find all the task completions by that house
                 TaskDone.find({ 'houseId': houseId }, (err, completions) => {
-
                     if (err) cb({ error: 'Database error' });
                     if (!completions) cb({ error: 'No data' });
+
                     let taskIds = [];
                     let userIds = [];
+
+                    //For each of the completions, take the task and user references they contain
                     for (let i = 0; i < completions.length; i++) {
                         let thisTaskId = mongoose.Types.ObjectId(completions[i].taskId);
                         let thisUserId = mongoose.Types.ObjectId(completions[i].userId);
+
+                        //Ensure only one of each is added
                         if (!includes(thisTaskId))
                             taskIds.push(thisTaskId);
                         if (!includes(thisUserId))
                             userIds.push(thisUserId);
                     }
+
+                    //Get all of the users from their IDs
                     User.find({
                         '_id': {
                             $in: userIds
                         }
                     }, function (err, users) {
                         if (err) { console.log(err); cb({ error: 'Database error' }) }
+
+                        //Then get all of the tasks from their IDs
                         Task.find({
                             '_id': {
                                 $in: taskIds
@@ -172,9 +184,12 @@ function getCompletions(houseId, user, cb) {
                         }, function (err, tasks) {
                             if (err) { console.log(err); cb({ error: 'Database error' }) }
 
+                            //Format completion objects which contain verbose user and task data
+                            //For each completion, find the user and task it is referencing
                             let niceCompletions = [];
                             for (let i = 0; i < completions.length; i++) {
                                 let thisNiceCompletion = {};
+
                                 users.forEach((user) => {
                                     if (completions[i].userId === user._id.toString()) {
                                         thisNiceCompletion.fname = user.fname;
@@ -190,12 +205,16 @@ function getCompletions(houseId, user, cb) {
                                     }
                                 });
 
+                                //Add the remaining completion data
                                 thisNiceCompletion.date = completions[i].date;
                                 thisNiceCompletion.description = completions[i].description;
                                 thisNiceCompletion._id = completions[i]._id;
 
+                                //Add this completion to the array
                                 niceCompletions.push(thisNiceCompletion);
                             }
+
+                            //Return all completions
                             cb(niceCompletions);
                         });
                     });
