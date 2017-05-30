@@ -42,3 +42,4 @@ public/bundle.js
 #log
 log.txt
 node_modules/
+sslcert/
